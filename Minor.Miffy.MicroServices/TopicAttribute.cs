@@ -12,11 +12,10 @@ namespace Minor.Miffy.MicroServices
     /// </summary>
     public class TopicAttribute : Attribute
     {
-        public TopicAttribute(string topicPattern)
-        {
-            // TODO
-        }
-
+        public string TopicPattern { get; }
+        
+        public TopicAttribute(string topicPattern) => TopicPattern = topicPattern;
+        
         // TODO
     }
 }

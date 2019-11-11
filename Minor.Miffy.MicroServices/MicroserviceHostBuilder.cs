@@ -26,6 +26,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
+            return this;
         }
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder UseConventions()
         {
+            return this;
         }
 
         /// <summary>
@@ -40,6 +42,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder AddEventListener<T>()
         {
+            return this;
         }
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
         {
+            return this;
         }
 
         /// <summary>
@@ -54,6 +58,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
         {
+            return this;
         }
 
         /// <summary>

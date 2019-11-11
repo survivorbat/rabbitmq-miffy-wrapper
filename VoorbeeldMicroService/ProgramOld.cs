@@ -8,7 +8,7 @@ namespace VoorbeeldMicroService
 {
     class ProgramOld
     {
-        static void Main(string[] args)
+        /*static*/ void Main(string[] args)
         {
             var contextBuilder = new RabbitMQContextBuilder()
                     .WithExchange("MVM.EventExchange")

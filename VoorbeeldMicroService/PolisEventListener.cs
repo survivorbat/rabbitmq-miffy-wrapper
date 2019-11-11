@@ -5,15 +5,13 @@ using System.Text;
 
 namespace VoorbeeldMicroService
 {
-    [EventListener(queueName:"MVM.TestService.PolisEventListenerQueue")]
+    [EventListener(queueNahmm
+    ime:"MVM.TestService.PolisEventListenerQueue")]
     public class PolisEventListener
     {
         private readonly IDbContextOptions<PolisContext> _context;
 
-        public PolisEventListener(IDbContextOptions<PolisContext> context)
-        {
-            _context = context;
-        }
+        public PolisEventListener(IDbContextOptions<PolisContext> context) => _context = context;
 
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(PolisToegevoegdEvent evt)
