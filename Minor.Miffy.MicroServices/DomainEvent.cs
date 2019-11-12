@@ -26,7 +26,7 @@ namespace Minor.Miffy.MicroServices
         /// The ID uniquely identifies the domain event.
         /// </summary>
         [JsonProperty]
-        public Guid ID { get; private set; }
+        public Guid Id { get; private set; }
 
         /// <summary>
         /// Creates a domain event by setting the topic and generating a timestamp.
@@ -36,7 +36,7 @@ namespace Minor.Miffy.MicroServices
         {
             Topic = topic;
             Timestamp = DateTime.Now.Ticks;
-            ID = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
     }
 

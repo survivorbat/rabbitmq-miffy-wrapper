@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy", "Minor.Miffy\Minor.Miffy.csproj", "{47F7C74F-1730-42F5-A5C2-7802F0AFD182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.Core", "Minor.Miffy.Core\Minor.Miffy.Core.csproj", "{47F7C74F-1730-42F5-A5C2-7802F0AFD182}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.MicroServices", "Minor.Miffy.MicroServices\Minor.Miffy.MicroServices.csproj", "{7D36EFF3-C185-41F8-958D-5DBB55E7B344}"
 EndProject
@@ -15,6 +15,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{ED2CE3AD
 	ProjectSection(SolutionItems) = preProject
 		Miffy Opdracht.md = Miffy Opdracht.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoorbeeldMicroService2", "VoorbeeldMicroServic2e\VoorbeeldMicroService2.csproj", "{0CD2F3A2-DF2F-4A77-92F8-454DF4F019F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.Core.Test", "Minor.Miffy.Core.Test\Minor.Miffy.Core.Test.csproj", "{6628A592-5D27-4F54-9C0F-2B36D42C0023}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus.Test", "Minor.Miffy.RabbitMQBus.Test\Minor.Miffy.RabbitMQBus.Test.csproj", "{019C1378-C135-425A-A59B-80285364165E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.MicroServices.Test", "Minor.Miffy.MicroServices.Test\Minor.Miffy.MicroServices.Test.csproj", "{EF238689-8FA9-4D93-B58E-08DD1970E324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoorbeeldMicroService.Test", "VoorbeeldMicroService.Test\VoorbeeldMicroService.Test.csproj", "{755DBB7C-5834-4AEB-9A6E-EAD4BEB46558}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,11 +48,33 @@ Global
 		{183F572D-7160-4B29-ABC3-367A9E874488}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{183F572D-7160-4B29-ABC3-367A9E874488}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{183F572D-7160-4B29-ABC3-367A9E874488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CD2F3A2-DF2F-4A77-92F8-454DF4F019F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CD2F3A2-DF2F-4A77-92F8-454DF4F019F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CD2F3A2-DF2F-4A77-92F8-454DF4F019F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CD2F3A2-DF2F-4A77-92F8-454DF4F019F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6628A592-5D27-4F54-9C0F-2B36D42C0023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6628A592-5D27-4F54-9C0F-2B36D42C0023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6628A592-5D27-4F54-9C0F-2B36D42C0023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6628A592-5D27-4F54-9C0F-2B36D42C0023}.Release|Any CPU.Build.0 = Release|Any CPU
+		{019C1378-C135-425A-A59B-80285364165E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{019C1378-C135-425A-A59B-80285364165E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{019C1378-C135-425A-A59B-80285364165E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{019C1378-C135-425A-A59B-80285364165E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF238689-8FA9-4D93-B58E-08DD1970E324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF238689-8FA9-4D93-B58E-08DD1970E324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF238689-8FA9-4D93-B58E-08DD1970E324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF238689-8FA9-4D93-B58E-08DD1970E324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{755DBB7C-5834-4AEB-9A6E-EAD4BEB46558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{755DBB7C-5834-4AEB-9A6E-EAD4BEB46558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{755DBB7C-5834-4AEB-9A6E-EAD4BEB46558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{755DBB7C-5834-4AEB-9A6E-EAD4BEB46558}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08833567-777F-4F9F-ACC8-6B04F02175A9}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

@@ -16,7 +16,5 @@ namespace Minor.Miffy.MicroServices
         public string QueueName { get; }
         
         public EventListenerAttribute(string queueName) => QueueName = queueName;
-
-        // TODO
     }
 }

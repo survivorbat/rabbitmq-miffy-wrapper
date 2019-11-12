@@ -9,8 +9,7 @@ namespace Minor.Miffy.MicroServices
     {
         public static IHostBuilder ConfigureMicroServiceHostDefaults(this IHostBuilder builder, Action<IHostBuilder> configuration)
         {
-            // TODO:
-
+            configuration.Invoke(builder);
             return builder;
         }
     }

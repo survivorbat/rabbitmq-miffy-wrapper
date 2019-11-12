@@ -2,14 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Minor.Miffy</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
+    <Folder Include="TestBus\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Minor.Miffy.Core\Minor.Miffy.Core.csproj" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>
 
 </Project>

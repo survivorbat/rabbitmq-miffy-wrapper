@@ -15,7 +15,5 @@ namespace Minor.Miffy.MicroServices
         public string TopicPattern { get; }
         
         public TopicAttribute(string topicPattern) => TopicPattern = topicPattern;
-        
-        // TODO
     }
 }

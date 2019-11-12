@@ -8,18 +8,17 @@ namespace Minor.Miffy.MicroServices
     /// <summary>
     /// Listens to incoming events and dispatches them to the appropriate handler
     /// </summary>
-    public class MicroserviceHost //: IDisposable
+    public class MicroserviceHost : IDisposable
     {
-        public MicroserviceHost(IBusContext<IConnection> connection)
-        {
-            // TODO
-        }
+        public IBusContext<IConnection> Context { get; }
+        
+        public MicroserviceHost(IBusContext<IConnection> connection) => Context = connection;
 
         public void Start()
         {
-            // TODO
+            
         }
 
-        // TODO
+        public void Dispose() => Context.Dispose();
     }
 }

@@ -10,7 +10,7 @@ namespace Minor.Miffy
         IEnumerable<string> TopicFilters { get; }
 
         void StartReceivingMessages();
-        void StartHandlingMessages(EventMessageReceivedCallback Callback);
+        void StartHandlingMessages(EventMessageReceivedCallback callback);
     }
 
     public delegate void EventMessageReceivedCallback(EventMessage eventMessage);
