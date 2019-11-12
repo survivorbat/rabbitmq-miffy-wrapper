@@ -5,8 +5,7 @@ using System.Text;
 
 namespace VoorbeeldMicroService
 {
-    [EventListener(queueNahmm
-    ime:"MVM.TestService.PolisEventListenerQueue")]
+    [EventListener(queueName: "MVM.TestService.PolisEventListenerQueue")]
     public class PolisEventListener
     {
         private readonly IDbContextOptions<PolisContext> _context;

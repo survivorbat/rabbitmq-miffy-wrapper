@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Minor.Miffy.MicroServices
@@ -21,11 +22,14 @@ namespace Minor.Miffy.MicroServices
     /// </summary>
     public class MicroserviceHostBuilder
     {
+        private IBusContext<IConnection> _context;
+        
         /// <summary>
         /// Configures the connection to the message broker
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
+            _context = context;
             return this;
         }
 
@@ -34,6 +38,15 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder UseConventions()
         {
+            IEnumerable<TypeInfo> types = Assembly.GetExecutingAssembly().DefinedTypes;
+
+            foreach (var type in types)
+            {
+                EventListenerAttribute attribute = type.GetCustomAttribute<EventListenerAttribute>();
+                
+                // TODO: Register event listener
+            }
+            
             return this;
         }
 
@@ -65,8 +78,6 @@ namespace Minor.Miffy.MicroServices
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost()
-        {
-        }
+        public MicroserviceHost CreateHost() => new MicroserviceHost(_context);
     }
 }
