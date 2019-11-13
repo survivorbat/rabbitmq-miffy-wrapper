@@ -24,8 +24,8 @@ namespace Minor.Miffy.TestBus
             
             foreach (var key in matchingTopics)
             {
-                _context.DataQueues[key].AutoResetEvent.Set();
                 _context.DataQueues[key].Queue.Enqueue(message);
+                _context.DataQueues[key].AutoResetEvent.Set();
             }
         }
     }

@@ -33,8 +33,8 @@ namespace Minor.Miffy.TestBus
 
             string regex = topicName
                 .Replace(".", @"\.")
-                .Replace("##", @"[a-zA-Z0-9\.]+")
-                .Replace("#", @"[a-zA-Z0-9]+");
+                .Replace("*", @"[^.]*")
+                .Replace("#", @".*");
 
             TopicPattern = new Regex($"^{regex}$");
         }

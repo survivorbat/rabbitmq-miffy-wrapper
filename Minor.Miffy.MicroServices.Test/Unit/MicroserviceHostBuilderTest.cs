@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RabbitMQ.Client;
@@ -29,7 +30,9 @@ namespace Minor.Miffy.MicroServices.Test.Unit
             var context = contextMock.Object;
             
             var builder = new MicroserviceHostBuilder();
-            builder.WithBusContext(context);
+            builder
+                .SetLoggerFactory(null)
+                .WithBusContext(context);
 
             // Act
             var host = builder.CreateHost();

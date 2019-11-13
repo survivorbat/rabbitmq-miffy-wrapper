@@ -20,14 +20,14 @@ namespace Minor.Miffy.MicroServices
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
-        public Dictionary<(string, string[]), EventMessageReceivedCallback> Listeners { get; }
+        public IEnumerable<MicroserviceListener> Listeners { get; }
 
         /// <summary>
         /// Create a new Microservice host
         /// </summary>
         /// <param name="connection">IBusContext for the connection with the message bus</param>
         /// <param name="listeners">All the listeners</param>
-        public MicroserviceHost(IBusContext<IConnection> connection, Dictionary<(string, string[]), EventMessageReceivedCallback> listeners)
+        public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners)
         {
             Context = connection;
             Listeners = listeners;
@@ -38,11 +38,11 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public void Start()
         {
-            foreach (var (queue, topics) in Listeners.Keys)
+            foreach (var callback in Listeners)
             {
-                var receiver = Context.CreateMessageReceiver(queue, topics);
+                var receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();
-                receiver.StartHandlingMessages(Listeners[(queue, topics)]);
+                receiver.StartHandlingMessages(callback.Callback);
             }
         }
 

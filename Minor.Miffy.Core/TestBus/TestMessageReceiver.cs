@@ -16,7 +16,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// dDetermine if the receiver is listening
         /// </summary>
-        private bool _isListening = false;
+        private bool _isListening;
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions
@@ -71,9 +71,7 @@ namespace Minor.Miffy.TestBus
                     while (true)
                     {
                         TestBusKey key = new TestBusKey(QueueName, topic);
-                        
-                        if (Context.DataQueues[key] == null) continue;
-                    
+
                         Context.DataQueues[key].AutoResetEvent.WaitOne();
                         Context.DataQueues[key].Queue.TryDequeue(out var result);
                         

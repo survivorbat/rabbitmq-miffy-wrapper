@@ -79,17 +79,17 @@ namespace Minor.Miffy.Test.Component
         }
         
         [TestMethod]
-        [DataRow("MVM.#.test", "MVM.foo.test", true)]
-        [DataRow("MVM.#.##", "MVM.bar.foo.zed.lorem", true)]
-        [DataRow("MVM.##.test", "MVM.foo.bar.test", true)]
-        [DataRow("Blackjack.#", "Blackjack.foo", true)]
-        [DataRow("Blackjack.Whitejack", "#.Blackjack", false)]
-        [DataRow("Test.Test.#", "Test.Test.Nee.Nee", false)]
-        [DataRow("##.Foo", "Bar.Bar.Foo.Bar", false)]
-        [DataRow("##.Foo", "Bar.Bar.Bar", false)]
-        [DataRow("##", "Bar.Foo.Dez.Bez", true)]
-        [DataRow("#.Foo", "Foo.Foo.Foo", false)]
-        [DataRow("#.Foo", "Foo.Foo", true)]
+        [DataRow("MVM.*.test", "MVM.foo.test", true)]
+        [DataRow("MVM.*.#", "MVM.bar.foo.zed.lorem", true)]
+        [DataRow("MVM.#.test", "MVM.foo.bar.test", true)]
+        [DataRow("Blackjack.*", "Blackjack.foo", true)]
+        [DataRow("Blackjack.Whitejack", "*.Blackjack", false)]
+        [DataRow("Test.Test.*", "Test.Test.Nee.Nee", false)]
+        [DataRow("#.Foo", "Bar.Bar.Foo.Bar", false)]
+        [DataRow("#.Foo", "Bar.Bar.Bar", false)]
+        [DataRow("#", "Bar.Foo.Dez.Bez", true)]
+        [DataRow("*.Foo", "Foo.Foo.Foo", false)]
+        [DataRow("*.Foo", "Foo.Foo", true)]
         public void SendingMessageWithTopicsWorkWithWildcards(string topicPattern, string topicName, bool shouldHaveBeenCalled)
         {
             // Arrange

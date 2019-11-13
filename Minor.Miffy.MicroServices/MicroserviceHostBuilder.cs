@@ -35,21 +35,26 @@ namespace Minor.Miffy.MicroServices
         private ILoggerFactory _loggerFactory;
 
         /// <summary>
-        /// Service provider to enable us to register services
+        /// Logger to log everything in here
         /// </summary>
-        private IServiceProvider _serviceProvider;
+        private ILogger<MicroserviceHostBuilder> _logger;
+
+        /// <summary>
+        /// Service collection to collect all services in
+        /// </summary>
+        private readonly IServiceCollection _serviceCollection = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
         /// </summary>
-        private readonly Dictionary<(string, string[]), EventMessageReceivedCallback> _eventListeners = 
-            new Dictionary<(string, string[]), EventMessageReceivedCallback>();
-        
+        private readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
+
         /// <summary>
         /// Configures the connection to the message broker
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
+            _logger.LogDebug("Adding Bus Context");
             _context = context;
             return this;
         }
@@ -59,9 +64,10 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder UseConventions()
         {
-            IEnumerable<TypeInfo> types = Assembly.GetCallingAssembly().DefinedTypes;
-
-            foreach (var type in types)
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            _logger.LogDebug($"Using conventions, applying types from: {callingAssembly.FullName}");
+            
+            foreach (var type in callingAssembly.DefinedTypes)
             {
                 RegisterEventListener(type);
             }
@@ -74,7 +80,11 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder AddEventListener<T>()
         {
-            RegisterEventListener(typeof(T).GetTypeInfo());
+            TypeInfo type = typeof(T).GetTypeInfo();
+            
+            _logger.LogDebug($"Adding event listeners for type {type.FullName}");
+            
+            RegisterEventListener(type);
             return this;
         }
 
@@ -83,29 +93,49 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         private void RegisterEventListener(TypeInfo type)
         {
-            string queueName = type.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
+            ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
             
-            if (queueName == null) return;
+            _logger.LogTrace($"Analysing type {type.Name}");
+            string queueName = type.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
 
-            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, type);
+            if (queueName == null)
+            {
+                _logger.LogTrace($"Type {type.Name} does not contain event listener attribute.");
+                return;
+            }
+
+            _logger.LogTrace($"Instantiating {type.Name} with provided services.");
+            var instance = ActivatorUtilities.CreateInstance(serviceProvider, type);
 
             foreach (var method in type.DeclaredMethods)
             {
+                _logger.LogTrace($"Retrieving topic attributes from {type.Name}");
                 var topicPatterns = method.GetCustomAttributes<TopicAttribute>()
                     .Select(e => e.TopicPattern)
                     .ToArray();
                 
+                _logger.LogTrace($"Retrieving parameter type of {method.Name} in {type.Name}");
                 var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
                 
                 // If method is not suitable, skip it
-                if (parameterType == null) continue;
-
-                _eventListeners[(queueName, topicPatterns)] = message =>
+                if (parameterType == null)
                 {
-                    var text = Encoding.Unicode.GetString(message.Body);
-                    var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-                    method.Invoke(instance, new[] {jsonObject});
-                };
+                    _logger.LogWarning($"Method {method.Name} in {type.Name} does not have a parameter but is marked as event listener!");
+                    continue;
+                }
+
+                _logger.LogDebug($"Adding method {method.Name} in {type.Name} to event listener collection.");
+                _eventListeners.Add(new MicroserviceListener
+                {
+                    TopicExpressions = topicPatterns,
+                    Queue = queueName,
+                    Callback = message =>
+                    {
+                        var text = Encoding.Unicode.GetString(message.Body);
+                        var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+                        method.Invoke(instance, new[] {jsonObject});
+                    }
+                });
             }
         }
 
@@ -115,6 +145,10 @@ namespace Minor.Miffy.MicroServices
         public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
+
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _logger = serviceProvider.GetService<ILogger<MicroserviceHostBuilder>>();
+            
             return this;
         }
 
@@ -123,9 +157,8 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
         {
-            var collection = new ServiceCollection();
-            servicesConfiguration.Invoke(collection);
-            _serviceProvider = collection.BuildServiceProvider();
+            _logger.LogDebug("Registering dependencies");
+            servicesConfiguration.Invoke(_serviceCollection);
             return this;
         }
 
@@ -133,6 +166,10 @@ namespace Minor.Miffy.MicroServices
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost() => new MicroserviceHost(_context, _eventListeners);
+        public MicroserviceHost CreateHost()
+        {
+            _logger.LogDebug("Creating host");
+            return new MicroserviceHost(_context, _eventListeners);
+        }
     }
 }

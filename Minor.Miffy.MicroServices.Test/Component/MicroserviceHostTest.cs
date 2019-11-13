@@ -26,12 +26,9 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var message = new DummyEvent("TestTopic");
             new EventPublisher(testContext).Publish(message);
             
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             
-            Assert.AreEqual(message.Id, EventListenerDummy.HandlesResult?.Id);
-            Assert.AreEqual(message.Topic, EventListenerDummy.HandlesResult?.Topic);
-            Assert.AreEqual(message.Timestamp, EventListenerDummy.HandlesResult?.Timestamp);
-            Assert.AreEqual(message.DummyText, EventListenerDummy.HandlesResult?.DummyText);
+            Assert.AreEqual(message, EventListenerDummy.HandlesResult);
         }
     }
 }
