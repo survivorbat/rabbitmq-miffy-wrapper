@@ -15,7 +15,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit
             var context = contextMock.Object;
             
             // Act
-            var host = new MicroserviceHost(context);
+            var host = new MicroserviceHost(context, null);
             
             // Assert
             Assert.AreSame(context, host.Context);
@@ -27,7 +27,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit
             // Arrange
             var contextMock = new Mock<IBusContext<IConnection>>();
             var context = contextMock.Object;
-            var host = new MicroserviceHost(context);
+            var host = new MicroserviceHost(context, null);
 
             // Act
             host.Dispose();

@@ -15,6 +15,7 @@ namespace Minor.Miffy.RabbitMQBus
 
         private readonly IModel _model;
         private readonly IBusContext<IConnection> _context;
+        private bool _isListening = false;
 
         public RabbitMqMessageReceiver(IBusContext<IConnection> context, string queueName, IEnumerable<string> topicFilters)
         {
@@ -32,11 +33,15 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartReceivingMessages()
         {
+            if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
+            
             _model.QueueDeclare(QueueName);
             foreach (var topicExpression in TopicFilters)
             {
                 _model.QueueBind(QueueName, _context.ExchangeName, topicExpression);
             }
+
+            _isListening = true;
         }
 
         /// <summary>

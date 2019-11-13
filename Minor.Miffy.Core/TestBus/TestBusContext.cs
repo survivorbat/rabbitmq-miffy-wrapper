@@ -1,7 +1,6 @@
+using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
@@ -22,7 +21,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        public readonly Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+        internal readonly Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues = new Dictionary<TestBusKey, TestBusQueueWrapper>();
         
         /// <summary>
         /// Properties that do not matter for the queue but are
@@ -41,37 +40,5 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions) => 
             new TestMessageReceiver(this, queueName, topicExpressions);
-    }
-
-    /// <summary>
-    /// Wrapper class that contains a reset event, a queue and a topicname
-    /// </summary>
-    public class TestBusQueueWrapper
-    {
-        /// <summary>
-        /// Reset event to wait for
-        /// </summary>
-        internal AutoResetEvent AutoResetEvent { get; } = new AutoResetEvent(false);
-        
-        /// <summary>
-        /// The actual queue with messages
-        /// </summary>
-        internal Queue<EventMessage> Queue { get; } = new Queue<EventMessage>();
-    }
-
-    /// <summary>
-    /// Wrapper class that contains a queuename and a topic name
-    /// </summary>
-    public class TestBusKey
-    {
-        /// <summary>
-        /// Name of the queue
-        /// </summary>
-        internal string QueueName { get; set; }
-        
-        /// <summary>
-        /// Name of the topic
-        /// </summary>
-        internal string TopicName { get; set; }
     }
 }

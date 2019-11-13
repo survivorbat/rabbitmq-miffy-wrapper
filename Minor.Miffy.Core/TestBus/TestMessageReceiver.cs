@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -11,6 +12,11 @@ namespace Minor.Miffy.TestBus
         /// The test context being used
         /// </summary>
         public readonly TestBusContext Context;
+
+        /// <summary>
+        /// dDetermine if the receiver is listening
+        /// </summary>
+        private bool _isListening = false;
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions
@@ -42,11 +48,15 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void StartReceivingMessages()
         {
+            if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
+
             foreach (string topic in TopicFilters)
             {
-                TestBusKey key = new TestBusKey {TopicName = topic, QueueName = QueueName};
+                TestBusKey key = new TestBusKey(QueueName, topic);
                 Context.DataQueues[key] = new TestBusQueueWrapper();
             }
+
+            _isListening = true;
         }
 
         /// <summary>
@@ -55,25 +65,25 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
-            var thread = new Thread(() => {
-                while (true)
-                {
-                    foreach (string topic in TopicFilters)
+            foreach (string topic in TopicFilters)
+            {
+                var thread = new Thread(() => {
+                    while (true)
                     {
-                        TestBusKey key = new TestBusKey {TopicName = topic, QueueName = QueueName};
-                        TestBusQueueWrapper wrapper = Context.DataQueues[key];
-
-                        if (wrapper == null) continue;
+                        TestBusKey key = new TestBusKey(QueueName, topic);
                         
-                        wrapper.AutoResetEvent.WaitOne(1000);
+                        if (Context.DataQueues[key] == null) continue;
+                    
+                        Context.DataQueues[key].AutoResetEvent.WaitOne();
+                        Context.DataQueues[key].Queue.TryDequeue(out var result);
                         
-                        callback(wrapper.Queue.Dequeue());
+                        callback(result);
                     }
-                }
-            });
-
-            thread.IsBackground = true;
-            thread.Start();
+                });
+                
+                thread.IsBackground = true;
+                thread.Start();
+            }
         }
     }
 }

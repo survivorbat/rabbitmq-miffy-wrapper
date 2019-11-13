@@ -45,7 +45,7 @@ namespace Minor.Miffy.Test.Component
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(4000);
+            Thread.Sleep(500);
             
             // Assert
             Assert.IsTrue(callbackCalled);
@@ -54,7 +54,7 @@ namespace Minor.Miffy.Test.Component
         [TestMethod]
         [DataRow("test.topic")]
         [DataRow("topicTest")]
-        [DataRow("Test#Topic#Test")]
+        [DataRow("MVM.BlackJack")]
         [DataRow("Aanmeldingen")]
         public void SendingMessageWithTopicsWorks(string topicName)
         {
@@ -72,10 +72,44 @@ namespace Minor.Miffy.Test.Component
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(4000);
+            Thread.Sleep(500);
             
             // Assert
             Assert.IsTrue(callbackCalled);
+        }
+        
+        [TestMethod]
+        [DataRow("MVM.#.test", "MVM.foo.test", true)]
+        [DataRow("MVM.#.##", "MVM.bar.foo.zed.lorem", true)]
+        [DataRow("MVM.##.test", "MVM.foo.bar.test", true)]
+        [DataRow("Blackjack.#", "Blackjack.foo", true)]
+        [DataRow("Blackjack.Whitejack", "#.Blackjack", false)]
+        [DataRow("Test.Test.#", "Test.Test.Nee.Nee", false)]
+        [DataRow("##.Foo", "Bar.Bar.Foo.Bar", false)]
+        [DataRow("##.Foo", "Bar.Bar.Bar", false)]
+        [DataRow("##", "Bar.Foo.Dez.Bez", true)]
+        [DataRow("#.Foo", "Foo.Foo.Foo", false)]
+        [DataRow("#.Foo", "Foo.Foo", true)]
+        public void SendingMessageWithTopicsWorkWithWildcards(string topicPattern, string topicName, bool shouldHaveBeenCalled)
+        {
+            // Arrange
+            var context = new TestBusContext();
+            var sender = context.CreateMessageSender();
+            var receiver = context.CreateMessageReceiver("testQueue", new []{ topicPattern });
+            
+            var message = new EventMessage {Topic = topicName};
+
+            var callbackCalled = false;
+            
+            receiver.StartReceivingMessages();
+            receiver.StartHandlingMessages(e => callbackCalled = true);
+            
+            // Act
+            sender.SendMessage(message);
+            Thread.Sleep(500);
+            
+            // Assert
+            Assert.AreEqual(shouldHaveBeenCalled, callbackCalled);
         }
 
         [TestMethod]
@@ -87,7 +121,7 @@ namespace Minor.Miffy.Test.Component
             // Arrange
             var context = new TestBusContext();
             var sender = context.CreateMessageSender();
-            var receiver = context.CreateMessageReceiver(queueName, new []{ "TestTopic" });
+            var receiver = context.CreateMessageReceiver(queueName, new [] { "TestTopic" });
             
             var message = new EventMessage {Topic = "TestTopic" };
 
@@ -98,7 +132,7 @@ namespace Minor.Miffy.Test.Component
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(4000);
+            Thread.Sleep(500);
             
             // Assert
             Assert.IsTrue(callbackCalled);

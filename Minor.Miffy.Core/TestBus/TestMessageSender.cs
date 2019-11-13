@@ -1,21 +1,29 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Minor.Miffy.TestBus
 {
     public class TestMessageSender : IMessageSender
     {
+        /// <summary>
+        /// Testbus context
+        /// </summary>
         private readonly TestBusContext _context;
         
+        /// <summary>
+        /// Testbuscontext to send the message to
+        /// </summary>
         public TestMessageSender(TestBusContext context) => _context = context;
 
         /// <summary>
         /// Send a message to the in-memory bus
         /// </summary>
-        /// <param name="message"></param>
         public void SendMessage(EventMessage message)
         {
-            foreach (TestBusKey key in _context.DataQueues.Keys)
+            IEnumerable<TestBusKey> matchingTopics = _context.DataQueues.Keys.Where(key => key.TopicPattern.IsMatch(message.Topic));
+            
+            foreach (var key in matchingTopics)
             {
-                if (key.TopicName != message.Topic) continue;
-                
                 _context.DataQueues[key].AutoResetEvent.Set();
                 _context.DataQueues[key].Queue.Enqueue(message);
             }

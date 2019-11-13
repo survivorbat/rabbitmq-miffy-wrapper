@@ -90,7 +90,7 @@ Schrijf een class 'RabbitMQMessageReceiver' om EventMessages te ontvangen. Deze 
 
 De RabbitMQMessageReceiver krijgt een RabbitMQBusContext geinjecteerd. Deze bevat onder andere de (al geopende) connectie met RabbitMQ en de naam van de Exchange waar de MessageReceiver zijn queue aan zal koppelen.
 
-De DeclareQueueWithTopics-method zal een queue aanmaken met de naam QueueName (indien deze nog niet bestaat). Vanaf dat moment zullen alle relevante messages in de queue bewaard blijven totdat de Receiver klaar is om ze te verwerken.
+De DeclareQueueWithTopics-method zal een squeue aanmaken met de naam QueueName (indien deze nog niet bestaat). Vanaf dat moment zullen alle relevante messages in de queue bewaard blijven totdat de Receiver klaar is om ze te verwerken.
 De DeclareQueueWithTopics-method moet maar eenmalig worden aangeroepen. Een tweede aanroep moet een BusConfigurationException opleveren.
 
 De StartReceivingMessages-method geeft aan det de Reciever klaar is om messages te verwerken. De event messages worden een voor een uit de queue gehaald, en voor elke event message wordt de callback-methode uitgevoerd.

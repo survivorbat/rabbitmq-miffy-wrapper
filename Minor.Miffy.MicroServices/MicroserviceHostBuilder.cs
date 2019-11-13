@@ -38,6 +38,12 @@ namespace Minor.Miffy.MicroServices
         /// Service provider to enable us to register services
         /// </summary>
         private IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Registered event listeners
+        /// </summary>
+        private readonly Dictionary<(string, string[]), EventMessageReceivedCallback> _eventListeners = 
+            new Dictionary<(string, string[]), EventMessageReceivedCallback>();
         
         /// <summary>
         /// Configures the connection to the message broker
@@ -53,7 +59,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder UseConventions()
         {
-            IEnumerable<TypeInfo> types = Assembly.GetEntryAssembly()?.DefinedTypes;
+            IEnumerable<TypeInfo> types = Assembly.GetCallingAssembly().DefinedTypes;
 
             foreach (var type in types)
             {
@@ -77,29 +83,29 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         private void RegisterEventListener(TypeInfo type)
         {
-            EventListenerAttribute attribute = type.GetCustomAttribute<EventListenerAttribute>();
+            string queueName = type.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
             
-            if (attribute == null)
-            {
-                return;
-            }
-            
+            if (queueName == null) return;
+
             var instance = ActivatorUtilities.CreateInstance(_serviceProvider, type);
 
             foreach (var method in type.DeclaredMethods)
             {
-                var topicPatterns = method.GetCustomAttributes<TopicAttribute>().Select(e => e.TopicPattern);
-                var parameterType = method.GetParameters().First().ParameterType;
-
-                IMessageReceiver receiver = _context.CreateMessageReceiver(attribute.QueueName, topicPatterns);
+                var topicPatterns = method.GetCustomAttributes<TopicAttribute>()
+                    .Select(e => e.TopicPattern)
+                    .ToArray();
                 
-                receiver.StartReceivingMessages();
-                receiver.StartHandlingMessages(message =>
+                var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+                
+                // If method is not suitable, skip it
+                if (parameterType == null) continue;
+
+                _eventListeners[(queueName, topicPatterns)] = message =>
                 {
                     var text = Encoding.Unicode.GetString(message.Body);
-                    var json = JsonConvert.DeserializeObject(text, parameterType);
-                    method.Invoke(instance, new[] {json});
-                });
+                    var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+                    method.Invoke(instance, new[] {jsonObject});
+                };
             }
         }
 
@@ -127,6 +133,6 @@ namespace Minor.Miffy.MicroServices
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost() => new MicroserviceHost(_context);
+        public MicroserviceHost CreateHost() => new MicroserviceHost(_context, _eventListeners);
     }
 }
