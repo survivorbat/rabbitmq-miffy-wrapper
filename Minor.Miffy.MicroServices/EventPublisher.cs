@@ -8,9 +8,9 @@ namespace Minor.Miffy.MicroServices
 {
     public class EventPublisher : IEventPublisher
     {
-        private readonly IBusContext<IConnection> _context;
+        private readonly IMessageSender _sender;
         
-        public EventPublisher(IBusContext<IConnection> context) => _context = context;
+        public EventPublisher(IBusContext<IConnection> context) => _sender = context.CreateMessageSender();
 
         public void Publish(DomainEvent domainEvent)
         {
@@ -25,8 +25,7 @@ namespace Minor.Miffy.MicroServices
                 Body = Encoding.Unicode.GetBytes(json)
             };
             
-            var sender = _context.CreateMessageSender();
-            sender.SendMessage(message);
+            _sender.SendMessage(message);
         }
     }
 }

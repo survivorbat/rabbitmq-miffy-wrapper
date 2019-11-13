@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -105,8 +104,6 @@ namespace Minor.Miffy.MicroServices
         }
 
         /// <summary>
-        /// TODO: Finish later
-        /// 
         /// Configures logging functionality for the MicroserviceHost
         /// </summary>
         public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
