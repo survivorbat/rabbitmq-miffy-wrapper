@@ -44,7 +44,8 @@ namespace Minor.Miffy.TestBus
         {
             foreach (string topic in TopicFilters)
             {
-                Context.DataQueues[(QueueName, topic)] = new TestBusQueueWrapper();
+                TestBusKey key = new TestBusKey {TopicName = topic, QueueName = QueueName};
+                Context.DataQueues[key] = new TestBusQueueWrapper();
             }
         }
 
@@ -59,11 +60,12 @@ namespace Minor.Miffy.TestBus
                 {
                     foreach (string topic in TopicFilters)
                     {
-                        TestBusQueueWrapper wrapper = Context.DataQueues[(QueueName, topic)];
+                        TestBusKey key = new TestBusKey {TopicName = topic, QueueName = QueueName};
+                        TestBusQueueWrapper wrapper = Context.DataQueues[key];
 
                         if (wrapper == null) continue;
                         
-                        wrapper.AutoResetEvent.WaitOne();
+                        wrapper.AutoResetEvent.WaitOne(1000);
                         
                         callback(wrapper.Queue.Dequeue());
                     }

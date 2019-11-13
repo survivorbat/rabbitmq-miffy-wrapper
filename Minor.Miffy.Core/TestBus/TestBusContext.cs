@@ -22,8 +22,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        public readonly Dictionary<(string, string), TestBusQueueWrapper> DataQueues = 
-            new Dictionary<(string, string), TestBusQueueWrapper>();
+        public readonly Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues = new Dictionary<TestBusKey, TestBusQueueWrapper>();
         
         /// <summary>
         /// Properties that do not matter for the queue but are
@@ -58,5 +57,21 @@ namespace Minor.Miffy.TestBus
         /// The actual queue with messages
         /// </summary>
         public Queue<EventMessage> Queue { get; } = new Queue<EventMessage>();
+    }
+
+    /// <summary>
+    /// Wrapper class that contains a queuename and a topic name
+    /// </summary>
+    public class TestBusKey
+    {
+        /// <summary>
+        /// Name of the queue
+        /// </summary>
+        public string QueueName { get; set; }
+        
+        /// <summary>
+        /// Name of the topic
+        /// </summary>
+        public string TopicName { get; set; }
     }
 }

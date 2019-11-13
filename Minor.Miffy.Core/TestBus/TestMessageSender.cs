@@ -12,13 +12,12 @@ namespace Minor.Miffy.TestBus
         /// <param name="message"></param>
         public void SendMessage(EventMessage message)
         {
-            foreach (var (queue, topic) in _context.DataQueues.Keys)
+            foreach (TestBusKey key in _context.DataQueues.Keys)
             {
-                if (topic == message.Topic)
-                {
-                    _context.DataQueues[(queue, topic)].AutoResetEvent.Set();
-                    _context.DataQueues[(queue, topic)].Queue.Enqueue(message);
-                }
+                if (key.TopicName != message.Topic) continue;
+                
+                _context.DataQueues[key].AutoResetEvent.Set();
+                _context.DataQueues[key].Queue.Enqueue(message);
             }
         }
     }
