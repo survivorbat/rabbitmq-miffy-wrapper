@@ -32,7 +32,7 @@ namespace Minor.Miffy.MicroServices
         /// Creates a domain event by setting the topic and generating a timestamp.
         /// </summary>
         /// <param name="topic">The topic should be of the format domain.eventname</param>
-        public DomainEvent(string topic)
+        protected DomainEvent(string topic)
         {
             Topic = topic;
             Timestamp = DateTime.Now.Ticks;

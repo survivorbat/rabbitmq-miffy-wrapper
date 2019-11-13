@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Minor.Miffy.MicroServices
 {
@@ -16,21 +17,28 @@ namespace Minor.Miffy.MicroServices
         /// Connection context
         /// </summary>
         public IBusContext<IConnection> Context { get; }
-        
+
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
-        public IEnumerable<MicroserviceListener> Listeners { get; }
+        private readonly IEnumerable<MicroserviceListener> _listeners;
+
+        /// <summary>
+        /// A logger factory to log the start
+        /// </summary>
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Create a new Microservice host
         /// </summary>
         /// <param name="connection">IBusContext for the connection with the message bus</param>
         /// <param name="listeners">All the listeners</param>
-        public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners)
+        /// <param name="loggerFactory">Logging factory</param>
+        public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners, ILoggerFactory loggerFactory)
         {
             Context = connection;
-            Listeners = listeners;
+            _listeners = listeners;
+            _logger = loggerFactory.CreateLogger<MicroserviceHost>();
         }
 
         /// <summary>
@@ -38,8 +46,10 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public void Start()
         {
-            foreach (var callback in Listeners)
+            foreach (var callback in _listeners)
             {
+                _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}", callback);
+                
                 var receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();
                 receiver.StartHandlingMessages(callback.Callback);

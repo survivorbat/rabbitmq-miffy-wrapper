@@ -54,7 +54,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
-            _logger.LogDebug("Adding Bus Context");
+            _logger.LogDebug("Adding Bus Context", context);
             _context = context;
             return this;
         }
@@ -65,7 +65,7 @@ namespace Minor.Miffy.MicroServices
         public MicroserviceHostBuilder UseConventions()
         {
             Assembly callingAssembly = Assembly.GetCallingAssembly();
-            _logger.LogDebug($"Using conventions, applying types from: {callingAssembly.FullName}");
+            _logger.LogDebug($"Using conventions, applying types from assembly: {callingAssembly.GetName()}");
             
             foreach (var type in callingAssembly.DefinedTypes)
             {
@@ -124,7 +124,7 @@ namespace Minor.Miffy.MicroServices
                     continue;
                 }
 
-                _logger.LogDebug($"Adding method {method.Name} in {type.Name} to event listener collection.");
+                _logger.LogInformation($"Adding method {method.Name} in {type.Name} to event listener collection.");
                 _eventListeners.Add(new MicroserviceListener
                 {
                     TopicExpressions = topicPatterns,
@@ -145,10 +145,7 @@ namespace Minor.Miffy.MicroServices
         public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
-
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
-            _logger = serviceProvider.GetService<ILogger<MicroserviceHostBuilder>>();
-            
+            _logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
             return this;
         }
 
@@ -166,10 +163,6 @@ namespace Minor.Miffy.MicroServices
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost()
-        {
-            _logger.LogDebug("Creating host");
-            return new MicroserviceHost(_context, _eventListeners);
-        }
+        public MicroserviceHost CreateHost() => new MicroserviceHost(_context, _eventListeners, _loggerFactory);
     }
 }

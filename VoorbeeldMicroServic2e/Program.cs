@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Threading;
+using Microsoft.Extensions.Logging;
 using Minor.Miffy;
 using Minor.Miffy.MicroServices;
 using Minor.Miffy.RabbitMQBus;
 using RabbitMQ.Client;
-using Serilog;
 using VoorbeeldMicroService.Models;
 
 namespace VoorbeeldMicroService
@@ -17,12 +17,7 @@ namespace VoorbeeldMicroService
                 configure.AddConsole()
                     .SetMinimumLevel(LogLevel.Trace);
             });
-            
-            loggerFactory.AddSerilog(new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger());
-            
+
             var contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("MVM.EventExchange")
                     .WithConnectionString("amqp://guest:guest@localhost");  
@@ -42,8 +37,11 @@ namespace VoorbeeldMicroService
             };
             
             var sender = new EventPublisher(context);
-            
-            sender.Publish(polisToegevoegdEvent);
+            while (true)
+            {
+                sender.Publish(polisToegevoegdEvent);
+                Thread.Sleep(1000);
+            }
         }
     }
 }
