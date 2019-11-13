@@ -51,12 +51,12 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Reset event to wait for
         /// </summary>
-        public AutoResetEvent AutoResetEvent { get; } = new AutoResetEvent(false);
+        internal AutoResetEvent AutoResetEvent { get; } = new AutoResetEvent(false);
         
         /// <summary>
         /// The actual queue with messages
         /// </summary>
-        public Queue<EventMessage> Queue { get; } = new Queue<EventMessage>();
+        internal Queue<EventMessage> Queue { get; } = new Queue<EventMessage>();
     }
 
     /// <summary>
@@ -67,11 +67,11 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Name of the queue
         /// </summary>
-        public string QueueName { get; set; }
+        internal string QueueName { get; set; }
         
         /// <summary>
         /// Name of the topic
         /// </summary>
-        public string TopicName { get; set; }
+        internal string TopicName { get; set; }
     }
 }
