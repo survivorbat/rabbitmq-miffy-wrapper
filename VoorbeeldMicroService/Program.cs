@@ -1,40 +1,51 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Minor.Miffy;
 using Minor.Miffy.MicroServices;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Minor.Miffy;
 using Minor.Miffy.RabbitMQBus;
 using RabbitMQ.Client;
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using VoorbeeldMicroService.DAL;
 
 namespace VoorbeeldMicroService
 {
-    public class Program
+    class Program
     {
-//        public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
+        static void Main(string[] args)
+        {
+            using var loggerFactory = LoggerFactory.Create(configure =>
+            {
+                configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
+            });
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureMicroServiceHostDefaults(hostBuilder =>
-                {
-                    var contextBuilder = new RabbitMqContextBuilder()
-                        .WithExchange("MVM.EventExchange")
-                        .WithConnectionString("amqp://guest:guest@localhost");  
+            MiffyLoggerFactory.LoggerFactory = loggerFactory;
+            RabbitMqLoggerFactory.LoggerFactory = loggerFactory;
+
+            var contextBuilder = new RabbitMqContextBuilder()
+                    .WithExchange("MVM.EventExchange")
+                    .WithConnectionString("amqp://guest:guest@localhost");  
             
-                    using IBusContext<IConnection> context = contextBuilder.CreateContext();
+            using IBusContext<IConnection> context = contextBuilder.CreateContext();
 
-                    var builder = new MicroserviceHostBuilder()
-                        .WithBusContext(context)
-                        .RegisterDependencies(services =>
-                        {
-                            services.AddDbContext<PolisContext>(e => e.UseSqlite(":memory:"));
-                        })
-                        .UseConventions();
-
-                    builder.CreateHost();
-                });
+            var builder = new MicroserviceHostBuilder()
+                .SetLoggerFactory(loggerFactory)
+                .RegisterDependencies(services =>
+                {
+                    services.AddDbContext<PolisContext>(e =>
+                    {
+                        e.UseSqlite(":memory:");
+                    });
+                })
+                .WithBusContext(context)
+                .UseConventions();
+            
+            using var host = builder.CreateHost();
+            host.Start();
+            
+            Console.WriteLine("ServiceHost is listening to incoming events...");
+            Console.WriteLine("Press any key to quit.");
+            Console.ReadKey();
+        }
     }
 }
