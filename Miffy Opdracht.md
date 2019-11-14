@@ -187,3 +187,9 @@ Implementeer vervolgens de ICommandSender en ICommandReceiver interfaces voor Ra
 
 
 # Stap 6 - Commands toevoegen aan Eventbus Framework
+
+Vragen:
+	- hoe logger factory krijgen in de rest
+	- hoe command verzenden met queuename etc.
+	- Wat moet je disposen in de publisher?
+	- Queue declaren en wachten in command?

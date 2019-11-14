@@ -40,5 +40,12 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions) => 
             new TestMessageReceiver(this, queueName, topicExpressions);
+
+        public ICommandSender CreateCommandSender() => new TestCommandSender(this);
+
+        public ICommandReceiver CreateCommandReceiver()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
