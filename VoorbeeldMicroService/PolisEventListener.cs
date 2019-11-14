@@ -21,7 +21,7 @@ namespace VoorbeeldMicroService
         [Topic(TopicNames.MvmPolisbeheerPolisToegevoegd)]
         public void Handles(PolisToegevoegdEvent evt)
         {
-            _logger.LogCritical("Received PolisToegevoegdEvent!");
+            _logger.LogDebug("Received PolisToegevoegdEvent!");
             _context.Polissen.Add(evt.Polis);
             _context.SaveChanges();
         }
