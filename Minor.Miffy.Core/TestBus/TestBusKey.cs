@@ -45,12 +45,15 @@ namespace Minor.Miffy.TestBus
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
-            var key = obj as TestBusKey;
-            return key?._queueName == _queueName && key?._topicName == _topicName;
+            TestBusKey key = obj as TestBusKey;
+            return Equals(key);
         }
 
-        protected bool Equals(TestBusKey other) => _queueName == other._queueName && _topicName == other._topicName;
+        private bool Equals(TestBusKey other) => _queueName == other._queueName && _topicName == other._topicName;
+        
         public override int GetHashCode() => 
             ((_queueName != null ? _queueName.GetHashCode() : 0) * 397) ^ (_topicName != null ? _topicName.GetHashCode() : 0);
+        
+        public override string ToString() => $"Queue: {_queueName}, Topic: {_topicName}";
     }
 }

@@ -39,9 +39,15 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions) => 
             new RabbitMqMessageReceiver(this, queueName, topicExpressions);
-
+        
+        /// <summary>
+        /// Create a command sender
+        /// </summary>
         public ICommandSender CreateCommandSender() => new RabbitMqCommandSender(this);
 
-        public ICommandReceiver CreateCommandReceiver() => new RabbitMqCommandReceiver(this);
+        /// <summary>
+        /// Create a receiver for commands with a stringname
+        /// </summary>
+        public ICommandReceiver CreateCommandReceiver(string queueName) => new RabbitMqCommandReceiver(this, queueName);
     }
 }

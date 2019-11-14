@@ -19,6 +19,9 @@ namespace VoorbeeldMicroService
                 configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
             });
 
+            MiffyLoggerFactory.LoggerFactory = loggerFactory;
+            RabbitMqLoggerFactory.LoggerFactory = loggerFactory;
+
             var contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("MVM.EventExchange")
                     .WithConnectionString("amqp://guest:guest@localhost");  

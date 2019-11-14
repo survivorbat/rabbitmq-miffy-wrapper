@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Minor.Miffy.TestBus
 {
@@ -19,6 +20,11 @@ namespace Minor.Miffy.TestBus
         private bool _isListening;
 
         /// <summary>
+        /// Logger
+        /// </summary>
+        private ILogger<TestMessageReceiver> _logger;
+
+        /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions
         /// </summary>
         public TestMessageReceiver(TestBusContext context, string queueName, IEnumerable<string> topicExpressions)
@@ -26,6 +32,7 @@ namespace Minor.Miffy.TestBus
             Context = context;
             QueueName = queueName;
             TopicFilters = topicExpressions;
+            _logger = MiffyLoggerFactory.CreateInstance<TestMessageReceiver>();
         }
 
         /// <summary>
@@ -52,6 +59,7 @@ namespace Minor.Miffy.TestBus
 
             foreach (string topic in TopicFilters)
             {
+                _logger.LogDebug($"Creating queue {QueueName} with topic {topic}");
                 TestBusKey key = new TestBusKey(QueueName, topic);
                 Context.DataQueues[key] = new TestBusQueueWrapper();
             }
@@ -67,14 +75,20 @@ namespace Minor.Miffy.TestBus
         {
             foreach (string topic in TopicFilters)
             {
+                _logger.LogDebug($"Creating thread for queue {QueueName} with topic {topic}");
+                
                 var thread = new Thread(() => {
                     while (true)
                     {
                         TestBusKey key = new TestBusKey(QueueName, topic);
 
+                        _logger.LogTrace($"Waiting for message on queue {QueueName} with topic {topic}");
+
                         Context.DataQueues[key].AutoResetEvent.WaitOne();
                         Context.DataQueues[key].Queue.TryDequeue(out var result);
                         
+                        _logger.LogDebug($"Message received on queue {QueueName} with topic {topic}");
+
                         callback(result);
                     }
                 });

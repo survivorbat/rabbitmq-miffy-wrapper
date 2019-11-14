@@ -33,12 +33,12 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         /// <param name="connection">IBusContext for the connection with the message bus</param>
         /// <param name="listeners">All the listeners</param>
-        /// <param name="loggerFactory">Logging factory</param>
-        public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners, ILoggerFactory loggerFactory)
+        /// <param name="logger">Logging instance</param>
+        public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners, ILogger<MicroserviceHost> logger)
         {
             Context = connection;
             _listeners = listeners;
-            _logger = loggerFactory.CreateLogger<MicroserviceHost>();
+            _logger = logger;
         }
 
         /// <summary>

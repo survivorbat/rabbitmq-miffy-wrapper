@@ -30,9 +30,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit
             var context = contextMock.Object;
             
             var builder = new MicroserviceHostBuilder();
-            builder
-                .SetLoggerFactory(null)
-                .WithBusContext(context);
+            builder.WithBusContext(context);
 
             // Act
             var host = builder.CreateHost();

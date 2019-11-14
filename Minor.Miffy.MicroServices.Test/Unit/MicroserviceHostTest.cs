@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -8,27 +10,16 @@ namespace Minor.Miffy.MicroServices.Test.Unit
     [TestClass]
     public class MicroserviceHostTest
     {
-        private Mock<ILoggerFactory> _loggerFactory;
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            var logger = new Mock<ILogger<MicroserviceHost>>();
-            
-            _loggerFactory = new Mock<ILoggerFactory>();
-            _loggerFactory.Setup(e => e.CreateLogger<MicroserviceHost>())
-                .Returns(logger.Object);
-        }
-        
         [TestMethod]
         public void ContextIsProperlySet()
         {
             // Arrange
             var contextMock = new Mock<IBusContext<IConnection>>();
+            var loggerFactory = new Mock<ILogger<MicroserviceHost>>();
             var context = contextMock.Object;
             
             // Act
-            var host = new MicroserviceHost(context, null, _loggerFactory.Object);
+            var host = new MicroserviceHost(context, null, loggerFactory.Object);
             
             // Assert
             Assert.AreSame(context, host.Context);
@@ -39,8 +30,9 @@ namespace Minor.Miffy.MicroServices.Test.Unit
         {
             // Arrange
             var contextMock = new Mock<IBusContext<IConnection>>();
+            var loggerFactory = new Mock<ILogger<MicroserviceHost>>();
             var context = contextMock.Object;
-            var host = new MicroserviceHost(context, null, _loggerFactory.Object);
+            var host = new MicroserviceHost(context, null, loggerFactory.Object);
 
             // Act
             host.Dispose();

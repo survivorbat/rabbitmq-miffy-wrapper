@@ -23,7 +23,8 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder()
+                .WithBusContext(testContext);
 
             // Act
             hostBuilder.UseConventions();

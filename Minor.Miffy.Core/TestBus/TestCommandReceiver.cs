@@ -8,8 +8,7 @@ namespace Minor.Miffy.TestBus
         /// Testbus context
         /// </summary>
         private readonly TestBusContext _context;
-        private readonly IModel _model;
-        
+
         /// <summary>
         /// Name of the queue for th ecommands
         /// </summary>
@@ -21,14 +20,16 @@ namespace Minor.Miffy.TestBus
         public TestCommandReceiver(TestBusContext context, string queueName)
         {
             _context = context;
-            _model = context.Connection.CreateModel();
             QueueName = queueName;
         }
-        
+
         /// <summary>
         /// Declare the queue with the given queue name
         /// </summary>
-        public void DeclareCommandQueue() => _model.QueueDeclare(QueueName);
+        public void DeclareCommandQueue()
+        {
+            
+        }
 
         /// <summary>
         /// Start receiving commands and calling the callback
@@ -39,8 +40,8 @@ namespace Minor.Miffy.TestBus
         }
 
         /// <summary>
-        /// Dispose of the created command
+        /// Empty dispose since there is nothing to dispose of
         /// </summary>
-        public void Dispose() => _model.Dispose();
+        public void Dispose() { }
     }
 }

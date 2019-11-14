@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 
 namespace Minor.Miffy.MicroServices
@@ -49,6 +50,16 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         private readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
 
+        /// <summary>
+        /// Initialize a new builder with a null logger factory
+        /// </summary>
+        public MicroserviceHostBuilder()
+        {
+            _loggerFactory = new NullLoggerFactory();
+            _serviceCollection.AddSingleton(_loggerFactory);
+            _logger = _loggerFactory.CreateLogger<MicroserviceHostBuilder>();
+        }
+        
         /// <summary>
         /// Configures the connection to the message broker
         /// </summary>
@@ -164,6 +175,7 @@ namespace Minor.Miffy.MicroServices
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost() => new MicroserviceHost(_context, _eventListeners, _loggerFactory);
+        public MicroserviceHost CreateHost() => 
+            new MicroserviceHost(_context, _eventListeners, _loggerFactory.CreateLogger<MicroserviceHost>());
     }
 }

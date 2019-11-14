@@ -13,6 +13,6 @@ namespace Minor.Miffy
         IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions);
         
         ICommandSender CreateCommandSender();
-        ICommandReceiver CreateCommandReceiver();
+        ICommandReceiver CreateCommandReceiver(string queueName);
     }
 }

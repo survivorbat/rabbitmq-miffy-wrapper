@@ -34,6 +34,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit
         [DataRow("School", "Test data")]
         [DataRow("MVM.Blackjack", "Nijntje, lief klein konijntje")]
         [DataRow("MVM.Blackjack", "Nieuwe speler toegevoegd")]
+        [DataRow("EDA.Start.Machine", "The machine has started!")]
         public void PublishCallsSendMessageWithExpectedMessageOnSender(string topic, string body)
         {
             // Arrange

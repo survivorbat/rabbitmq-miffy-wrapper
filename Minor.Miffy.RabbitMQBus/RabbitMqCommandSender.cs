@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing;
@@ -10,54 +11,39 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandSender : ICommandSender
     {
+        /// <summary>
+        /// Context
+        /// </summary>
         private readonly IBusContext<IConnection> _context;
 
         /// <summary>
-        /// Dispose of the model
+        /// Logger
         /// </summary>
-        public void Dispose()
+        private readonly ILogger<RabbitMqCommandSender> _logger;
+
+        /// <summary>
+        /// Create a new sender with a provider context
+        /// </summary>
+        public RabbitMqCommandSender(IBusContext<IConnection> context)
         {
+            _context = context;
+            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqCommandSender>();
         }
 
-        public RabbitMqCommandSender(IBusContext<IConnection> context) => _context = context;
-
+        /// <summary>
+        /// Send a command asynchronously
+        /// </summary>
         public async Task<CommandMessage> SendCommandAsync(CommandMessage request)
         {
-            using var model = _context.Connection.CreateModel();
-            
-            var resetHandler = new AutoResetEvent(false);
-            
-            // Declare reply queue ny the replyqueue name
-            model.QueueDeclare(request.ReplyQueue);
-            model.QueueBind(request.ReplyQueue, "", request.ReplyQueue);
-
-            // Start consuming, waiting for a reply
-            CommandMessage result = new CommandMessage();
-            
-            var consumer = new EventingBasicConsumer(model);
-            consumer.Received += (sender, args) =>
+            return await Task.Run(() =>
             {
-                result = new CommandMessage();
-                resetHandler.Set();
-            };
-
-            model.BasicConsume(consumer, request.ReplyQueue);
-            
-            // Publish the command
-            IBasicProperties basicProperties = new BasicProperties
-            {
-                Timestamp = new AmqpTimestamp(request.Timestamp),
-                CorrelationId = request.CorrelationId.ToString(),
-                ReplyTo = request.ReplyQueue,
-                Type = request.EventType
-            };
-            
-            model.BasicPublish("", request.DestinationQueue, basicProperties, request.Body);
-
-            // Wait for reply to come in
-            resetHandler.WaitOne();
-            
-            return result;
+                return new CommandMessage();
+            });
         }
+        
+        /// <summary>
+        /// Dispose of the model
+        /// </summary>
+        public void Dispose() { }
     }
 }

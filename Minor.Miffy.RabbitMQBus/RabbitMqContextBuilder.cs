@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Minor.Miffy.RabbitMQBus.Constants;
 using RabbitMQ.Client;
 
@@ -8,23 +9,44 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqContextBuilder
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly ILogger<RabbitMqContextBuilder> _logger;
+
+        /// <summary>
+        /// Connection string
+        /// </summary>
         public Uri ConnectionString { get; private set; }
-        public string ExchangeName { get; private set; }
         
+        /// <summary>
+        /// Exchange name
+        /// </summary>
+        public string ExchangeName { get; private set; }
+
+        /// <summary>
+        /// Initialize a builder with a logger
+        /// </summary>
+        public RabbitMqContextBuilder() => _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqContextBuilder>();
+
         /// <summary>
         /// Set up an exchange name
         /// </summary>
         public RabbitMqContextBuilder WithExchange(string exchangeName)
         {
+            _logger.LogTrace($"Setting exchange name as {exchangeName}");
             ExchangeName = exchangeName;
             return this;
         }
 
         /// <summary>
         /// Set the connection string to the broker
+        ///
+        /// Not logging the url since it might leak secrets
         /// </summary>
         public RabbitMqContextBuilder WithConnectionString(string url)
         {
+            _logger.LogTrace($"Setting connection string");
             ConnectionString = new Uri(url);
             return this;
         }
@@ -38,6 +60,8 @@ namespace Minor.Miffy.RabbitMQBus
                            throw new BusConfigurationException($"{EnvVarNames.BrokerConnectionString} env variable not set");
             ExchangeName = Environment.GetEnvironmentVariable(EnvVarNames.BrokerExchangeName) ?? 
                            throw new BusConfigurationException($"{EnvVarNames.BrokerExchangeName} env variable not set");
+
+            _logger.LogDebug($"Setting exchange name as {ExchangeName} and setting connection string");
 
             ConnectionString = new Uri(url);
             return this;
@@ -55,6 +79,7 @@ namespace Minor.Miffy.RabbitMQBus
             
             using (var channel = connection.CreateModel())
             {
+                _logger.LogDebug($"Declaring exchange {ExchangeName}");
                 channel.ExchangeDeclare(ExchangeName, ExchangeType.Topic);
             }
             

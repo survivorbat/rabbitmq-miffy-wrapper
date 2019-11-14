@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
@@ -12,18 +14,32 @@ namespace Minor.Miffy.MicroServices
         /// Sender to send a message through the bus
         /// </summary>
         private readonly IMessageSender _sender;
-        
+
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly ILogger<EventPublisher> _logger;
+
         /// <summary>
         /// Create a publisher and initialize a sender
         /// </summary>
-        public EventPublisher(IBusContext<IConnection> context) => _sender = context.CreateMessageSender();
+        public EventPublisher(IBusContext<IConnection> context, ILoggerFactory loggerFactory = null)
+        {
+            _sender = context.CreateMessageSender();
+            loggerFactory ??= new NullLoggerFactory();
+            _logger = loggerFactory.CreateLogger<EventPublisher>();
+        }
 
         /// <summary>
         /// Publish a domain event
         /// </summary>
         public void Publish(DomainEvent domainEvent)
         {
+            _logger.LogTrace($"Publishing domain event with type {domainEvent.GetType().Name} and ID {domainEvent.Id}");
+            
             var json = JsonConvert.SerializeObject(domainEvent);
+            
+            _logger.LogDebug($"Publishing domain event {domainEvent.Id} with body: {json}");
             
             EventMessage message = new EventMessage
             {

@@ -21,14 +21,14 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        internal readonly Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues = new Dictionary<TestBusKey, TestBusQueueWrapper>();
-        
+        internal virtual Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues { get; } = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+
         /// <summary>
         /// Properties that do not matter for the queue but are
         /// here to comply with the interface
         /// </summary>
-        public IConnection Connection { get; set; }
-        public string ExchangeName { get; set; }
+        public IConnection Connection => throw new NotImplementedException();
+        public string ExchangeName => throw new NotImplementedException();
 
         /// <summary>
         /// Return a test message sender to use for testing purposes
@@ -42,10 +42,6 @@ namespace Minor.Miffy.TestBus
             new TestMessageReceiver(this, queueName, topicExpressions);
 
         public ICommandSender CreateCommandSender() => new TestCommandSender(this);
-
-        public ICommandReceiver CreateCommandReceiver()
-        {
-            throw new NotImplementedException();
-        }
+        public ICommandReceiver CreateCommandReceiver(string queueName) => new TestCommandReceiver(this, queueName);
     }
 }

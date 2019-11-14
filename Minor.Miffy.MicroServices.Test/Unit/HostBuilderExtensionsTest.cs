@@ -15,8 +15,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit
             bool hasBeenCalled = false;
 
             // Act
-            HostBuilderExtensions.ConfigureMicroServiceHostDefaults(builder.Object,
-                hostBuilder => hasBeenCalled = true);
+            builder.Object.ConfigureMicroServiceHostDefaults(hostBuilder => hasBeenCalled = true);
 
             // Assert
             Assert.IsTrue(hasBeenCalled);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Minor.Miffy.TestBus
 {
@@ -9,18 +10,31 @@ namespace Minor.Miffy.TestBus
         /// Testbus context
         /// </summary>
         private readonly TestBusContext _context;
-        
+
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly ILogger<TestMessageSender> _logger;
+
         /// <summary>
         /// Testbuscontext to send the message to
         /// </summary>
-        public TestMessageSender(TestBusContext context) => _context = context;
+        public TestMessageSender(TestBusContext context)
+        {
+            _context = context;
+            _logger = MiffyLoggerFactory.CreateInstance<TestMessageSender>();
+        }
 
         /// <summary>
         /// Send a message to the in-memory bus
         /// </summary>
         public void SendMessage(EventMessage message)
         {
-            IEnumerable<TestBusKey> matchingTopics = _context.DataQueues.Keys.Where(key => key.TopicPattern.IsMatch(message.Topic));
+            IEnumerable<TestBusKey> matchingTopics = _context.DataQueues.Keys
+                .Where(key => key.TopicPattern.IsMatch(message.Topic))
+                .ToList();
+            
+            _logger.LogDebug($"Message {message.CorrelationId} received with matching topics {string.Join(", ", matchingTopics)}");
             
             foreach (var key in matchingTopics)
             {
