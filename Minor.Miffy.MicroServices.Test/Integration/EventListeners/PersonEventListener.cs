@@ -1,7 +1,6 @@
-using Minor.Miffy.MicroServices;
-using Minor.Miffy.RabbitMQBus.Test.Integration.Events;
+using Minor.Miffy.MicroServices.Test.Integration.Events;
 
-namespace Minor.Miffy.RabbitMQBus.Test.Integration.EventListeners
+namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
 {
     [EventListener("PeopleApp.Persons")]
     public class PersonEventListener
