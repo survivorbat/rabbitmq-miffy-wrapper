@@ -11,18 +11,27 @@ namespace Minor.Miffy.RabbitMQBus
         public Uri ConnectionString { get; private set; }
         public string ExchangeName { get; private set; }
         
+        /// <summary>
+        /// Set up an exchange name
+        /// </summary>
         public RabbitMqContextBuilder WithExchange(string exchangeName)
         {
             ExchangeName = exchangeName;
             return this;
         }
 
+        /// <summary>
+        /// Set the connection string to the broker
+        /// </summary>
         public RabbitMqContextBuilder WithConnectionString(string url)
         {
             ConnectionString = new Uri(url);
             return this;
         }
 
+        /// <summary>
+        /// Initialize the connection to the broker using environment variables
+        /// </summary>
         public RabbitMqContextBuilder ReadFromEnvironmentVariables()
         {
             string url = Environment.GetEnvironmentVariable(EnvVarNames.BrokerConnectionString) ?? 
@@ -36,7 +45,7 @@ namespace Minor.Miffy.RabbitMQBus
 
         /// <summary>
         /// Creates a context with 
-        ///  - an opened connection (based on HostName, Port, UserName and Password)
+        ///  - an opened connection (based on the URI)
         ///  - a declared Topic-Exchange (based on ExchangeName)
         /// </summary>
         public IBusContext<IConnection> CreateContext()

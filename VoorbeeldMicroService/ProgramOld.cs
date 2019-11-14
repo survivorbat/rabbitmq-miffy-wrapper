@@ -6,8 +6,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Extensions.Logging;
 using VoorbeeldMicroService.DAL;
 
 namespace VoorbeeldMicroService
@@ -18,14 +16,9 @@ namespace VoorbeeldMicroService
         {
             using var loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole().AddDebug();
+                configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
             });
-            
-            loggerFactory.AddSerilog(new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger());
-            
+
             var contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("MVM.EventExchange")
                     .WithConnectionString("amqp://guest:guest@localhost");  
