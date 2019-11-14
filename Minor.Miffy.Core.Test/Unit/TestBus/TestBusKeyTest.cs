@@ -38,6 +38,26 @@ namespace Minor.Miffy.Test.Unit.TestBus
         [DataRow("test", "testA", "test", "testB", false)]
         [DataRow("test", "test*", "test", "test#", false)]
         [DataRow("foo", "bar", "bez", "foo", false)]
+        public void TwoKeysWithTheSameValuesHaveEqualHashkeys(string queueA, string topicA, string queueB, string topicB, bool expected)
+        {
+            // Arrange
+            var keyA = new TestBusKey(queueA, topicA);
+            var keyB = new TestBusKey(queueB, topicB);
+            
+            // Act
+            bool result = keyA.GetHashCode() == keyB.GetHashCode();
+
+            // Assert
+            Assert.AreEqual(result, expected);
+        }
+        
+        [TestMethod]
+        [DataRow("test.queue", "test.topic", "test.queue", "test.topic", true)]
+        [DataRow("test*", "test*", "test*", "test*", true)]
+        [DataRow("testA", "test", "testB", "test", false)]
+        [DataRow("test", "testA", "test", "testB", false)]
+        [DataRow("test", "test*", "test", "test#", false)]
+        [DataRow("foo", "bar", "bez", "foo", false)]
         public void TwoKeysWithTheSameValuesAreEqual(string queueA, string topicA, string queueB, string topicB, bool expected)
         {
             // Arrange
@@ -49,19 +69,6 @@ namespace Minor.Miffy.Test.Unit.TestBus
 
             // Assert
             Assert.AreEqual(result, expected);
-        }
-
-        [TestMethod]
-        public void EqualsWithNullReturnsFalse()
-        {
-            // Arrange
-            var key = new TestBusKey("test", "test");
-            
-            // Act
-            bool result = key.Equals(null);
-
-            // Assert
-            Assert.IsFalse(result);
         }
     }
 }

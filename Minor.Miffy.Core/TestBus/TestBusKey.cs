@@ -53,7 +53,5 @@ namespace Minor.Miffy.TestBus
         
         public override int GetHashCode() => 
             ((_queueName != null ? _queueName.GetHashCode() : 0) * 397) ^ (_topicName != null ? _topicName.GetHashCode() : 0);
-        
-        public override string ToString() => $"Queue: {_queueName}, Topic: {_topicName}";
     }
 }
