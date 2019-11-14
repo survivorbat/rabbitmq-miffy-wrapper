@@ -51,7 +51,6 @@ namespace Minor.Miffy.TestBus
 
         private bool Equals(TestBusKey other) => _queueName == other._queueName && _topicName == other._topicName;
         
-        public override int GetHashCode() => 
-            ((_queueName != null ? _queueName.GetHashCode() : 0) * 397) ^ (_topicName != null ? _topicName.GetHashCode() : 0);
+        public override int GetHashCode() => (_queueName.GetHashCode() * 397) ^ (_topicName.GetHashCode() * 379);
     }
 }

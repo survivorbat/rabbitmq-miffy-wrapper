@@ -36,7 +36,7 @@ namespace VoorbeeldMicroService
                 Polis = new Polis {Klantnaam = "Marco Pill"}
             };
             
-            var sender = new EventPublisher(context, loggerFactory);
+            var sender = new EventPublisher(context);
             while (true)
             {
                 sender.Publish(polisToegevoegdEvent);

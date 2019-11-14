@@ -26,7 +26,7 @@ namespace Minor.Miffy.MicroServices
         public EventPublisher(IBusContext<IConnection> context, ILoggerFactory loggerFactory = null)
         {
             _sender = context.CreateMessageSender();
-            loggerFactory ??= new NullLoggerFactory();
+            loggerFactory = loggerFactory ?? new NullLoggerFactory();
             _logger = loggerFactory.CreateLogger<EventPublisher>();
         }
 
