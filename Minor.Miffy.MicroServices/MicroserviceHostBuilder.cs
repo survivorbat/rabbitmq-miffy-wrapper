@@ -145,6 +145,7 @@ namespace Minor.Miffy.MicroServices
         public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
+            _serviceCollection.AddSingleton(loggerFactory);
             _logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
             return this;
         }
