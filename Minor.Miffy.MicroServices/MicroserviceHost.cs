@@ -48,7 +48,7 @@ namespace Minor.Miffy.MicroServices
         {
             foreach (var callback in _listeners)
             {
-                _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}", callback);
+                _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
                 
                 var receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();

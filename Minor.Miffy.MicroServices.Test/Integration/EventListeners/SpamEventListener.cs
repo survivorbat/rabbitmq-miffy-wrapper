@@ -11,7 +11,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// Static variable to keep the result in
         /// </summary>
-        internal static ConcurrentBag<CatAddedEvent> ResultEvents { get; set; } = new ConcurrentBag<CatAddedEvent>();
+        internal static List<CatAddedEvent> ResultEvents { get; set; } = new List<CatAddedEvent>();
 
         /// <summary>
         /// Listener for all events
@@ -19,6 +19,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         [Topic("PeopleApp.Cats.New")]
         public void Handles(CatAddedEvent addedEvent)
         {
+            Console.WriteLine($"Received addedEvent with {addedEvent.Cat.Name}!");
             ResultEvents.Add(addedEvent);
         }
     }

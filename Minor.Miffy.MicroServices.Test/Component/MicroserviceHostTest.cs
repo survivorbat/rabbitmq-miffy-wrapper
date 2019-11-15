@@ -27,5 +27,11 @@ namespace Minor.Miffy.MicroServices.Test.Component
             
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
         }
+
+        [TestMethod]
+        public void AddingListenerOnlyAddsRelevantMethods()
+        {
+            Assert.IsTrue(false);
+        }
     }
 }

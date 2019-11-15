@@ -118,7 +118,10 @@ namespace Minor.Miffy.MicroServices
             _logger.LogTrace($"Instantiating {type.Name} with provided services.");
             var instance = ActivatorUtilities.CreateInstance(serviceProvider, type);
 
-            foreach (var method in type.DeclaredMethods)
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Where(e => !e.IsSpecialName);
+            
+            foreach (var method in methods)
             {
                 _logger.LogTrace($"Retrieving topic attributes from {type.Name}");
                 var topicPatterns = method.GetCustomAttributes<TopicAttribute>()
@@ -131,7 +134,7 @@ namespace Minor.Miffy.MicroServices
                 // If method is not suitable, skip it
                 if (parameterType == null)
                 {
-                    _logger.LogWarning($"Method {method.Name} in {type.Name} does not have a parameter but is marked as event listener!");
+                    _logger.LogWarning($"Method {method.Name} in {type.Name} is not an event callback, skipping");
                     continue;
                 }
 

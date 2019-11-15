@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Test.Integration.EventListeners;
 using Minor.Miffy.MicroServices.Test.Integration.Events;
@@ -181,12 +182,11 @@ namespace Minor.Miffy.MicroServices.Test.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            MicroserviceHost host = new MicroserviceHostBuilder()
+            new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<SpamEventListener>()
-                .CreateHost();
-            
-            host.Start();
+                .CreateHost()
+                .Start();
             
             var publisher = new EventPublisher(busContext);
 
@@ -197,9 +197,21 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             {
                 publisher.Publish(@event);
             }
+            
+            Thread.Sleep(1000);
 
-            Thread.Sleep(500);
             CollectionAssert.AreEquivalent(catEvents, SpamEventListener.ResultEvents);
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            SpamEventListener.ResultEvents = new List<CatAddedEvent>();
+            CatEventListener.ResultEvent = null;
+            WildCardPersonEventListener.ResultEvent = null;
+            WildCardPersonEventListener2.ResultEvent = null;
+            PersonEventListener.ResultEvent = null;
+            FanInEventListener.ResultEvent = null;
         }
     }
 }
