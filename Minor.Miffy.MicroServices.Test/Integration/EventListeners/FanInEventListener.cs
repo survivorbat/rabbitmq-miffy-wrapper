@@ -2,23 +2,23 @@ using Minor.Miffy.MicroServices.Test.Integration.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
 {
-    [EventListener("PeopleApp.Persons")]
-    public class PersonEventListener
+    [EventListener("PeopleApp.Persons.FanIn")]
+    public class FanInEventListener
     {
         /// <summary>
         /// Reset the static variable
         /// </summary>
-        public PersonEventListener() => ResultEvent = null;
+        public FanInEventListener() => ResultEvent = null;
         
         /// <summary>
-        /// Static variable to keep track of the event
+        /// Static variable to keep the result in
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; private set; }
         
         /// <summary>
-        /// Listener for the event
+        /// Listener for all events
         /// </summary>
-        [Topic("PeopleApp.Persons.New")]
+        [Topic("#")]
         public void Handles(PersonAddedEvent addedEvent) => ResultEvent = addedEvent;
     }
 }

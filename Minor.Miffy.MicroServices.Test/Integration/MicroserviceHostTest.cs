@@ -25,7 +25,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             
             MicroserviceHost host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
-                .UseConventions()
+                .AddEventListener<PersonEventListener>()
                 .CreateHost();
             
             host.Start();
@@ -47,6 +47,86 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             
             // Assert
             Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
+        }
+        
+        [TestMethod]
+        [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060344556")]
+        [DataRow("Cristian", "de Hamer", "c.hamer@info.com", "0603445562")]
+        public void EventListenerReceivesMessageWithWildcards(string firstName, string lastName, string email, string phone)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+            
+            MicroserviceHost host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<WildCardPersonEventListener>()
+                .AddEventListener<WildCardPersonEventListener2>()
+                .CreateHost();
+            
+            host.Start();
+            
+            var publisher = new EventPublisher(busContext);
+
+            var personEvent = new PersonAddedEvent { Person = new Person 
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    PhoneNumber = phone
+                }
+            };
+            
+            // Act
+            publisher.Publish(personEvent);
+            Thread.Sleep(1000);
+            
+            // Assert
+            Assert.AreEqual(personEvent, WildCardPersonEventListener.ResultEvent);
+            Assert.AreEqual(personEvent, WildCardPersonEventListener2.ResultEvent);
+        }
+        
+        [TestMethod]
+        [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060344556")]
+        [DataRow("Cristian", "de Hamer", "c.hamer@info.com", "0603445562")]
+        public void FanInListenerReceivesAllMessages(string firstName, string lastName, string email, string phone)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+            
+            MicroserviceHost host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<FanInEventListener>()
+                .CreateHost();
+            
+            host.Start();
+            
+            var publisher = new EventPublisher(busContext);
+
+            var personEvent = new PersonAddedEvent { Person = new Person 
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    PhoneNumber = phone
+                }
+            };
+            
+            // Act
+            publisher.Publish(personEvent);
+            Thread.Sleep(500);
+            
+            // Assert
+            Assert.AreEqual(personEvent, FanInEventListener.ResultEvent);
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Minor.Miffy.RabbitMQBus
         {
             if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
             
-            _model.QueueDeclare(QueueName);
+            _model.QueueDeclare(QueueName, true, false);
             foreach (var topicExpression in TopicFilters)
             {
                 _model.QueueBind(QueueName, _context.ExchangeName, topicExpression);
@@ -69,6 +69,7 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
+        /// TODO: Prevent this if not listening
         /// Start consuming messages from the queue
         /// </summary>
         public void StartHandlingMessages(EventMessageReceivedCallback callback)

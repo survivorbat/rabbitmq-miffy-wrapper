@@ -2,23 +2,23 @@ using Minor.Miffy.MicroServices.Test.Integration.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
 {
-    [EventListener("PeopleApp.Persons")]
-    public class PersonEventListener
+    [EventListener("PeopleApp.Persons.Wild")]
+    public class WildCardPersonEventListener
     {
         /// <summary>
         /// Reset the static variable
         /// </summary>
-        public PersonEventListener() => ResultEvent = null;
-        
+        public WildCardPersonEventListener() => ResultEvent = null;
+
         /// <summary>
-        /// Static variable to keep track of the event
+        /// Result of the initial call from rabbitMQ
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; private set; }
         
         /// <summary>
-        /// Listener for the event
+        /// Listener for the topic on the queue
         /// </summary>
-        [Topic("PeopleApp.Persons.New")]
+        [Topic("PeopleApp.Persons.*")]
         public void Handles(PersonAddedEvent addedEvent) => ResultEvent = addedEvent;
     }
 }
