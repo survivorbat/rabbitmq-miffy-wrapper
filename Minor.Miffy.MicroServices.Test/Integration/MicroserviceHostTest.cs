@@ -83,7 +83,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             
             // Act
             publisher.Publish(personEvent);
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             
             // Assert
             Assert.AreEqual(personEvent, WildCardPersonEventListener.ResultEvent);
@@ -127,6 +127,40 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             
             // Assert
             Assert.AreEqual(personEvent, FanInEventListener.ResultEvent);
+        }
+        
+        [TestMethod]
+        [DataRow("Aspra")]
+        [DataRow("Luna")]
+        [DataRow("Brownie")]
+        [DataRow("Zilver")]
+        public void CatEventDoesNotTriggerPersonEvent(string name)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+            
+            MicroserviceHost host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<PersonEventListener>()
+                .AddEventListener<CatEventListener>()
+                .CreateHost();
+            
+            host.Start();
+            
+            var publisher = new EventPublisher(busContext);
+
+            var catEvent = new CatAddedEvent { Cat = new Cat {Name = name}};
+            
+            // Act
+            publisher.Publish(catEvent);
+            Thread.Sleep(500);
+            
+            // Assert
+            Assert.IsNull(PersonEventListener.ResultEvent);
+            Assert.AreEqual(catEvent, CatEventListener.ResultEvent);
         }
     }
 }
