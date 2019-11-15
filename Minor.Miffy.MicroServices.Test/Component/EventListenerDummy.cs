@@ -4,6 +4,11 @@ namespace Minor.Miffy.MicroServices.Test.Component
     public class EventListenerDummy
     {
         /// <summary>
+        /// Reset the result
+        /// </summary>
+        public EventListenerDummy() => HandlesResult = null;
+        
+        /// <summary>
         /// Result of the handles method
         /// </summary>
         public static DummyEvent HandlesResult { get; internal set; }

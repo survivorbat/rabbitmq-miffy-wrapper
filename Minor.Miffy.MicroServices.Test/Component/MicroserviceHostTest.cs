@@ -7,9 +7,6 @@ namespace Minor.Miffy.MicroServices.Test.Component
     [TestClass]
     public class MicroserviceHostTest
     {
-        [TestInitialize]
-        public void TestInitialize() => EventListenerDummy.HandlesResult = null;
-
         [TestMethod]
         public void AddingListenerRegistersProperReceiver()
         {
@@ -26,7 +23,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var message = new DummyEvent("TestTopic");
             new EventPublisher(testContext).Publish(message);
             
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
         }

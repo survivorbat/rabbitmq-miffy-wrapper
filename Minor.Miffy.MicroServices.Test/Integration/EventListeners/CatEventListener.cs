@@ -13,7 +13,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// Static variable to keep track of the event
         /// </summary>
-        internal static CatAddedEvent ResultEvent { get; private set; }
+        internal static CatAddedEvent ResultEvent { get; set; }
         
         /// <summary>
         /// Listener for the event

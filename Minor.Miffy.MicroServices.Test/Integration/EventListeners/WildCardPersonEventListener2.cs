@@ -13,7 +13,7 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// To keep track of this event
         /// </summary>
-        internal static PersonAddedEvent ResultEvent { get; private set; }
+        internal static PersonAddedEvent ResultEvent { get; set; }
         
         /// <summary>
         /// Listener for events
