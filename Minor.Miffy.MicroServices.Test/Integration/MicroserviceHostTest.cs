@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -166,8 +167,10 @@ namespace Minor.Miffy.MicroServices.Test.Integration
         }
         
         [TestMethod]
-        [DataRow("Aspra", "Chris", "Kat")]
         [DataRow("Bram")]
+        [DataRow("Aspra", "Chris", "Kat")]
+        [DataRow("Jan", "Piet")]
+        [DataRow("Job", "Jen", "Jas", "Snor")]
         [DataRow("Olaf", "Janneke", "Piet", "Poes")]
         [DataRow("Kat1", "Kat2", "Kat3", "Kat4", "Kat5")]
         public void EventListenerHandlesMultipleEvents(params string[] names)
@@ -194,22 +197,9 @@ namespace Minor.Miffy.MicroServices.Test.Integration
             {
                 publisher.Publish(@event);
             }
-            
-            Thread.Sleep(3000);
-            
-            // Assert
-            CollectionAssert.AreEqual(catEvents, SpamEventListener.ResultEvents);
-        }
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            SpamEventListener.ResultEvents = new List<CatAddedEvent>();
-            WildCardPersonEventListener.ResultEvent = null;
-            WildCardPersonEventListener2.ResultEvent = null;
-            PersonEventListener.ResultEvent = null;
-            CatEventListener.ResultEvent = null;
-            FanInEventListener.ResultEvent = null;
+            Thread.Sleep(500);
+            CollectionAssert.AreEquivalent(catEvents, SpamEventListener.ResultEvents);
         }
     }
 }
