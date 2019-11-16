@@ -18,8 +18,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Minor.Miffy.Microservices.Test.Integration\Minor.Miffy.Microservices.Test.Integration.csproj" />
       <ProjectReference Include="..\Minor.Miffy.MicroServices\Minor.Miffy.MicroServices.csproj" />
+      <ProjectReference Include="..\Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj" />
     </ItemGroup>
 
 </Project>

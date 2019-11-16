@@ -21,7 +21,7 @@ namespace Minor.Miffy.MicroServices
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
-        private readonly IEnumerable<MicroserviceListener> _listeners;
+        internal readonly IEnumerable<MicroserviceListener> Listeners;
 
         /// <summary>
         /// A logger factory to log the start
@@ -37,7 +37,7 @@ namespace Minor.Miffy.MicroServices
         public MicroserviceHost(IBusContext<IConnection> connection, IEnumerable<MicroserviceListener> listeners, ILogger<MicroserviceHost> logger)
         {
             Context = connection;
-            _listeners = listeners;
+            Listeners = listeners;
             _logger = logger;
         }
 
@@ -46,7 +46,7 @@ namespace Minor.Miffy.MicroServices
         /// </summary>
         public void Start()
         {
-            foreach (var callback in _listeners)
+            foreach (var callback in Listeners)
             {
                 _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
                 

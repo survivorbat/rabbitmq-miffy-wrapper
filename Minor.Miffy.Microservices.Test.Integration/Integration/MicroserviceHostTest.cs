@@ -1,15 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.MicroServices;
 using Minor.Miffy.MicroServices.Test.Integration.EventListeners;
-using Minor.Miffy.MicroServices.Test.Integration.Events;
-using Minor.Miffy.MicroServices.Test.Integration.Models;
+using Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners;
+using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
+using Minor.Miffy.Microservices.Test.Integration.Integration.Models;
 using Minor.Miffy.RabbitMQBus;
 
-namespace Minor.Miffy.MicroServices.Test.Integration
+namespace Minor.Miffy.Microservices.Test.Integration.Integration
 {
     [TestClass]
     public class MicroserviceHostTest

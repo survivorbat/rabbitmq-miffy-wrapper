@@ -1,4 +1,4 @@
-namespace Minor.Miffy.MicroServices.Test.Integration.Models
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.Models
 {
     public class Cat
     {

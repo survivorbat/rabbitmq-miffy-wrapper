@@ -1,6 +1,7 @@
-using Minor.Miffy.MicroServices.Test.Integration.Events;
+using Minor.Miffy.MicroServices;
+using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
-namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
 {
     [EventListener("PeopleApp.Cats")]
     public class CatEventListener

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Minor.Miffy.MicroServices.Test.Integration.Events;
+using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
 {
@@ -17,10 +17,6 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// Listener for all events
         /// </summary>
         [Topic("PeopleApp.Cats.New")]
-        public void Handles(CatAddedEvent addedEvent)
-        {
-            Console.WriteLine($"Received addedEvent with {addedEvent.Cat.Name}!");
-            ResultEvents.Add(addedEvent);
-        }
+        public void Handles(CatAddedEvent addedEvent) => ResultEvents.Add(addedEvent);
     }
 }

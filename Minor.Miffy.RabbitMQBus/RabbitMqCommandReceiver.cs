@@ -1,6 +1,8 @@
 using System;
+using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -45,7 +47,8 @@ namespace Minor.Miffy.RabbitMQBus
         public void DeclareCommandQueue()
         {
             _logger.LogTrace($"Declaring command queue {QueueName}");
-            _model.QueueDeclare(QueueName);
+            _model.QueueDeclare(QueueName, true, false, false);
+            _model.BasicQos(0, 1, false);
         }
 
         /// <summary>
@@ -54,9 +57,24 @@ namespace Minor.Miffy.RabbitMQBus
         public void StartReceivingCommands(CommandReceivedCallback callback)
         {
             _logger.LogTrace($"Start receiving commands on queue {QueueName}");
+
             var consumer = new EventingBasicConsumer(_model);
-            consumer.Received += (sender, args) => Console.WriteLine("yay");
-            _model.BasicConsume(consumer, QueueName);
+            
+            consumer.Received += (model, ea) =>
+            {
+                IBasicProperties replyProps = _model.CreateBasicProperties();
+                replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                string messageString = Encoding.Unicode.GetString(ea.Body); 
+                CommandMessage request = JsonConvert.DeserializeObject<CommandMessage>(messageString);
+                CommandMessage response = callback(request);
+                
+                string responseMessage = JsonConvert.SerializeObject(response);
+                byte[] responseBody = Encoding.Unicode.GetBytes(responseMessage);
+                _model.BasicPublish(_context.ExchangeName, ea.BasicProperties.ReplyTo, replyProps, responseBody);
+            };
+            
+            _model.BasicConsume(QueueName, true, consumer);
         }
 
         /// <summary>

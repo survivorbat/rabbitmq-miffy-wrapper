@@ -1,6 +1,7 @@
-using Minor.Miffy.MicroServices.Test.Integration.Models;
+using Minor.Miffy.MicroServices;
+using Minor.Miffy.Microservices.Test.Integration.Integration.Models;
 
-namespace Minor.Miffy.MicroServices.Test.Integration.Events
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.Events
 {
     public class CatAddedEvent : DomainEvent
     {

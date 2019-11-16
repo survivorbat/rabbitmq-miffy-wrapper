@@ -1,5 +1,7 @@
+using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners;
 using Minor.Miffy.TestBus;
 
 namespace Minor.Miffy.MicroServices.Test.Component
@@ -31,8 +33,20 @@ namespace Minor.Miffy.MicroServices.Test.Component
         [TestMethod]
         public void AddingListenerOnlyAddsRelevantMethods()
         {
-            // TODO
-            Assert.IsTrue(false);
+            // Arrange
+            var testContext = new TestBusContext();
+            var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
+                .AddEventListener<MethodEventListener>();
+
+            // Act
+            var result = builder.CreateHost().Listeners.ToList();
+            
+            // Assert
+            Assert.AreEqual(1, result.Count);
+
+            var firstItem = result.FirstOrDefault();
+            Assert.AreEqual("PersonApp.Cats.Test", firstItem?.Queue);
+            Assert.AreEqual("testPattern", firstItem?.TopicExpressions.FirstOrDefault());
         }
     }
 }

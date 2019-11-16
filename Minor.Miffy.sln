@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.MicroServices.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.MicroServices.Test.Conventions", "Minor.Miffy.MicroServices.Test.Conventions\Minor.Miffy.MicroServices.Test.Conventions.csproj", "{6AA9C809-73C3-4666-B729-4A45BA5FA833}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.Microservices.Test.Integration", "Minor.Miffy.Microservices.Test.Integration\Minor.Miffy.Microservices.Test.Integration.csproj", "{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus.Test.Integration", "Minor.Miffy.RabbitMQBus.Test.Integration\Minor.Miffy.RabbitMQBus.Test.Integration.csproj", "{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +72,14 @@ Global
 		{6AA9C809-73C3-4666-B729-4A45BA5FA833}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AA9C809-73C3-4666-B729-4A45BA5FA833}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AA9C809-73C3-4666-B729-4A45BA5FA833}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
