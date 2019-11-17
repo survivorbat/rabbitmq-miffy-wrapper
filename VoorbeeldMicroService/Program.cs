@@ -6,6 +6,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Minor.Miffy.MicroServices.Host;
 using VoorbeeldMicroService.DAL;
 
 namespace VoorbeeldMicroService

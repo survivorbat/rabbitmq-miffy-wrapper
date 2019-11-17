@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Threading;
 using RabbitMQ.Client;
 
 namespace Minor.Miffy.TestBus
@@ -15,6 +17,11 @@ namespace Minor.Miffy.TestBus
         public string QueueName { get; }
 
         /// <summary>
+        /// Whether the queue is already declared or not
+        /// </summary>
+        private bool _queueDeclared;
+
+        /// <summary>
         /// Initialize a receiver with a context and queue name
         /// </summary>
         public TestCommandReceiver(TestBusContext context, string queueName)
@@ -28,7 +35,8 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void DeclareCommandQueue()
         {
-            
+            _context.CommandQueues[QueueName] = new TestBusQueueWrapper<CommandMessage>();
+            _queueDeclared = true;
         }
 
         /// <summary>
@@ -36,7 +44,25 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void StartReceivingCommands(CommandReceivedCallback callback)
         {
-            
+            if (!_queueDeclared)
+            {
+                throw new BusConfigurationException($"Queue {QueueName} has not been declared yet.");
+            }
+
+            var thread = new Thread(() =>
+            {
+                while (true)
+                {
+                    _context.CommandQueues[QueueName].AutoResetEvent.WaitOne();
+                    _context.CommandQueues[QueueName].Queue.TryDequeue(out CommandMessage input);
+                    CommandMessage result = callback(input);
+                    _context.CommandQueues[input.ReplyQueue].Queue.Enqueue(result);
+                    _context.CommandQueues[input.ReplyQueue].AutoResetEvent.Set();
+                }
+            });
+
+            thread.IsBackground = true;
+            thread.Start();
         }
 
         /// <summary>

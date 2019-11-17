@@ -1,7 +1,9 @@
 using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners;
+using Minor.Miffy.MicroServices.Events;
+using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.MicroServices.Test.Component.EventListeners;
 using Minor.Miffy.TestBus;
 
 namespace Minor.Miffy.MicroServices.Test.Component
@@ -31,7 +33,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         }
 
         [TestMethod]
-        public void AddingListenerOnlyAddsRelevantMethods()
+        public void AddingListenerOnlyAddsRelevantMethod()
         {
             // Arrange
             var testContext = new TestBusContext();
@@ -47,6 +49,25 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var firstItem = result.FirstOrDefault();
             Assert.AreEqual("PersonApp.Cats.Test", firstItem?.Queue);
             Assert.AreEqual("testPattern", firstItem?.TopicExpressions.FirstOrDefault());
+        }
+        
+        [TestMethod]
+        public void AddingListenerRegistersProperCommandReceiver()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            // Act
+            hostBuilder.AddEventListener<CommandListenerDummy>();
+            
+            var result = hostBuilder.CreateHost().CommandListeners.ToList();
+            
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            
+            var firstItem = result.FirstOrDefault();
+            Assert.AreEqual("command.queue", firstItem?.Queue);
         }
     }
 }

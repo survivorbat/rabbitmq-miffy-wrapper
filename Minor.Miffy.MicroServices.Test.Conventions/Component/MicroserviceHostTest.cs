@@ -1,5 +1,7 @@
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.MicroServices.Events;
+using Minor.Miffy.MicroServices.Host;
 using Minor.Miffy.TestBus;
 
 namespace Minor.Miffy.MicroServices.Test.Conventions.Component

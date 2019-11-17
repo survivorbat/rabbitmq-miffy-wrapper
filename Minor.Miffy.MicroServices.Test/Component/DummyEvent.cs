@@ -1,3 +1,5 @@
+using Minor.Miffy.MicroServices.Events;
+
 namespace Minor.Miffy.MicroServices.Test.Component
 {
     public class DummyEvent : DomainEvent

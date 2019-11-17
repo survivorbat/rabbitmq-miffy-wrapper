@@ -21,7 +21,14 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        internal virtual Dictionary<TestBusKey, TestBusQueueWrapper> DataQueues { get; } = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+        internal virtual Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>> DataQueues { get; } = 
+            new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
+        
+        /// <summary>
+        /// The dictionary that keeps track of running commands
+        /// </summary>
+        internal virtual Dictionary<string, TestBusQueueWrapper<CommandMessage>> CommandQueues { get; } = 
+            new Dictionary<string, TestBusQueueWrapper<CommandMessage>>();
 
         /// <summary>
         /// Properties that do not matter for the queue but are
@@ -41,7 +48,14 @@ namespace Minor.Miffy.TestBus
         public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions) => 
             new TestMessageReceiver(this, queueName, topicExpressions);
 
+        /// <summary>
+        /// Return a test command sender
+        /// </summary>
         public ICommandSender CreateCommandSender() => new TestCommandSender(this);
+        
+        /// <summary>
+        /// Return a test command sender
+        /// </summary>
         public ICommandReceiver CreateCommandReceiver(string queueName) => new TestCommandReceiver(this, queueName);
     }
 }

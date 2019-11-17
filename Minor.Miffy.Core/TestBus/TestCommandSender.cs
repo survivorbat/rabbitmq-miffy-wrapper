@@ -27,9 +27,17 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Send a command asynchronously
         /// </summary>
-        public Task<CommandMessage> SendCommandAsync(CommandMessage request)
-        {
-            throw new System.NotImplementedException();
-        }
+        public Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
+            Task.Run(() =>
+            {
+                _context.CommandQueues[request.ReplyQueue] = new TestBusQueueWrapper<CommandMessage>();
+                
+                _context.CommandQueues[request.DestinationQueue].Queue.Enqueue(request);
+                _context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
+
+                _context.CommandQueues[request.ReplyQueue].AutoResetEvent.WaitOne();
+                _context.CommandQueues[request.ReplyQueue].Queue.TryDequeue(out var output);
+                return output;
+            });
     }
 }

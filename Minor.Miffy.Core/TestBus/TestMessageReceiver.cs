@@ -61,7 +61,7 @@ namespace Minor.Miffy.TestBus
             {
                 _logger.LogDebug($"Creating queue {QueueName} with topic {topic}");
                 TestBusKey key = new TestBusKey(QueueName, topic);
-                Context.DataQueues[key] = new TestBusQueueWrapper();
+                Context.DataQueues[key] = new TestBusQueueWrapper<EventMessage>();
             }
 
             _isListening = true;

@@ -59,7 +59,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         {
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);

@@ -13,7 +13,6 @@ namespace Minor.Miffy.RabbitMQBus
         public void Dispose()
         {
             _model.Dispose();
-            _context.Dispose();
         }
 
         /// <summary>

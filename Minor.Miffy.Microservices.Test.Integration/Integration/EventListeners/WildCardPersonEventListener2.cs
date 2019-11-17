@@ -1,4 +1,5 @@
 using System.Diagnostics.Tracing;
+using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners

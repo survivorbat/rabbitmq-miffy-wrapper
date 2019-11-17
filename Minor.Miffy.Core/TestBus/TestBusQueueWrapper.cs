@@ -6,7 +6,7 @@ namespace Minor.Miffy.TestBus
     /// <summary>
     /// Wrapper class that contains a reset event, a queue and a topicname
     /// </summary>
-    internal class TestBusQueueWrapper
+    internal class TestBusQueueWrapper<T>
     {
         /// <summary>
         /// Reset event to wait for
@@ -16,6 +16,6 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The actual queue with messages
         /// </summary>
-        internal ConcurrentQueue<EventMessage> Queue { get; } = new ConcurrentQueue<EventMessage>();
+        internal ConcurrentQueue<T> Queue { get; } = new ConcurrentQueue<T>();
     }
 }

@@ -15,7 +15,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         {
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);
@@ -37,7 +37,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void SendMessageDoesNothingWithoutAvailableQueue(string topic)
         {
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);
@@ -61,10 +61,10 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void SendMessageAddsMessageToQueueIfQueueExists(string topic)
         {
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
             var key = new TestBusKey("testQueue", topic);
 
-            dictionary[key] = new TestBusQueueWrapper();
+            dictionary[key] = new TestBusQueueWrapper<EventMessage>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);
@@ -88,10 +88,10 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void SendMessageFlagsAutoResetEvent(string topic)
         {
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
             var key = new TestBusKey("testQueue", topic);
 
-            dictionary[key] = new TestBusQueueWrapper();
+            dictionary[key] = new TestBusQueueWrapper<EventMessage>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);
@@ -116,10 +116,10 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void TopicsAreSelectedByRegex(string regexTopic, string topic)
         {
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper>();
+            var dictionary = new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
             var key = new TestBusKey("testQueue", topic);
 
-            dictionary[key] = new TestBusQueueWrapper();
+            dictionary[key] = new TestBusQueueWrapper<EventMessage>();
 
             context.SetupGet(e => e.DataQueues)
                 .Returns(dictionary);

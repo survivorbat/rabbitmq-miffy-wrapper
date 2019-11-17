@@ -1,9 +1,14 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy;
 using Minor.Miffy.MicroServices;
+using Minor.Miffy.MicroServices.Commands;
+using Minor.Miffy.MicroServices.Events;
+using Minor.Miffy.MicroServices.Host;
 using Minor.Miffy.RabbitMQBus;
 using RabbitMQ.Client;
+using VoorbeeldMicroService.Commands;
 using VoorbeeldMicroService.Models;
 
 namespace VoorbeeldMicroService
@@ -17,6 +22,9 @@ namespace VoorbeeldMicroService
                 configure.AddConsole()
                     .SetMinimumLevel(LogLevel.Trace);
             });
+            
+            MiffyLoggerFactory.LoggerFactory = loggerFactory;
+            RabbitMqLoggerFactory.LoggerFactory = loggerFactory;
 
             var contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("MVM.EventExchange")
@@ -31,16 +39,21 @@ namespace VoorbeeldMicroService
             using var host = builder.CreateHost();
             host.Start();
 
-            var polisToegevoegdEvent = new PolisToegevoegdEvent
+            var newEvent = new PolisToegevoegdEvent
             {
-                Polis = new Polis {Klantnaam = "Marco Pill"}
+                Polis = new Polis() {Klantnaam = "Jan de Man"}
             };
             
-            var sender = new EventPublisher(context);
-            while (true)
+            var messageSender = new EventPublisher(context);
+            messageSender.Publish(newEvent);
+            
+            var polisCommand = new HaalPolissenOpCommand();
+            var sender = new CommandPublisher(context);
+            var result = sender.PublishAsync<HaalPolissenOpCommand>(polisCommand);
+            
+            foreach (var resultPolis in result.Result.Polisses)
             {
-                sender.Publish(polisToegevoegdEvent);
-                Thread.Sleep(1000);
+                Console.WriteLine(resultPolis.Klantnaam);
             }
         }
     }

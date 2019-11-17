@@ -26,10 +26,15 @@ namespace Minor.Miffy.RabbitMQBus
         private readonly ILogger<RabbitMqCommandReceiver> _logger;
 
         /// <summary>
+        /// Is queue declared?
+        /// </summary>
+        private bool _queueDeclared;
+
+        /// <summary>
         /// Name of the queue for th ecommands
         /// </summary>
         public string QueueName { get; }
-        
+
         /// <summary>
         /// Initialize a receiver with a context and queue name
         /// </summary>
@@ -48,7 +53,8 @@ namespace Minor.Miffy.RabbitMQBus
         {
             _logger.LogTrace($"Declaring command queue {QueueName}");
             _model.QueueDeclare(QueueName, true, false, false);
-            _model.BasicQos(0, 1, false);
+            _model.QueueBind(QueueName, _context.ExchangeName, QueueName);
+            _queueDeclared = true;
         }
 
         /// <summary>
@@ -56,25 +62,42 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartReceivingCommands(CommandReceivedCallback callback)
         {
+            if (!_queueDeclared)
+            {
+                throw new BusConfigurationException($"Queue {QueueName} has not been declared yet");    
+            }
+            
             _logger.LogTrace($"Start receiving commands on queue {QueueName}");
 
             var consumer = new EventingBasicConsumer(_model);
             
             consumer.Received += (model, ea) =>
             {
+                _logger.LogInformation($"Received command on {QueueName} with reply queue {ea.BasicProperties.ReplyTo}");
                 IBasicProperties replyProps = _model.CreateBasicProperties();
                 replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
 
-                string messageString = Encoding.Unicode.GetString(ea.Body); 
-                CommandMessage request = JsonConvert.DeserializeObject<CommandMessage>(messageString);
+                CommandMessage request = new CommandMessage
+                {
+                    Body = ea.Body, 
+                    Timestamp = ea.BasicProperties.Timestamp.UnixTime,
+                    DestinationQueue = QueueName,
+                    CorrelationId = Guid.Parse(ea.BasicProperties.CorrelationId)
+                };
                 CommandMessage response = callback(request);
                 
                 string responseMessage = JsonConvert.SerializeObject(response);
-                byte[] responseBody = Encoding.Unicode.GetBytes(responseMessage);
-                _model.BasicPublish(_context.ExchangeName, ea.BasicProperties.ReplyTo, replyProps, responseBody);
+                
+                _model.BasicPublish(
+                    _context.ExchangeName, 
+                    ea.BasicProperties.ReplyTo, 
+                    replyProps, 
+                    Encoding.Unicode.GetBytes(responseMessage));
+                
+                _model.BasicAck(ea.DeliveryTag, false);
             };
             
-            _model.BasicConsume(QueueName, true, consumer);
+            _model.BasicConsume(consumer, QueueName);
         }
 
         /// <summary>

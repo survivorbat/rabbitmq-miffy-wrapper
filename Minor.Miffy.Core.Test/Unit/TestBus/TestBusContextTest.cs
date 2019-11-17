@@ -90,7 +90,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             var context = new TestBusContext();
             var key = new TestBusKey(queueName, topic);
             
-            var wrapper = new TestBusQueueWrapper();
+            var wrapper = new TestBusQueueWrapper<EventMessage>();
             
             // Act
             context.DataQueues[key] = wrapper;
