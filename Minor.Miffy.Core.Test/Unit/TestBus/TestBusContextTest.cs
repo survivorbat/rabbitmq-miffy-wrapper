@@ -1,7 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.TestBus;
-using Moq;
 using RabbitMQ.Client;
 
 namespace Minor.Miffy.Test.Unit.TestBus

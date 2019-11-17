@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RabbitMQ.Client;
@@ -23,6 +24,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             
             // Act
             sender.SendCommandAsync(command);
+
+            Thread.Sleep(500);
 
             // Assert
             connectionMock.Verify(e => e.CreateModel(), Times.Once);
