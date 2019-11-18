@@ -28,7 +28,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             // Assert
             connectionMock.Verify(e => e.CreateModel(), Times.Once);
@@ -55,7 +55,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             // Assert
             modelMock.Verify(e => 
@@ -91,7 +91,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             // Assert
             modelMock.Verify(e => e.QueueBind(queueName, exchangeName, queueName, null));
@@ -131,7 +131,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             // Assert
             modelMock.Verify(e => e.BasicConsume(queueName, 
@@ -180,7 +180,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             // Assert
             modelMock.Verify(e => e.BasicPublish(exchangeName, queueName, true, It.IsAny<BasicProperties>(), It.IsAny<byte[]>()));
