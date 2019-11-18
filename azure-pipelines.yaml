@@ -12,6 +12,8 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+
+parameters:
   projects:
     - testProjects: 
         - Minor.Miffy.Core.Test
