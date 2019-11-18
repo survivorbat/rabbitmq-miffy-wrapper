@@ -12,8 +12,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-
-parameters:
   projects:
     - testProjects: 
         - Minor.Miffy.Core.Test
@@ -25,7 +23,7 @@ parameters:
       projectPath: Minor.Miffy.Microservices
 
 steps:
-  - ${{ each project in projects }}:
+  - ${{ each project in variables.projects }}:
     - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
       inputs:
