@@ -73,18 +73,32 @@ namespace Minor.Miffy.RabbitMQBus
             
             consumer.Received += (model, ea) =>
             {
-                _logger.LogInformation($"Received command on {QueueName} with reply queue {ea.BasicProperties.ReplyTo}");
+                _logger.LogInformation(
+                    $"Received command on {QueueName} with reply queue {ea.BasicProperties.ReplyTo}");
                 IBasicProperties replyProps = _model.CreateBasicProperties();
                 replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
 
                 CommandMessage request = new CommandMessage
                 {
-                    Body = ea.Body, 
+                    Body = ea.Body,
                     Timestamp = ea.BasicProperties.Timestamp.UnixTime,
                     DestinationQueue = QueueName,
                     CorrelationId = Guid.Parse(ea.BasicProperties.CorrelationId)
                 };
-                CommandMessage response = callback(request);
+                
+                CommandMessage response;
+                try
+                {
+                    response = callback(request);
+                }
+                catch (Exception e)
+                {
+                    response = new CommandError
+                    {
+                        ExceptionMessage = e.Message,
+                        EventType = "CommandError"
+                    };
+                }
                 
                 string responseMessage = JsonConvert.SerializeObject(response);
                 
@@ -93,7 +107,7 @@ namespace Minor.Miffy.RabbitMQBus
                     ea.BasicProperties.ReplyTo, 
                     replyProps, 
                     Encoding.Unicode.GetBytes(responseMessage));
-                
+            
                 _model.BasicAck(ea.DeliveryTag, false);
             };
             

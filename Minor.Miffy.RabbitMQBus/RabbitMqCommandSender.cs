@@ -64,7 +64,14 @@ namespace Minor.Miffy.RabbitMQBus
                     _logger.LogInformation($"Received response with id {request.CorrelationId} on queue {replyQueue} from {request.DestinationQueue}");
                     
                     var response = Encoding.Unicode.GetString(ea.Body);
+
                     result = JsonConvert.DeserializeObject<CommandMessage>(response);
+
+                    if (result.EventType == typeof(CommandError).Name)
+                    {
+                        result = JsonConvert.DeserializeObject<CommandError>(response);
+                    }
+                    
                     channel.BasicAck(ea.DeliveryTag, false);
                     resetEvent.Set();
                 };
@@ -72,7 +79,7 @@ namespace Minor.Miffy.RabbitMQBus
                 channel.BasicConsume(replyQueue, false, "", false, false, null, consumer);
                 channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, true, props, request.Body);
                 
-                resetEvent.WaitOne(10000);
+                resetEvent.WaitOne(6000);
 
                 return result ?? throw new BusConfigurationException($"No response received from queue {request.DestinationQueue}");
             });
