@@ -26,13 +26,13 @@ steps:
   - task: DotNetCoreCLI@2
     displayName: 'dotnet pack'
     inputs:
+      versioningScheme: ByPrereleaseNumber
       majorVersion: 1
       minorVersion: 0
       patchVersion: $(Build.BuildId)
       command: 'pack'
       packagesToPack: '**/*.csproj'
       nobuild: true
-      versioningScheme: 'off'
 
   - task: DotNetCoreCLI@2
     displayName: 'nuget push'
