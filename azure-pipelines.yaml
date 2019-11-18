@@ -20,7 +20,9 @@ steps:
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: '*Test/*.csproj'
+      projects: | 
+        *Test/*.csproj
+        *Test.Conventions/*.csproj
       arguments: '--configuration $(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
