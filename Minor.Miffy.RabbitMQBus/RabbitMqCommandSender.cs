@@ -68,8 +68,8 @@ namespace Minor.Miffy.RabbitMQBus
                     resetEvent.Set();
                 };
                 
-                channel.BasicConsume(replyQueue, false, consumer);
-                channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, props, request.Body);
+                channel.BasicConsume(replyQueue, false, null, true, false, null, consumer);
+                channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, false, props, request.Body);
                 
                 resetEvent.WaitOne(10000);
 

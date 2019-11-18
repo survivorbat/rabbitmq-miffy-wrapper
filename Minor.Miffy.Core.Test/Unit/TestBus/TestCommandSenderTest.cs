@@ -35,7 +35,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Act
             sender.SendCommandAsync(request);
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             
             // Assert
             Assert.IsTrue(dictionary.ContainsKey(queueName));
