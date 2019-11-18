@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy;
 using Minor.Miffy.MicroServices;
@@ -20,40 +21,53 @@ namespace VoorbeeldMicroService
             using var loggerFactory = LoggerFactory.Create(configure =>
             {
                 configure.AddConsole()
-                    .SetMinimumLevel(LogLevel.Trace);
+                    .SetMinimumLevel(LogLevel.Information);
             });
-            
+
             MiffyLoggerFactory.LoggerFactory = loggerFactory;
             RabbitMqLoggerFactory.LoggerFactory = loggerFactory;
 
             var contextBuilder = new RabbitMqContextBuilder()
-                    .WithExchange("MVM.EventExchange")
-                    .WithConnectionString("amqp://guest:guest@localhost");  
-            
+                .WithExchange("MVM.EventExchange")
+                .WithConnectionString("amqp://guest:guest@localhost");
+
             using IBusContext<IConnection> context = contextBuilder.CreateContext();
 
             var builder = new MicroserviceHostBuilder()
-                    .SetLoggerFactory(loggerFactory)
-                    .WithBusContext(context);
-            
+                .SetLoggerFactory(loggerFactory)
+                .WithBusContext(context);
+
             using var host = builder.CreateHost();
             host.Start();
 
             var newEvent = new PolisToegevoegdEvent
             {
-                Polis = new Polis() {Klantnaam = "Jan de Man"}
+                Polis = new Polis {Klantnaam = "Piet Jan"}
             };
-            
-            var messageSender = new EventPublisher(context);
-            messageSender.Publish(newEvent);
-            
-            var polisCommand = new HaalPolissenOpCommand();
-            var sender = new CommandPublisher(context);
-            var result = sender.PublishAsync<HaalPolissenOpCommand>(polisCommand);
-            
-            foreach (var resultPolis in result.Result.Polisses)
+
+            Task.Run(() =>
             {
-                Console.WriteLine(resultPolis.Klantnaam);
+                while (true)
+                {
+                    var messageSender = new EventPublisher(context);
+                    messageSender.Publish(newEvent);
+                    
+                    Thread.Sleep(5000);
+                }
+            });
+            
+            while (true)
+            {
+                var polisCommand = new HaalPolissenOpCommand();
+                var sender = new CommandPublisher(context);
+                var result = sender.PublishAsync<HaalPolissenOpCommand>(polisCommand);
+
+                foreach (var resultPolis in result.Result.Polisses)
+                {
+                    Console.WriteLine(resultPolis.Klantnaam);
+                }
+                
+                Thread.Sleep(9000);
             }
         }
     }

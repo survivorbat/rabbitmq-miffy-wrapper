@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -68,8 +69,8 @@ namespace Minor.Miffy.RabbitMQBus
                     resetEvent.Set();
                 };
                 
-                channel.BasicConsume(replyQueue, false, null, true, false, null, consumer);
-                channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, false, props, request.Body);
+                channel.BasicConsume(replyQueue, false, "", false, false, null, consumer);
+                channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, true, props, request.Body);
                 
                 resetEvent.WaitOne(10000);
 

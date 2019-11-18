@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
 using Minor.Miffy.MicroServices.Events;
 using VoorbeeldMicroService.Constants;
 using VoorbeeldMicroService.DAL;
@@ -10,19 +10,12 @@ namespace VoorbeeldMicroService.EventListeners
     public class PolisEventListener
     {
         private readonly PolisContext _context;
-        private readonly ILogger<PolisEventListener> _logger;
 
-        public PolisEventListener(PolisContext context, ILoggerFactory loggerFactory)
-        {
-            _context = context;
-            _logger = loggerFactory.CreateLogger<PolisEventListener>();
-        }
+        public PolisEventListener(PolisContext context) => _context = context;
 
         [Topic(TopicNames.MvmPolisbeheerPolisToegevoegd)]
         public void Handles(PolisToegevoegdEvent evt)
         {
-            _logger.LogDebug($"Received PolisToegevoegdEvent with id {evt.Id}");
-            
             _context.Polissen.Add(evt.Polis);
             _context.SaveChanges();
         }

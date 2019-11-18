@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -24,6 +26,11 @@ namespace Minor.Miffy.RabbitMQBus
         /// Context that is connected to the broker
         /// </summary>
         private readonly IBusContext<IConnection> _context;
+
+        /// <summary>
+        /// Logger to log received messages
+        /// </summary>
+        private ILogger<RabbitMqMessageReceiver> _logger;
         
         /// <summary>
         /// Whether the current message receiver is listening to the broker
@@ -39,6 +46,7 @@ namespace Minor.Miffy.RabbitMQBus
             _model = _context.Connection.CreateModel();
             QueueName = queueName;
             TopicFilters = topicFilters;
+            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessageReceiver>();
         }
 
         /// <summary>
@@ -58,6 +66,7 @@ namespace Minor.Miffy.RabbitMQBus
         {
             if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
             
+            _logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
             _model.QueueDeclare(QueueName, true, false);
             foreach (var topicExpression in TopicFilters)
             {
@@ -68,14 +77,19 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
-        /// TODO: Prevent this if not listening
         /// Start consuming messages from the queue
         /// </summary>
         public void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
+            if (!_isListening) throw new BusConfigurationException("Received is not listening to events");
+            
             EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
             consumer.Received += (model, args) =>
             {
+                _logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
+                                       $"of type {args.BasicProperties.Type} " +
+                                       $"with topic {args.RoutingKey}");
+                
                 var eventMessage = new EventMessage
                 {
                     Body = args.Body,
@@ -86,7 +100,9 @@ namespace Minor.Miffy.RabbitMQBus
 
                 callback(eventMessage);
             };
-            _model.BasicConsume(consumer, QueueName);
+            
+            _logger.LogDebug($"Start consuming queue {QueueName}");
+            _model.BasicConsume(consumer, QueueName, true);
         }
     }
 }

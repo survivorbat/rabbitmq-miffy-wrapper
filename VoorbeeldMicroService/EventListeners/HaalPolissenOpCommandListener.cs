@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy.MicroServices.Events;
 using VoorbeeldMicroService.Commands;
@@ -13,18 +14,8 @@ namespace VoorbeeldMicroService.EventListeners
     {
         private readonly PolisContext _context;
 
-        private readonly ILogger<HaalPolissenOpCommandListener> _logger;
-        
-        public HaalPolissenOpCommandListener(PolisContext context, ILoggerFactory loggerFactory)
-        {
-            _context = context;
-            _logger = loggerFactory.CreateLogger<HaalPolissenOpCommandListener>();
-        }
+        public HaalPolissenOpCommandListener(PolisContext context) => _context = context;
 
-        public HaalPolissenOpCommand Handle(HaalPolissenOpCommand command)
-        {
-            _logger.LogInformation($"Received haalPolossenOpCommand with Id {command.Id} and queue {command.DestinationQueue}");
-            return new HaalPolissenOpCommand {Polisses = new List<Polis> {new Polis {Klantnaam = "Jan"}}};
-        }
+        public HaalPolissenOpCommand Handle(HaalPolissenOpCommand command) => new HaalPolissenOpCommand { Polisses = _context.Polissen.ToArray() };
     }
 }

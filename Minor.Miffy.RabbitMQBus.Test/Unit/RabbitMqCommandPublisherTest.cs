@@ -136,8 +136,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             modelMock.Verify(e => e.BasicConsume(queueName, 
                 false, 
-                null, 
-                true, 
+                It.IsAny<string>(), 
+                false, 
                 false, 
                 null, 
                 It.IsAny<EventingBasicConsumer>()));

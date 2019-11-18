@@ -9,14 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.dotCover.CommandLineTools" Version="2019.2.3">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="JetBrains.dotCover.CommandLineTools.Linux" Version="2019.2.3">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0-preview-20191115-01" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />

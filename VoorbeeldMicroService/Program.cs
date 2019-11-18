@@ -17,7 +17,7 @@ namespace VoorbeeldMicroService
         {
             using var loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
+                configure.AddConsole().SetMinimumLevel(LogLevel.Information);
             });
 
             MiffyLoggerFactory.LoggerFactory = loggerFactory;
@@ -35,12 +35,13 @@ namespace VoorbeeldMicroService
                 {
                     services.AddDbContext<PolisContext>(e =>
                     {
-                        e.UseSqlite(":memory:");
+                        e.UseNpgsql("Host=localhost;Database=test;Username=root;Password=root");
+                        e.UseLoggerFactory(loggerFactory);
                     });
                 })
                 .WithBusContext(context)
                 .UseConventions();
-            
+
             using var host = builder.CreateHost();
             host.Start();
             

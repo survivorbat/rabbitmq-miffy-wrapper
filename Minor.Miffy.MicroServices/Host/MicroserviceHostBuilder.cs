@@ -114,7 +114,6 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterEventListener(TypeInfo type, string queueName)
         {
-            var instance = InstantiatePopulatedType(type);
             var methods = GetRelevantMethods(type);
 
             foreach (var method in methods)
@@ -138,6 +137,7 @@ namespace Minor.Miffy.MicroServices.Host
                     Queue = queueName,
                     Callback = message =>
                     {
+                        var instance = InstantiatePopulatedType(type);
                         var text = Encoding.Unicode.GetString(message.Body);
                         var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
                         method.Invoke(instance, new[] {jsonObject});
@@ -151,7 +151,6 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterCommandListener(TypeInfo type, string queueName)
         {
-            var instance = InstantiatePopulatedType(type);
             var methods = GetRelevantMethods(type);
             
             foreach (var method in methods)
@@ -170,6 +169,8 @@ namespace Minor.Miffy.MicroServices.Host
                     Queue = queueName,
                     Callback = message =>
                     {
+                        var instance = InstantiatePopulatedType(type);
+
                         var text = Encoding.Unicode.GetString(message.Body);
                         var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
                         var command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;

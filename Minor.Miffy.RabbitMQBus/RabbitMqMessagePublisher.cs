@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing;
 
@@ -16,12 +17,18 @@ namespace Minor.Miffy.RabbitMQBus
         private readonly string _exchangeName;
 
         /// <summary>
+        /// Logger
+        /// </summary>
+        private ILogger<RabbitMqMessagePublisher> _logger;
+
+        /// <summary>
         /// Initialize a message publisher with a bus context
         /// </summary>
         public RabbitMqMessagePublisher(IBusContext<IConnection> context)
         {
             _connection = context.Connection;
             _exchangeName = context.ExchangeName;
+            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessagePublisher>();
         }
 
         /// <summary>
@@ -30,6 +37,9 @@ namespace Minor.Miffy.RabbitMQBus
         public void SendMessage(EventMessage message)
         {
             using var channel = _connection.CreateModel();
+            
+            _logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
+                                   $", topic {message.Topic} and type {message.EventType}");
             
             IBasicProperties basicProperties = new BasicProperties
             {

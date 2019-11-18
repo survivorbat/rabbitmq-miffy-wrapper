@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Minor.Miffy</RootNamespace>
+    <Title>Miffy Framework Core</Title>
+    <Description>Miffy Framework forEventBusses</Description>
+    <PackageVersion>0.0.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
