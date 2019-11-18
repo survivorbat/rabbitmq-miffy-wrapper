@@ -8,12 +8,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  abstractionsProjectPath: Minor.Miffy.Core.Test
-  abstractionsTestProjectPath: Minor.Miffy.Core.Test
-  microservicesProjectPath: Minor.Miffy.Microservices
-  microservicesTestProjectPath: Minor.Miffy.MicroServices.Test
-  microservicesTestConventionsProjectPath: Minor.Miffy.MicroServices.Test.Conventions
-  rabbitMQTestProjectPath: Minor.Miffy.RabbitMQBus.Test
 
 steps:
   - task: DotNetCoreCLI@2
