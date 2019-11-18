@@ -19,28 +19,20 @@ steps:
   - task: DotNetCoreCLI@2
     displayName: 'dotnet build'
     inputs:
-      projects: 
-        - '$(abstractionsProjectPath)/*.csproj'
-        - '$(microservicesProjectPath)/*.csproj'
+      projects: '**/*.csproj'
       arguments: '--configuration $(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: 
-        - '$(abstractionsTestProjectPath)/*.csproj'
-        - '$(microservicesTestProjectPath)/*.csproj'
-        - '$(microservicesTestConventionsProjectPath)/*.csproj'
-        - '$(rabbitMQTestProjectPath)/*.csproj'
+      projects: '*Test/*.csrproj'
       arguments: '--configuration $(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
     inputs:
       command: 'pack'
-      packagesToPack: 
-        - '$(abstractionsProjectPath)/*.csproj'
-        - '$(microservicesProjectPath)/*.csproj'
+      packagesToPack: '**/*.csproj'
       nobuild: true
       versioningScheme: 'off'
 
@@ -50,9 +42,7 @@ steps:
       minorVersion: 0
       patchVersion: $(Build.BuildId)
       command: 'pack'
-      packagesToPack:
-        - '$(abstractionsProjectPath)/*.csproj'
-        - '$(microservicesProjectPath)/*.csproj'
+      packagesToPack: '**/*.csproj'
       nobuild: true
       versioningScheme: 'off'
 
