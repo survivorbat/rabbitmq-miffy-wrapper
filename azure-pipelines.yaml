@@ -2,10 +2,6 @@ trigger:
   branches:
     include:
       - master
-  paths:
-    include:
-      - Minor.Miffy.Core/*
-      - Minor.Miffy.Microservices/*
 
 pool:
   vmImage: 'ubuntu-latest'
