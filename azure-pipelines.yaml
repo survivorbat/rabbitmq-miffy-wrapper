@@ -24,14 +24,13 @@ steps:
       arguments: '--configuration $(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
-    displayName: 'dotnet pack'
     inputs:
-      versioningScheme: ByPrereleaseNumber
+      command: 'pack'
+      packagesToPack: '**/*.csproj'
+      versioningScheme: byPrereleaseNumber
       majorVersion: 1
       minorVersion: 0
       patchVersion: $(Build.BuildId)
-      command: 'pack'
-      packagesToPack: '**/*.csproj'
       nobuild: true
 
   - task: DotNetCoreCLI@2
