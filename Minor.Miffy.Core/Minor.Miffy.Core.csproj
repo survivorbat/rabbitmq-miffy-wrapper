@@ -3,9 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Minor.Miffy</RootNamespace>
-    <Title>Miffy Framework Core</Title>
+    <Title>MaartenH.Minor.Miffy.Abstractions</Title>
     <Description>Miffy Framework forEventBusses</Description>
     <PackageVersion>0.0.1</PackageVersion>
+    <PackageId>MaartenH.Minor.Miffy.Abstractions</PackageId>
+    <Authors>Maarten van der Heijden</Authors>
   </PropertyGroup>
 
   <ItemGroup>

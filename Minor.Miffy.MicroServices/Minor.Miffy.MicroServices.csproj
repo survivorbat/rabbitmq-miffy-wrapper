@@ -3,9 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Title>Miffy Framework Microservices</Title>
+    <Title>MaartenH.Minor.Miffy</Title>
     <Description>The microservice host package of the Miffy framework</Description>
     <PackageVersion>0.0.1</PackageVersion>
+    <PackageId>MaartenH.Minor.Miffy</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Minor.Miffy.Core\Minor.Miffy.Core.csproj" />
+    <ProjectReference Include="..\Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj" />
   </ItemGroup>
 
 </Project>

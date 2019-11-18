@@ -1,0 +1,49 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - Minor.Miffy.Core/*
+      - Minor.Miffy.Microservices/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  projectPath: 'Minor.Miffy.Core'
+  projectTestPath: 'Minor.Miffy.Core.Test'
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: '$(projectPath)/*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: '$(projectTestPath)/*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'pack'
+      packagesToPack: '$(projectPath)/*.csproj'
+      nobuild: true
+      versioningScheme: 'off'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      majorVersion: 1
+      minorVersion: 0
+      patchVersion: 1
+      #$(Build.BuildId)
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+      nuGetFeedType: 'internal'
+      publishVstsFeed: 'c0b4a9f9-5699-4e4d-bc20-1299247ba0f9'
+
