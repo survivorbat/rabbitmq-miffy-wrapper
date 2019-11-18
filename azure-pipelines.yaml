@@ -8,48 +8,53 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  projects:
-    - testProjects: 
-        - Minor.Miffy.Core.Test
-      projectPath: Minor.Miffy.Core
-    - testProjects:
-        - Minor.Miffy.MicroServices.Test
-        - Minor.Miffy.MicroServices.Conventions
-        - Minor.Miffy.RabbitMQBus.Test
-      projectPath: Minor.Miffy.Microservices
+  abstractionsProjectPath: Minor.Miffy.Core.Test
+  abstractionsTestProjectPath: Minor.Miffy.Core.Test
+  microservicesProjectPath: Minor.Miffy.Microservices
+  microservicesTestProjectPath: Minor.Miffy.MicroServices.Test
+  microservicesTestConventionsProjectPath: Minor.Miffy.MicroServices.Test.Conventions
+  rabbitMQTestProjectPath: Minor.Miffy.RabbitMQBus.Test
 
 steps:
-  - ${{ each project in variables.projects }}:
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
-        projects: '$(project.projctPath)/*.csproj'
-        arguments: '--configuration $(BuildConfiguration)'
-  
-    - ${{ each testProject in project.testProjects }}:
-      - task: DotNetCoreCLI@2
-        displayName: 'dotnet test'
-        inputs:
-          command: test
-          projects: '$(projectAbstractionsTestPath)/*.csproj'
-          arguments: '--configuration $(BuildConfiguration)'
-  
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'pack'
-        packagesToPack: '$(project.projctPath)/*.csproj'
-        nobuild: true
-        versioningScheme: 'off'
-  
-    - task: DotNetCoreCLI@2
-      inputs:
-        majorVersion: 1
-        minorVersion: 0
-        patchVersion: $(Build.BuildId)
-        command: 'pack'
-        packagesToPack: '$(projectMicroservicesPath)/*.csproj'
-        nobuild: true
-        versioningScheme: 'off'
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: 
+        - '$(abstractionsProjectPath)/*.csproj'
+        - '$(microservicesProjectPath)/*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: 
+        - '$(abstractionsTestProjectPath)/*.csproj'
+        - '$(microservicesTestProjectPath)/*.csproj'
+        - '$(microservicesTestConventionsProjectPath)/*.csproj'
+        - '$(rabbitMQTestProjectPath)/*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'pack'
+      packagesToPack: 
+        - '$(abstractionsProjectPath)/*.csproj'
+        - '$(microservicesProjectPath)/*.csproj'
+      nobuild: true
+      versioningScheme: 'off'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      majorVersion: 1
+      minorVersion: 0
+      patchVersion: $(Build.BuildId)
+      command: 'pack'
+      packagesToPack:
+        - '$(abstractionsProjectPath)/*.csproj'
+        - '$(microservicesProjectPath)/*.csproj'
+      nobuild: true
+      versioningScheme: 'off'
 
   - task: DotNetCoreCLI@2
     inputs:
