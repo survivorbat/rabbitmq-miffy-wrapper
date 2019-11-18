@@ -30,13 +30,7 @@ steps:
       arguments: '--configuration $(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
-    inputs:
-      command: 'pack'
-      packagesToPack: '**/*.csproj'
-      nobuild: true
-      versioningScheme: 'off'
-
-  - task: DotNetCoreCLI@2
+    displayName: 'dotnet pack'
     inputs:
       majorVersion: 1
       minorVersion: 0
@@ -47,6 +41,7 @@ steps:
       versioningScheme: 'off'
 
   - task: DotNetCoreCLI@2
+    displayName: 'nuget push'
     inputs:
       command: 'push'
       packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
