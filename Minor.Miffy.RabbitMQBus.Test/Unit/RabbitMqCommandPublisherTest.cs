@@ -183,7 +183,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             Thread.Sleep(500);
 
             // Assert
-            modelMock.Verify(e => e.BasicPublish(exchangeName, queueName, false, It.IsAny<BasicProperties>(), It.IsAny<byte[]>()));
+            modelMock.Verify(e => e.BasicPublish(exchangeName, queueName, true, It.IsAny<BasicProperties>(), It.IsAny<byte[]>()));
         }
     }
 }
