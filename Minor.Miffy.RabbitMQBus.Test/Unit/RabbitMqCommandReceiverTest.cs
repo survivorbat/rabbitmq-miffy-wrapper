@@ -1,6 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Framing;
 
 namespace Minor.Miffy.RabbitMQBus.Test.Unit
 {
@@ -178,6 +184,181 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             
             // Assert
             modelMock.Verify(e => e.BasicConsume(queueName, false, "", false, false, null, It.IsAny<IBasicConsumer>()));
+        }
+
+        [TestMethod]
+        [DataRow("reply.queue", "TestType", "Hello World")]
+        [DataRow("queue.reply", "DummyType", "Goodbye World")]
+        [DataRow("QueueToReplyTo", "CoolType", "Bonjour World")]
+        public void StartReceivingCommandsConsumerCallsCallback(string replyQueue, string type, string body)
+        {
+            // Arrange
+            byte[] byteBody = Encoding.Unicode.GetBytes(body);
+            
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
+                
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            CommandMessage result = new CommandMessage();
+            
+            IBasicConsumer consumer = null;
+            
+            // Retrieve consumer from callback
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+
+            Guid guid = Guid.NewGuid();
+            var properties = new BasicProperties
+            {
+                ReplyTo = replyQueue,
+                Type = type,
+                CorrelationId = guid.ToString()
+            };
+            
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e => result = e);
+
+            // Act
+            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, byteBody);
+            
+            // Assert
+            Assert.AreEqual(byteBody, result.Body);
+            Assert.AreEqual(guid, result.CorrelationId);
+            Assert.AreEqual(type, result.EventType);
+            Assert.AreEqual(replyQueue, result.ReplyQueue);
+        }
+        
+        [TestMethod]
+        [DataRow("Random exception was thrown")]
+        public void StartReceivingCommandsConsumerCatchesExceptionWithCommandErrorAndMessage(string message)
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
+                
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            IBasicConsumer consumer = null;
+            
+            // Retrieve consumer from callback
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+
+            // Retrieve basic publish data 
+            byte[] resultBody = null;
+            modelMock.Setup(e => e.BasicPublish(It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                false, 
+                It.IsAny<IBasicProperties>(),
+                It.IsAny<byte[]>()))
+                .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => resultBody = body);
+            
+            var properties = new BasicProperties { CorrelationId = Guid.NewGuid().ToString() };
+            
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e => throw new Exception(message));
+
+            // Act
+            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+
+            // Assert
+            var stringBody = Encoding.Unicode.GetString(resultBody);
+            var commandError = JsonConvert.DeserializeObject<CommandError>(stringBody);
+            Assert.AreEqual(message, commandError.ExceptionMessage);
+        }
+        
+        [TestMethod]
+        [DataRow("test.exchange", "reply.queue", "Hello World")]
+        public void ConsumerCallsBasicPublishWithValues(string exchangeName, string replyTo, string message)
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            contextMock.SetupGet(e => e.ExchangeName).Returns(exchangeName);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
+                
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            IBasicConsumer consumer = null;
+            
+            // Retrieve consumer from callback
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+            
+            var properties = new BasicProperties
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                ReplyTo = replyTo
+            };
+            
+            var responseMessage = new CommandMessage {Body = Encoding.Unicode.GetBytes(message) };
+            
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e => responseMessage);
+
+            // Act
+            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+
+            // Assert
+            var jsonResponse = JsonConvert.SerializeObject(responseMessage);
+            var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
+            modelMock.Verify(e => e.BasicPublish(exchangeName, 
+                replyTo,
+                false, 
+                It.IsAny<IBasicProperties>(), 
+                bodyResponse));
+        }
+
+        [TestMethod]
+        [DataRow(593L)]
+        [DataRow(5352593L)]
+        [DataRow(535252467893L)]
+        public void ConsumerCallsBasicAckWithDeliveryTag(long deliveryTagLong)
+        {
+            // Arrange
+            ulong deliveryTag = UInt64.Parse(deliveryTagLong.ToString());
+            
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
+                
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            IBasicConsumer consumer = null;
+            
+            // Retrieve consumer from callback
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+            
+            var properties = new BasicProperties { CorrelationId = Guid.NewGuid().ToString() };
+            
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e => new CommandMessage());
+
+            // Act
+            consumer.HandleBasicDeliver("", deliveryTag, false, "test.exchange", "test.queue", properties, new byte[0]);
+
+            // Assert
+            modelMock.Verify(e => e.BasicAck(deliveryTag, false));
         }
     }
 }

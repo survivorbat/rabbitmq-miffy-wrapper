@@ -190,6 +190,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             IBasicConsumer consumer = null;
             
+            // Retrieve consumer from callback
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
             modelMock.Setup(e => e.BasicConsume("test.queue", true, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);

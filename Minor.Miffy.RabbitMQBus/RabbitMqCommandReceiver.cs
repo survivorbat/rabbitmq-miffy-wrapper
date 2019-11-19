@@ -82,6 +82,8 @@ namespace Minor.Miffy.RabbitMQBus
                     Body = ea.Body,
                     Timestamp = ea.BasicProperties.Timestamp.UnixTime,
                     DestinationQueue = QueueName,
+                    EventType = ea.BasicProperties.Type,
+                    ReplyQueue = ea.BasicProperties.ReplyTo,
                     CorrelationId = Guid.Parse(ea.BasicProperties.CorrelationId)
                 };
                 
@@ -110,7 +112,7 @@ namespace Minor.Miffy.RabbitMQBus
                 _model.BasicAck(ea.DeliveryTag, false);
             };
             
-            _model.BasicConsume(consumer, QueueName);
+            _model.BasicConsume(QueueName, false, "", false, false, null, consumer);
         }
 
         /// <summary>
