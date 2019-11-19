@@ -40,15 +40,13 @@ namespace Minor.Miffy.RabbitMQBus
             
             _logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
                                    $", topic {message.Topic} and type {message.EventType}");
-            
-            IBasicProperties basicProperties = new BasicProperties
-            {
-                Type = message.EventType,
-                Timestamp = new AmqpTimestamp(message.Timestamp),
-                CorrelationId = message.CorrelationId.ToString(),
-            };
-                
-            channel.BasicPublish(_exchangeName, message.Topic, basicProperties, message.Body);
+
+            IBasicProperties properties = channel.CreateBasicProperties();
+            properties.Type = message.EventType;
+            properties.Timestamp = new AmqpTimestamp(message.Timestamp);
+            properties.CorrelationId = message.CorrelationId.ToString();
+
+            channel.BasicPublish(_exchangeName, message.Topic, properties, message.Body);
         }
     }
 }
