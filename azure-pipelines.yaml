@@ -75,6 +75,7 @@ stages:
               command: 'pack'
               packagesToPack: '**/*.csproj'
               versioningScheme: byReleaseNumber
+              patchVersion: $(Build.BuildId)
               nobuild: true
 
           - task: DotNetCoreCLI@2
