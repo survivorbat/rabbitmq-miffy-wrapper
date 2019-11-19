@@ -81,7 +81,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
-            if (!_isListening) throw new BusConfigurationException("Received is not listening to events");
+            if (!_isListening) throw new BusConfigurationException("Receiver is not listening to events");
             
             EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
             consumer.Received += (model, args) =>
@@ -102,7 +102,7 @@ namespace Minor.Miffy.RabbitMQBus
             };
             
             _logger.LogDebug($"Start consuming queue {QueueName}");
-            _model.BasicConsume(consumer, QueueName, true);
+            _model.BasicConsume(QueueName, true, "", false, false, null, consumer);
         }
     }
 }
