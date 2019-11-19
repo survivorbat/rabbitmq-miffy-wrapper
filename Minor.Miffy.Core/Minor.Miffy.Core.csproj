@@ -4,10 +4,11 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Minor.Miffy</RootNamespace>
     <Title>MaartenH.Minor.Miffy.Abstractions</Title>
-    <Description>Miffy Framework forEventBusses</Description>
-    <PackageVersion>0.0.1</PackageVersion>
+    <Description></Description>
+    <PackageVersion>0.1.0</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Abstractions</PackageId>
     <Authors>Maarten van der Heijden</Authors>
+    <PackageTags>Miffy RabbitMQ</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
