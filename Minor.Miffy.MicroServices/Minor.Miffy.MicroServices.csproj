@@ -3,10 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Title>MaartenH.Minor.Miffy</Title>
-    <Description>The microservice host package of the Miffy framework</Description>
-    <PackageVersion>0.0.1</PackageVersion>
-    <PackageId>MaartenH.Minor.Miffy</PackageId>
+    <Title>MaartenH.Minor.Miffy.Microservices</Title>
+    <Description></Description>
+    <PackageVersion>0.1.0</PackageVersion>
+    <PackageId>MaartenH.Minor.Miffy.Microservices</PackageId>
+    <Authors>Maarten van der Heijden</Authors>
+    <PackageTags>Miffy RabbitMQ</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
