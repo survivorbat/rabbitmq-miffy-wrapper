@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -20,8 +21,7 @@ namespace VoorbeeldMicroService
         {
             using var loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole()
-                    .SetMinimumLevel(LogLevel.Information);
+                configure.AddConsole().SetMinimumLevel(LogLevel.Information);
             });
 
             MiffyLoggerFactory.LoggerFactory = loggerFactory;
@@ -40,19 +40,22 @@ namespace VoorbeeldMicroService
             using var host = builder.CreateHost();
             host.Start();
 
-            var newEvent = new PolisToegevoegdEvent
-            {
-                Polis = new Polis {Klantnaam = "Piet Jan"}
-            };
-
             Task.Run(() =>
             {
                 while (true)
                 {
+                    byte[] randomBytes = new byte[20];
+                    new Random().NextBytes(randomBytes);
+                    
+                    var newEvent = new PolisToegevoegdEvent
+                    {
+                        Polis = new Polis {Klantnaam = Encoding.Unicode.GetString(randomBytes)}
+                    };
+                    
                     var messageSender = new EventPublisher(context);
                     messageSender.Publish(newEvent);
                     
-                    Thread.Sleep(5000);
+                    Thread.Sleep(2000);
                 }
             });
             
@@ -64,10 +67,10 @@ namespace VoorbeeldMicroService
 
                 foreach (var resultPolis in result.Result.Polisses)
                 {
-                    Console.WriteLine(resultPolis.Klantnaam);
+                    Console.WriteLine($"[{resultPolis.Id}] {resultPolis.Klantnaam}");
                 }
                 
-                Thread.Sleep(9000);
+                Thread.Sleep(5000);
             }
         }
     }
