@@ -214,5 +214,25 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             Assert.AreEqual(topic, eventMessage.Topic);
             Assert.AreEqual(eventType, eventMessage.EventType);
         }
+
+        [TestMethod]
+        public void DisposeIsCalledOnModel()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+
+            var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
+            
+            // Act
+            receiver.Dispose();
+            
+            // Assert
+            modelMock.Verify(e => e.Dispose());
+        } 
     }
 }

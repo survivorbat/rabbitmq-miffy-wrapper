@@ -138,7 +138,46 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         [TestMethod]
         public void DisposeCallsDisposeOnModel()
         {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
             
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            // Act
+            receiver.Dispose();
+            
+            // Assert
+            modelMock.Verify(e => e.Dispose());
+        }
+
+        [TestMethod]
+        [DataRow("test.queue")]
+        [DataRow("queue.test")]
+        [DataRow("TestQueue")]
+        public void StartReceivingCommandCallsBasicConsume(string queueName)
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
+            
+            receiver.DeclareCommandQueue();
+            
+            // Act
+            receiver.StartReceivingCommands(e => new CommandMessage());
+            
+            // Assert
+            modelMock.Verify(e => e.BasicConsume(queueName, false, "", false, false, null, It.IsAny<IBasicConsumer>()));
         }
     }
 }

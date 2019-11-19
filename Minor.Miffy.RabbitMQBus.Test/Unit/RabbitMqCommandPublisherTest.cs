@@ -210,7 +210,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             modelMock.Verify(e => e.BasicPublish(exchangeName, queueName, true, It.IsAny<BasicProperties>(), It.IsAny<byte[]>()));
         }
-        
+
         [TestMethod]
         [DataRow("TestQueue")]
         [DataRow("queue.test")]
