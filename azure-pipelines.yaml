@@ -5,6 +5,15 @@ trigger:
 
 variables:
   buildConfiguration: 'Release'
+  projects: |
+    Minor.Miffy.Core
+    Minor.Miffy.Microservices
+    Minor.Miffy.RabbitMQBus
+  testProjects: |
+    Minor.Miffy.Core.Test
+    Minor.Miffy.MicroServices.Test
+    Minor.Miffy.MicroServices.Test.Conventions
+    Minor.Miffy.RabbitMQBus.Test
 
 stages:
   - stage: PreRelease
@@ -18,22 +27,20 @@ stages:
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
             inputs:
-              projects: '**/*.csproj'
+              projects: $(projects)
               arguments: '--configuration $(BuildConfiguration)'
         
           - task: DotNetCoreCLI@2
             displayName: 'dotnet test'
             inputs:
               command: test
-              projects: | 
-                *Test/*.csproj
-                *Test.Conventions/*.csproj
+              projects: $(testProjects)
               arguments: '--configuration $(BuildConfiguration)'
         
           - task: DotNetCoreCLI@2
             inputs:
               command: 'pack'
-              packagesToPack: '**/*.csproj'
+              packagesToPack: $(projects)
               versioningScheme: byPrereleaseNumber
               majorVersion: 1
               minorVersion: 0
@@ -58,22 +65,20 @@ stages:
             - task: DotNetCoreCLI@2
               displayName: 'dotnet build'
               inputs:
-                projects: '**/*.csproj'
+                projects: $(projects)
                 arguments: '--configuration $(BuildConfiguration)'
 
             - task: DotNetCoreCLI@2
               displayName: 'dotnet test'
               inputs:
                 command: test
-                projects: |
-                  *Test/*.csproj
-                  *Test.Conventions/*.csproj
+                projects: $(testProjects)
                 arguments: '--configuration $(BuildConfiguration)'
 
             - task: DotNetCoreCLI@2
               inputs:
                 command: 'pack'
-                packagesToPack: '**/*.csproj'
+                packagesToPack: $(projects)
                 versioningScheme: byReleaseNumber
                 majorVersion: 1
                 minorVersion: 0
