@@ -43,8 +43,8 @@ stages:
               command: 'pack'
               packagesToPack: '**/*.csproj'
               versioningScheme: byPrereleaseNumber
-              majorVersion: 1
-              minorVersion: 0
+              majorVersion: 0
+              minorVersion: 1
               patchVersion: $(Build.BuildId)
               nobuild: true
         
@@ -82,9 +82,6 @@ stages:
                 command: 'pack'
                 packagesToPack: '**/*.csproj'
                 versioningScheme: byReleaseNumber
-                majorVersion: 1
-                minorVersion: 0
-                patchVersion: $(Build.BuildId)
                 nobuild: true
 
             - task: DotNetCoreCLI@2
