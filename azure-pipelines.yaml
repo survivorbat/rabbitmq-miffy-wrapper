@@ -80,7 +80,7 @@ stages:
               displayName: 'dotnet pack'
               inputs:
                 command: 'pack'
-                packagesToPack: $(projects)
+                packagesToPack: '**/*.csproj'
                 versioningScheme: byReleaseNumber
                 majorVersion: 1
                 minorVersion: 0
