@@ -59,7 +59,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             new RabbitMqMessageReceiver(contextMock.Object, "test.queue", null);
 
             // Assert
-            connectionMock.Setup(e => e.CreateModel());
+            connectionMock.Verify(e => e.CreateModel());
         }
 
         [TestMethod]
@@ -128,7 +128,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             foreach (string topic in topicNames)
             {
-                modelMock.Setup(e => e.QueueBind(queueName, exchangeName, topic, null));
+                modelMock.Verify(e => e.QueueBind(queueName, exchangeName, topic, null));
             }
         }
 
