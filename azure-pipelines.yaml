@@ -3,42 +3,87 @@ trigger:
     include:
       - master
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
   buildConfiguration: 'Release'
 
-steps:
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet build'
-    inputs:
-      projects: '**/*.csproj'
-      arguments: '--configuration $(BuildConfiguration)'
+stages:
+  - stage: PreRelease
+    displayName: PreRelease
+    jobs:
+      - job: PreRelease
+        displayName: PreRelease
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet build'
+            inputs:
+              projects: '**/*.csproj'
+              arguments: '--configuration $(BuildConfiguration)'
+        
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet test'
+            inputs:
+              command: test
+              projects: | 
+                *Test/*.csproj
+                *Test.Conventions/*.csproj
+              arguments: '--configuration $(BuildConfiguration)'
+        
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'pack'
+              packagesToPack: '**/*.csproj'
+              versioningScheme: byPrereleaseNumber
+              majorVersion: 1
+              minorVersion: 0
+              patchVersion: $(Build.BuildId)
+              nobuild: true
+        
+          - task: DotNetCoreCLI@2
+            displayName: 'nuget push'
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              nuGetFeedType: 'internal'
+              publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
+  - stage: Release
+    displayName: Release
+    jobs:
+      - job: Release
+        displayName: Release
+        pool:
+          vmImage: 'ubuntu-latest'
+          steps:
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet build'
+              inputs:
+                projects: '**/*.csproj'
+                arguments: '--configuration $(BuildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet test'
-    inputs:
-      command: test
-      projects: | 
-        *Test/*.csproj
-        *Test.Conventions/*.csproj
-      arguments: '--configuration $(BuildConfiguration)'
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet test'
+              inputs:
+                command: test
+                projects: |
+                  *Test/*.csproj
+                  *Test.Conventions/*.csproj
+                arguments: '--configuration $(BuildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'pack'
-      packagesToPack: '**/*.csproj'
-      versioningScheme: byPrereleaseNumber
-      majorVersion: 1
-      minorVersion: 0
-      patchVersion: $(Build.BuildId)
-      nobuild: true
+            - task: DotNetCoreCLI@2
+              inputs:
+                command: 'pack'
+                packagesToPack: '**/*.csproj'
+                versioningScheme: byReleaseNumber
+                majorVersion: 1
+                minorVersion: 0
+                patchVersion: $(Build.BuildId)
+                nobuild: true
 
-  - task: DotNetCoreCLI@2
-    displayName: 'nuget push'
-    inputs:
-      command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-      nuGetFeedType: 'internal'
-      publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
+            - task: DotNetCoreCLI@2
+              displayName: 'nuget push'
+              inputs:
+                command: 'push'
+                packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+                nuGetFeedType: 'internal'
+                publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
