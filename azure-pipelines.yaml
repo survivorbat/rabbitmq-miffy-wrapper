@@ -62,32 +62,32 @@ stages:
         displayName: Release
         pool:
           vmImage: 'ubuntu-latest'
-          steps:
-            - task: DotNetCoreCLI@2
-              displayName: 'dotnet build'
-              inputs:
-                projects: $(projects)
-                arguments: '--configuration $(BuildConfiguration)'
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet build'
+            inputs:
+              projects: $(projects)
+              arguments: '--configuration $(BuildConfiguration)'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'dotnet test'
-              inputs:
-                command: test
-                projects: $(testProjects)
-                arguments: '--configuration $(BuildConfiguration)'
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet test'
+            inputs:
+              command: test
+              projects: $(testProjects)
+              arguments: '--configuration $(BuildConfiguration)'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'dotnet pack'
-              inputs:
-                command: 'pack'
-                packagesToPack: '**/*.csproj'
-                versioningScheme: byReleaseNumber
-                nobuild: true
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet pack'
+            inputs:
+              command: 'pack'
+              packagesToPack: '**/*.csproj'
+              versioningScheme: byReleaseNumber
+              nobuild: true
 
-            - task: DotNetCoreCLI@2
-              displayName: 'nuget push'
-              inputs:
-                command: 'push'
-                packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-                nuGetFeedType: 'internal'
-                publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
+          - task: DotNetCoreCLI@2
+            displayName: 'nuget push'
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              nuGetFeedType: 'internal'
+              publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
