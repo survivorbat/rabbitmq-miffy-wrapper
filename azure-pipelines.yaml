@@ -77,8 +77,6 @@ stages:
               command: 'pack'
               packagesToPack: '**/*.csproj'
               versioningScheme: byPrereleaseNumber
-              majorVersion: 0
-              minorVersion: 1
               patchVersion: $(Build.BuildId)
               nobuild: true
         
