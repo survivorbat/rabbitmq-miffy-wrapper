@@ -19,7 +19,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Logger
         /// </summary>
-        private ILogger<RabbitMqMessagePublisher> _logger;
+        private readonly ILogger<RabbitMqMessagePublisher> _logger;
 
         /// <summary>
         /// Initialize a message publisher with a bus context

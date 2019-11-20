@@ -11,18 +11,9 @@ namespace Minor.Miffy.TestBus
         private readonly TestBusContext _context;
 
         /// <summary>
-        /// Logger
-        /// </summary>
-        private readonly ILogger<TestCommandSender> _logger;
-
-        /// <summary>
         /// Instantiate a command sender with a context
         /// </summary>
-        public TestCommandSender(TestBusContext context)
-        {
-            _context = context;
-            _logger = MiffyLoggerFactory.CreateInstance<TestCommandSender>();
-        }
+        public TestCommandSender(TestBusContext context) => _context = context;
 
         /// <summary>
         /// Send a command asynchronously

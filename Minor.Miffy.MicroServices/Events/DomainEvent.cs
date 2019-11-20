@@ -6,7 +6,7 @@ namespace Minor.Miffy.MicroServices.Events
     /// <summary>
     /// Base class for all domain events.
     /// </summary>
-    public abstract class DomainEvent
+    public class DomainEvent
     {
         /// <summary>
         /// The Topic is used by the underlying protocol to route events to subscribers

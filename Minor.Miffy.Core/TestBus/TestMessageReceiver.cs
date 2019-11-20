@@ -12,7 +12,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The test context being used
         /// </summary>
-        public readonly TestBusContext Context;
+        public TestBusContext Context { get; set; }
 
         /// <summary>
         /// dDetermine if the receiver is listening
@@ -22,7 +22,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Logger
         /// </summary>
-        private ILogger<TestMessageReceiver> _logger;
+        private readonly ILogger<TestMessageReceiver> _logger;
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions

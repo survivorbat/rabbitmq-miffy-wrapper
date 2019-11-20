@@ -30,7 +30,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Logger to log received messages
         /// </summary>
-        private ILogger<RabbitMqMessageReceiver> _logger;
+        private readonly ILogger<RabbitMqMessageReceiver> _logger;
         
         /// <summary>
         /// Whether the current message receiver is listening to the broker

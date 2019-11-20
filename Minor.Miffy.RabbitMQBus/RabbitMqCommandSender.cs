@@ -14,6 +14,7 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandSender : ICommandSender
     {
+        private const int CommandTimeout = 6000;
         /// <summary>
         /// Context
         /// </summary>
@@ -82,7 +83,7 @@ namespace Minor.Miffy.RabbitMQBus
                 channel.BasicConsume(replyQueue, false, "", false, false, null, consumer);
                 channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, true, props, request.Body);
                 
-                resetEvent.WaitOne(6000);
+                resetEvent.WaitOne(CommandTimeout);
 
                 return result ?? throw new BusConfigurationException($"No response received from queue {request.DestinationQueue}");
             });
