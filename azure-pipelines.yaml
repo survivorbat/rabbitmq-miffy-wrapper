@@ -64,7 +64,7 @@ stages:
             inputs:
               command: test
               projects: $(testProjects)
-              arguments: '--configuration $(BuildConfiguration)'
+              arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover'
 
           - task: SonarQubeAnalyze@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
@@ -110,6 +110,7 @@ stages:
               projects: $(projects)
               arguments: '--configuration $(BuildConfiguration)'
 
+          # To be sure
           - task: DotNetCoreCLI@2
             displayName: 'dotnet test'
             inputs:

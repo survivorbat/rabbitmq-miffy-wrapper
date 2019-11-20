@@ -13,7 +13,7 @@ using RabbitMQ.Client;
 
 namespace Minor.Miffy.MicroServices.Host
 {
-    public class MicroserviceHostBuilder
+    public class MicroserviceHostBuilder 
     {
         /// <summary>
         /// Bus context that houses configuration for the message bus
@@ -60,7 +60,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
-            _logger.LogDebug("Adding Bus Context", context);
+            _logger.LogDebug($"Adding Bus Context with exchange {context.ExchangeName}");
             _context = context;
             return this;
         }
@@ -216,7 +216,6 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
         {
-            _logger.LogDebug("Registering dependencies");
             servicesConfiguration.Invoke(_serviceCollection);
             return this;
         }
@@ -225,10 +224,10 @@ namespace Minor.Miffy.MicroServices.Host
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost() => 
+        public MicroserviceHost CreateHost() =>
             new MicroserviceHost(
-                _context, 
-                _eventListeners, 
+                _context,
+                _eventListeners,
                 _commandListeners,
                 _loggerFactory.CreateLogger<MicroserviceHost>());
     }
