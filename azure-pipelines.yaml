@@ -48,7 +48,7 @@ stages:
               projectName: $(projectName)
         
           - displayName: 'Fix sonarqube'
-            script: |
+            bash: |
               mkdir -p /tmp/.sonarqube/resources/2/analyzers/dotnet \
               && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\YamlDotNet.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/YamlDotNet.dll \
               && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\SecurityCodeScan.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/SecurityCodeScan.dll
