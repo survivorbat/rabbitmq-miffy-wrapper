@@ -64,7 +64,10 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartReceivingMessages()
         {
-            if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
+            if (_isListening)
+            {
+                throw new BusConfigurationException("Receiver is already listening to events!");
+            }
             
             _logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
             _model.QueueDeclare(QueueName, true, false);
@@ -81,7 +84,10 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
-            if (!_isListening) throw new BusConfigurationException("Receiver is not listening to events");
+            if (!_isListening)
+            {
+                throw new BusConfigurationException("Receiver is not listening to events");
+            }
             
             EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
             consumer.Received += (model, args) =>

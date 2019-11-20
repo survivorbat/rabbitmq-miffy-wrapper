@@ -59,7 +59,10 @@ namespace Minor.Miffy.RabbitMQBus
 
                 consumer.Received += (model, ea) =>
                 {
-                    if (ea.BasicProperties.CorrelationId != request.CorrelationId.ToString()) return;
+                    if (ea.BasicProperties.CorrelationId != request.CorrelationId.ToString())
+                    {
+                        return;
+                    }
 
                     _logger.LogInformation($"Received response with id {request.CorrelationId} on queue {replyQueue} from {request.DestinationQueue}");
                     

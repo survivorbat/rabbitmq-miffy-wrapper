@@ -46,6 +46,7 @@ stages:
               scannerMode: 'MSBuild'
               projectKey: $(projectKey)
               projectName: $(projectName)
+              arguments: '/d:sonar.cs.opencover.reportsPaths=Minor.Miffy.*'
         
           - bash: |
               mkdir -p /tmp/.sonarqube/resources/2/analyzers/dotnet \
