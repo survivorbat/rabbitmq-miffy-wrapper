@@ -47,11 +47,11 @@ stages:
               projectKey: $(projectKey)
               projectName: $(projectName)
         
-          - displayName: 'Fix sonarqube'
-            bash: |
+          - bash: |
               mkdir -p /tmp/.sonarqube/resources/2/analyzers/dotnet \
               && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\YamlDotNet.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/YamlDotNet.dll \
               && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\SecurityCodeScan.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/SecurityCodeScan.dll
+            displayName: 'Fix sonarqube'
 
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
