@@ -46,13 +46,6 @@ stages:
               scannerMode: 'MSBuild'
               projectKey: $(projectKey)
               projectName: $(projectName)
-              arguments: '/d:sonar.cs.opencover.reportsPaths=Minor.Miffy.*'
-        
-          - bash: |
-              mkdir -p /tmp/.sonarqube/resources/2/analyzers/dotnet \
-              && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\YamlDotNet.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/YamlDotNet.dll \
-              && mv /tmp/.sonarqube/resources/2/analyzers\\dotnet\\SecurityCodeScan.dll /tmp/.sonarqube/resources/2/analyzers/dotnet/SecurityCodeScan.dll
-            displayName: 'Fix sonarqube'
 
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
@@ -65,7 +58,7 @@ stages:
             inputs:
               command: test
               projects: $(testProjects)
-              arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover'
+              arguments: '--configuration $(BuildConfiguration) --collect:"Code Coverage"'
 
           - task: SonarQubeAnalyze@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
