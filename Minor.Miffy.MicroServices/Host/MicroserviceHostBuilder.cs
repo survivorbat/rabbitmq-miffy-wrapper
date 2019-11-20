@@ -60,7 +60,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
-            _logger.LogDebug($"Adding Bus Context with exchange {context.ExchangeName}");
+            _logger.LogDebug($"Adding Bus Context");
             _context = context;
             return this;
         }
