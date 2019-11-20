@@ -16,7 +16,10 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Unimplemented since we don't use a connection
         /// </summary>
-        public void Dispose() { }
+        public void Dispose()
+        {
+            // Nothing to dispose of
+        }
 
         /// <summary>
         /// The dictionary that will keep track of our data

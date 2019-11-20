@@ -51,7 +51,10 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void DeclareCommandQueue()
         {
-            if (_queueDeclared) throw new BusConfigurationException($"Queue {QueueName} has already been declared!");
+            if (_queueDeclared)
+            {
+                throw new BusConfigurationException($"Queue {QueueName} has already been declared!");
+            }
             
             _logger.LogTrace($"Declaring command queue {QueueName}");
             _model.QueueDeclare(QueueName, true, false, false, null);
@@ -64,7 +67,10 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void StartReceivingCommands(CommandReceivedCallback callback)
         {
-            if (!_queueDeclared) throw new BusConfigurationException($"Queue {QueueName} has not been declared yet");
+            if (!_queueDeclared)
+            {
+                throw new BusConfigurationException($"Queue {QueueName} has not been declared yet");
+            }
 
             _logger.LogTrace($"Start receiving commands on queue {QueueName}");
 

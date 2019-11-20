@@ -195,9 +195,18 @@ namespace Minor.Miffy.MicroServices.Host
             string eventQueueName = type.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
             string commandQueueName = type.GetCustomAttribute<CommandListenerAttribute>()?.QueueName;
 
-            if (eventQueueName != null) RegisterEventListener(type, eventQueueName);
-            else if (commandQueueName != null) RegisterCommandListener(type, commandQueueName);
-            else _logger.LogTrace($"Type {type.Name} does not contain event listener attribute.");
+            if (eventQueueName != null)
+            {
+                RegisterEventListener(type, eventQueueName);
+            }
+            else if (commandQueueName != null)
+            {
+                RegisterCommandListener(type, commandQueueName);
+            }
+            else
+            {
+                _logger.LogTrace($"Type {type.Name} does not contain event listener attributes.");
+            }
         }
 
         /// <summary>

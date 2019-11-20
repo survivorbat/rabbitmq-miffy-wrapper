@@ -68,6 +68,9 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Empty dispose since there is nothing to dispose of
         /// </summary>
-        public void Dispose() { }
+        public void Dispose()
+        {
+            // Nothing to dispose of
+        }
     }
 }

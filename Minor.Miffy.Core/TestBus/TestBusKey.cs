@@ -44,7 +44,11 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+            
             TestBusKey key = obj as TestBusKey;
             return Equals(key);
         }

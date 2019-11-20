@@ -34,21 +34,21 @@ namespace Minor.Miffy.MicroServices.Commands
         /// <summary>
         /// Publish a domain event
         /// </summary>
-        public async Task<T> PublishAsync<T>(DomainCommand domainEvent)
+        public async Task<T> PublishAsync<T>(DomainCommand domainCommand)
         {
-            _logger.LogTrace($"Publishing domain command with type {domainEvent.GetType().Name} and ID {domainEvent.Id}");
+            _logger.LogTrace($"Publishing domain command with type {domainCommand.GetType().Name} and ID {domainCommand.Id}");
             
-            var json = JsonConvert.SerializeObject(domainEvent);
+            var json = JsonConvert.SerializeObject(domainCommand);
             
-            _logger.LogDebug($"Publishing domain event {domainEvent.Id} with body: {json}");
+            _logger.LogDebug($"Publishing domain event {domainCommand.Id} with body: {json}");
             
             var message = new CommandMessage
             {
-                Timestamp = domainEvent.Timestamp,
-                CorrelationId = domainEvent.Id,
-                EventType = domainEvent.GetType().Name,
+                Timestamp = domainCommand.Timestamp,
+                CorrelationId = domainCommand.Id,
+                EventType = domainCommand.GetType().Name,
                 Body = Encoding.Unicode.GetBytes(json),
-                DestinationQueue = domainEvent.DestinationQueue
+                DestinationQueue = domainCommand.DestinationQueue
             };
             
             var result = await _sender.SendCommandAsync(message);

@@ -38,7 +38,10 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Empty dispose since we don't have anything to dispose of
         /// </summary>
-        public void Dispose() { }
+        public void Dispose()
+        {
+            // Nothing to dispose of
+        }
 
         /// <summary>
         /// Name of the queue
@@ -55,7 +58,10 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void StartReceivingMessages()
         {
-            if (_isListening) throw new BusConfigurationException("Receiver is already listening to events!");
+            if (_isListening)
+            {
+                throw new BusConfigurationException("Receiver is already listening to events!");
+            }
 
             foreach (string topic in TopicFilters)
             {
