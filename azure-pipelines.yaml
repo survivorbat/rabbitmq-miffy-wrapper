@@ -37,7 +37,7 @@ stages:
       - job: PreRelease
         displayName: PreRelease
         pool:
-          vmImage: 'windows-latest'
+          vmImage: 'ubuntu-latest'
         steps:
           - task: SonarQubePrepare@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
