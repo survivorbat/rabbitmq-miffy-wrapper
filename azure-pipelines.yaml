@@ -2,6 +2,17 @@ trigger:
   branches:
     include:
       - master
+  paths:
+    include:
+      - Minor.Miffy.Core/
+      - Minor.Miffy.Core.Test/
+      - Minor.Miffy.MicroServices/
+      - Minor.Miffy.MicroServices.Test/
+      - Minor.Miffy.MicroServices.Test.Conventions/
+      - Minor.Miffy.Microservices.Test.Integration/
+      - Minor.Miffy.RabbitMQBus/
+      - Minor.Miffy.RabbitMQBus.Test/
+      - Minor.Miffy.RabbitMQBus.Test.Integration/
 
 variables:
   buildConfiguration: 'Release'
