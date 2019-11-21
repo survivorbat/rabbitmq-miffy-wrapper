@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>MaartenH.Minor.Miffy.Microservices</Title>
     <Description>The microservicde host package of the Miffy Framework</Description>
-    <PackageVersion>0.4.2</PackageVersion>
+    <PackageVersion>0.4.3</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Microservices</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ</PackageTags>
