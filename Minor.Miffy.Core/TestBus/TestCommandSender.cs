@@ -22,7 +22,7 @@ namespace Minor.Miffy.TestBus
         public Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
             Task.Run(() =>
             {
-                string randomReplyQueueName = Convert.ToBase64String(Guid.NewGuid().ToByteArray());;
+                string randomReplyQueueName = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
                 request.ReplyQueue = randomReplyQueueName;
                 
                 _context.CommandQueues[randomReplyQueueName] = new TestBusQueueWrapper<CommandMessage>();
