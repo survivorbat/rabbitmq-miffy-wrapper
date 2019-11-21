@@ -4,12 +4,16 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Minor.Miffy</RootNamespace>
     <Title>MaartenH.Minor.Miffy.Abstractions</Title>
-    <Description></Description>
-    <PackageVersion>0.4.0</PackageVersion>
+    <Description>Package containing the interfaces and testbus of the Miffy Framework</Description>
+    <PackageVersion>0.4.1</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Abstractions</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ</PackageTags>
     <ProjectGuid>9A19103F-16F7-4668-BE54-9A1E7A4F7556</ProjectGuid>
+    <PackageProjectUrl>https://github.com/survivorbat/rabbitmq-miffy-wrapper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/survivorbat/rabbitmq-miffy-wrapper</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageLicenseUrl>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
