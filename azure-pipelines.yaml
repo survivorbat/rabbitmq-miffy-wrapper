@@ -92,7 +92,7 @@ stages:
             displayName: 'nuget.org nuget push'
             inputs:
               command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkgltd '
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg '
               nuGetFeedType: 'external'
               publishFeedCredentials: 'NuGet feed'
   - stage: Release
@@ -123,7 +123,6 @@ stages:
             inputs:
               command: 'pack'
               packagesToPack: '**/*.csproj'
-              versioningScheme: byReleaseNumber
               patchVersion: $(Build.BuildId)
               nobuild: true
 
@@ -139,6 +138,6 @@ stages:
             displayName: 'nuget.org nuget push'
             inputs:
               command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkgltd '
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'NuGet feed'
