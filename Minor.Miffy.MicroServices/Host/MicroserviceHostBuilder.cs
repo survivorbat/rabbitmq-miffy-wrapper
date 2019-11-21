@@ -62,6 +62,7 @@ namespace Minor.Miffy.MicroServices.Host
         {
             _logger.LogDebug($"Adding Bus Context");
             _context = context;
+            _serviceCollection.AddSingleton(context);
             return this;
         }
 
