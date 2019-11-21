@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,10 +13,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
     public class TestCommandSenderTest
     {
         [TestMethod]
-        [DataRow("test.queue")]
-        [DataRow("reply.queue")]
-        [DataRow("where.should.the.other.ones.answers.go")]
-        public void SendCommandCreatesReplyQueue(string queueName)
+        public void SendCommandCreatesReplyQueue()
         {
             // Arrange
             var context = new Mock<TestBusContext>();
@@ -28,7 +26,6 @@ namespace Minor.Miffy.Test.Unit.TestBus
             var request = new CommandMessage
             {
                 DestinationQueue = "destination.queue",
-                ReplyQueue = queueName,
                 CorrelationId = Guid.Empty
             };
             
@@ -38,7 +35,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             Thread.Sleep(1000);
             
             // Assert
-            Assert.IsTrue(dictionary.ContainsKey(queueName));
+            Assert.AreEqual(1, dictionary.Keys.Count);
         }
         
         [TestMethod]

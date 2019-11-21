@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -21,13 +22,16 @@ namespace Minor.Miffy.TestBus
         public Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
             Task.Run(() =>
             {
-                _context.CommandQueues[request.ReplyQueue] = new TestBusQueueWrapper<CommandMessage>();
+                string randomReplyQueueName = Convert.ToBase64String(Guid.NewGuid().ToByteArray());;
+                request.ReplyQueue = randomReplyQueueName;
+                
+                _context.CommandQueues[randomReplyQueueName] = new TestBusQueueWrapper<CommandMessage>();
                 
                 _context.CommandQueues[request.DestinationQueue].Queue.Enqueue(request);
                 _context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
 
-                _context.CommandQueues[request.ReplyQueue].AutoResetEvent.WaitOne();
-                _context.CommandQueues[request.ReplyQueue].Queue.TryDequeue(out var output);
+                _context.CommandQueues[randomReplyQueueName].AutoResetEvent.WaitOne();
+                _context.CommandQueues[randomReplyQueueName].Queue.TryDequeue(out var output);
                 return output;
             });
     }

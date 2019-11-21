@@ -9,10 +9,10 @@ namespace Minor.Miffy.Test.Component.TestBus
     public class TestBusCommandTest
     {
         [TestMethod]
-        [DataRow("test.queue", "reply.queue", "World")]
-        [DataRow("command.queue", "reply.queue", "Test")]
-        [DataRow("command.queue", "reply.queue", "Hello")]
-        public void SentMessageIsProperlyReceivedAndReturned(string destQueue, string replyQueue, string expected)
+        [DataRow("test.queue", "World")]
+        [DataRow("command.queue", "Test")]
+        [DataRow("command.queue", "Hello")]
+        public void SentMessageIsProperlyReceivedAndReturned(string destQueue,string expected)
         {
             // Arrange
             var context = new TestBusContext();
@@ -23,7 +23,6 @@ namespace Minor.Miffy.Test.Component.TestBus
             var command = new CommandMessage
             {
                 DestinationQueue = destQueue,
-                ReplyQueue = replyQueue,
                 CorrelationId = Guid.NewGuid()
             };
             
@@ -54,7 +53,6 @@ namespace Minor.Miffy.Test.Component.TestBus
             var command = new CommandMessage
             {
                 DestinationQueue = "dest.queue",
-                ReplyQueue = "reply.queue",
                 CorrelationId = Guid.NewGuid(),
                 Body = Encoding.Unicode.GetBytes(startMessage)
             };
