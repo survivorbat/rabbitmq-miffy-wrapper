@@ -1,17 +1,14 @@
 # RabbitMQ Miffy Wrapper
 
 This is a work-in-progress wrapper library for the RabbitMQ Client in dotnetcore.
-
-## Prerequisites
-
-Nuget and a .NET Core application
-
-## Getting started
+These packages allow you to easily set up event listeners and command listeners using
+RabbitMQ.
 
 ### Example configuration
 
-You can find example applications in the folders **VoorbeeldMicroService** and **VoorbeeldMicroService2**.
-A receiving host and a command/event publishing host respectively.
+First, you need to open a connection using an implementation of the
+IBusContext<IConnection> class like so:
+
 
 ## Packages
 
