@@ -169,7 +169,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             
             // Assert
             var exception = Assert.ThrowsExceptionAsync<BusConfigurationException>(Act);
-            Assert.AreEqual($"No response received from queue {queueName}", exception.Result.Message);
+            Assert.AreEqual($"No response received from queue {queueName}, timeout is {RabbitMqCommandSender.CommandTimeout}ms", exception.Result.Message);
         }
         
         [TestMethod]

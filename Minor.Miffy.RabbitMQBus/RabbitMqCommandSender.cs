@@ -14,7 +14,7 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandSender : ICommandSender
     {
-        private const int CommandTimeout = 6000;
+        public static readonly int CommandTimeout = 8000;
         /// <summary>
         /// Context
         /// </summary>
@@ -85,7 +85,7 @@ namespace Minor.Miffy.RabbitMQBus
                 
                 resetEvent.WaitOne(CommandTimeout);
 
-                return result ?? throw new BusConfigurationException($"No response received from queue {request.DestinationQueue}");
+                return result ?? throw new BusConfigurationException($"No response received from queue {request.DestinationQueue}, timeout is {CommandTimeout}ms");
             });
     }
 }

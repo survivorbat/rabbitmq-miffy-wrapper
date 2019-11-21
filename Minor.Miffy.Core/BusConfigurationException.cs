@@ -19,9 +19,5 @@ namespace Minor.Miffy
         public BusConfigurationException(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected BusConfigurationException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

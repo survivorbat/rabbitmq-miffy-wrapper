@@ -21,8 +21,4 @@
       <ProjectReference Include="..\Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Component" />
-    </ItemGroup>
-
 </Project>

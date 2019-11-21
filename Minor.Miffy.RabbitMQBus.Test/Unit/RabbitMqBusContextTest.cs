@@ -34,6 +34,20 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             Assert.AreSame(connection.Object, context.Connection);
         }
+
+        [TestMethod]
+        public void DiposeCallsDisposeOnConnection()
+        {
+            // Arrange
+            var connection = new Mock<IConnection>();
+            var context = new RabbitMqBusContext(connection.Object, "test");
+            
+            // Act
+            context.Dispose();
+            
+            // Assert
+            connection.Verify(e => e.Dispose());
+        }
         
         [TestMethod]
         public void CreateMessageReceiverReturnsReceiver()

@@ -19,10 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Unit" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Minor.Miffy.Core\Minor.Miffy.Core.csproj" />
     </ItemGroup>
 
