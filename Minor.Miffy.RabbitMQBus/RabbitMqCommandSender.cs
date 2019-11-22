@@ -85,7 +85,12 @@ namespace Minor.Miffy.RabbitMQBus
                 
                 resetEvent.WaitOne(CommandTimeout);
 
-                return result ?? throw new BusConfigurationException($"No response received from queue {request.DestinationQueue}, timeout is {CommandTimeout}ms");
+                if (result is CommandError error)
+                {
+                    throw new DestinationQueueException(error.ExceptionMessage);
+                }
+
+                return result ?? throw new MessageTimeoutException($"No response received from queue {request.DestinationQueue} after {CommandTimeout}ms", CommandTimeout);
             });
     }
 }

@@ -236,6 +236,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         
         [TestMethod]
         [DataRow("Random exception was thrown")]
+        [DataRow("Apocalyptic exception was thrown")]
+        [DataRow("Ancient Exception")]
         public void StartReceivingCommandsConsumerCatchesExceptionWithCommandErrorAndMessage(string message)
         {
             // Arrange
@@ -319,6 +321,55 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
             modelMock.Verify(e => e.BasicPublish(exchangeName, 
                 replyTo,
+                false, 
+                It.IsAny<IBasicProperties>(), 
+                bodyResponse));
+        }
+
+        [TestMethod]
+        [DataRow("OopsieException")]
+        [DataRow("ExplosionException")]
+        [DataRow("DeathException")]
+        public void ExceptionIsProperlyHandled(string exceptionMessage)
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+            
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            contextMock.SetupGet(e => e.ExchangeName).Returns("test.exchange");
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
+                
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            
+            IBasicConsumer consumer = null;
+            
+            // Retrieve consumer from callback
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+            
+            var properties = new BasicProperties
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                ReplyTo = "reply.queue"
+            };
+            
+            var responseMessage = new CommandError {ExceptionMessage = exceptionMessage, EventType = "CommandError"};
+            
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e => throw new Exception(exceptionMessage));
+
+            // Act
+            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+
+            // Assert
+            var jsonResponse = JsonConvert.SerializeObject(responseMessage);
+            var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
+            
+            modelMock.Verify(e => e.BasicPublish("test.exchange", 
+                "reply.queue",
                 false, 
                 It.IsAny<IBasicProperties>(), 
                 bodyResponse));
