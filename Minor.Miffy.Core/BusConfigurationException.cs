@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Minor.Miffy
 {
-    [Serializable]
     public class BusConfigurationException : Exception
     {
         public BusConfigurationException() { }

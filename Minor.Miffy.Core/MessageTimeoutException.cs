@@ -5,7 +5,6 @@ namespace Minor.Miffy
     /// <summary>
     /// If a message is not received within a specific time limit this exception will be thrown
     /// </summary>
-    [Serializable]
     public class MessageTimeoutException : Exception
     {
         /// <summary>
