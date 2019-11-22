@@ -14,7 +14,8 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandSender : ICommandSender
     {
-        public static readonly int CommandTimeout = 8000;
+        public const int CommandTimeout = 8000;
+
         /// <summary>
         /// Context
         /// </summary>
