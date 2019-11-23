@@ -1,6 +1,5 @@
 # RabbitMQ Miffy Wrapper
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/survivorbat/rabbitmq-miffy-wrapper)
 ![GitHub](https://img.shields.io/github/license/survivorbat/rabbitmq-miffy-wrapper)
 
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
