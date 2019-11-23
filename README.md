@@ -116,7 +116,7 @@ public class ExampleEvent : DomainEvent
 
 var exampleEvent = new ExampleEvent() { ExampleData = "Hello World" };
 
-var publisher = new EventPublisher();
+var publisher = new EventPublisher(context);
 publisher.Publish(exampleEvent);
 ```
 
