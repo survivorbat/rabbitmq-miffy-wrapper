@@ -1,26 +1,29 @@
 # RabbitMQ Miffy Wrapper
 
-This is a work-in-progress wrapper library for the RabbitMQ Client in dotnetcore.
-These packages allow you to easily set up event listeners and command listeners using
-RabbitMQ.
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/survivorbat/rabbitmq-miffy-wrapper)
+![GitHub](https://img.shields.io/github/license/survivorbat/rabbitmq-miffy-wrapper)
 
-## Packages
+This is a wrapper library for the RabbitMQ Client in dotnetcore.
+These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
 **MaartenH.Minor.Miffy.Abstractions**:  
 Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Abstractions)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.Abstractions)
 
 **MaartenH.Minor.Miffy.MicroServices**:  
 The package containing the classes used to set up a microservice host.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Microservices)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.MicroServices)
 
-**MaartenH.Minor.Miffy.RabbitMQ**  
+**MaartenH.Minor.Miffy.RabbitMQBus**  
 Implementation classes to use RabbitMQ with the framework
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.RabbitMQBus)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.RabbitMQBus)
 
 These packages can be found on nuget.org and in my private azure cloud.
 
