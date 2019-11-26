@@ -26,6 +26,23 @@ Implementation classes to use RabbitMQ with the framework
 
 These packages can be found on nuget.org and in my private azure cloud.
 
+## Exceptions
+
+### DestinationQueueException
+
+This exception indicates that an exception occured at the CommandListener on
+the receiving end and that the CommandPublisher is unable to complete its command.
+
+### BusConfigurationException
+
+This exception indicates that something is wrong with the configuration of
+your listener of sender.
+
+### MessageTimeoutException
+
+This exception indicates that no response was received within the (currently hard-coded) limit
+within a CommandPublisher.
+
 ## Example configuration
 
 To allow you for a quick start, here are a few examples on how to use this library.
