@@ -88,7 +88,12 @@ namespace Minor.Miffy.RabbitMQBus
 
                 if (result is CommandError error)
                 {
-                    throw new DestinationQueueException(error.ExceptionMessage);
+                    _logger.LogError($"Received error command with id {request.DestinationQueue} " +
+                                     $"from queue {request.DestinationQueue} in reply queue {replyQueue}. " +
+                                     $"Errormessage: {error.Exception.Message}");
+                    
+                    throw new DestinationQueueException($"Received error command from queue {request.DestinationQueue}", 
+                        error.Exception, replyQueue, request.DestinationQueue, request.CorrelationId);
                 }
 
                 return result ?? throw new MessageTimeoutException($"No response received from queue {request.DestinationQueue} after {CommandTimeout}ms", CommandTimeout);

@@ -266,8 +266,6 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         [TestMethod]
         [DataRow("NullReferenceException")]
         [DataRow("Something terrible happened!")]
-        [DataRow("Oh noes")]
-        [DataRow("Something went wrong! An error was returned :o")]
         public void ExceptionIsThrownIfEventTypeIsCommandError(string exceptionMessage)
         {
             // Arrange
@@ -304,7 +302,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var body = new CommandError
             {
                 EventType = "CommandError",
-                ExceptionMessage = exceptionMessage,
+                Exception = new Exception(exceptionMessage),
                 CorrelationId = guid
             };
 
@@ -328,7 +326,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             // Assert
             Task<DestinationQueueException> exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act);
-            Assert.AreEqual(exceptionMessage, exception.Result.Message);
+            Assert.AreEqual("Received error command from queue test.queue", exception.Result.Message);
         }
         
         [TestMethod]
@@ -374,7 +372,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var body = new CommandError
             {
                 EventType = "DummyCommand",
-                ExceptionMessage = "TestException",
+                Exception = new Exception("TestException"),
                 CorrelationId = Guid.Parse(correlationId)
             };
 

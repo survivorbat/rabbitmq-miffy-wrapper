@@ -277,7 +277,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             var stringBody = Encoding.Unicode.GetString(resultBody);
             var commandError = JsonConvert.DeserializeObject<CommandError>(stringBody);
-            Assert.AreEqual(message, commandError.ExceptionMessage);
+            Assert.AreEqual(message, commandError.Exception.Message);
         }
         
         [TestMethod]
@@ -356,23 +356,26 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 ReplyTo = "reply.queue"
             };
             
-            var responseMessage = new CommandError {ExceptionMessage = exceptionMessage, EventType = "CommandError"};
-            
+            var exception = new Exception(exceptionMessage);
             receiver.DeclareCommandQueue();
-            receiver.StartReceivingCommands(e => throw new Exception(exceptionMessage));
+            receiver.StartReceivingCommands(e => throw exception);
 
+            var expectedBody = new byte[0];
+            modelMock.Setup(e => e.BasicPublish("test.exchange", 
+                "reply.queue",
+                false, 
+                It.IsAny<IBasicProperties>(), 
+                It.IsAny<byte[]>()))
+                .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => expectedBody = body);
+            
             // Act
             consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
 
             // Assert
-            var jsonResponse = JsonConvert.SerializeObject(responseMessage);
-            var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
+            var stringBody = Encoding.Unicode.GetString(expectedBody);
+            CommandError error = JsonConvert.DeserializeObject<CommandError>(stringBody);
             
-            modelMock.Verify(e => e.BasicPublish("test.exchange", 
-                "reply.queue",
-                false, 
-                It.IsAny<IBasicProperties>(), 
-                bodyResponse));
+            Assert.AreEqual(error.Exception.Message, exceptionMessage);
         }
 
         [TestMethod]

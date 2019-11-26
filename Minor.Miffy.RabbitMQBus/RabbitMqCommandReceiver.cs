@@ -109,7 +109,7 @@ namespace Minor.Miffy.RabbitMQBus
                     
                     response = new CommandError
                     {
-                        ExceptionMessage = e.InnerException?.Message ?? e.Message,
+                        Exception = e?.InnerException ?? e,
                         EventType = CommandErrorType
                     };
                 }

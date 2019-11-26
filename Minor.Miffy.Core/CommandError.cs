@@ -1,7 +1,15 @@
+using System;
+
 namespace Minor.Miffy
 {
+    /// <summary>
+    /// Special commandmessage with an exception
+    /// </summary>
     public class CommandError : CommandMessage
     {
-        public string ExceptionMessage { get; set; }
+        /// <summary>
+        /// Exception thrown
+        /// </summary>
+        public Exception Exception { get; set; }
     }
 }
