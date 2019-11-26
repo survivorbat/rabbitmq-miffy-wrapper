@@ -100,6 +100,9 @@ namespace Minor.Miffy.RabbitMQBus
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError($"Error occured while handling command, command id {ea.BasicProperties.CorrelationId} " +
+                                     $"with exception {e.Message}");
+                    
                     response = new CommandError
                     {
                         ExceptionMessage = e.Message,
