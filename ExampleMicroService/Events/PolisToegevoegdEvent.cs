@@ -1,8 +1,7 @@
-﻿using Minor.Miffy.MicroServices.Events;
-using VoorbeeldMicroService.Constants;
-using VoorbeeldMicroService.Models;
+﻿using ExampleMicroService.Models;
+using Minor.Miffy.MicroServices.Events;
 
-namespace VoorbeeldMicroService.Events
+namespace ExampleMicroService.Events
 {
     /// <summary>
     /// An example event to demonstrate how to
@@ -14,7 +13,7 @@ namespace VoorbeeldMicroService.Events
         /// Ensure that all PolisToegevoegdEvents have the same topic by putting it in the
         /// parent constructor
         /// </summary>
-        public PolisToegevoegdEvent() : base(TopicNames.MvmPolisbeheerPolisToegevoegd) { }
+        public PolisToegevoegdEvent() : base("MVM.Polisbeheer.PolisToegevoegd") { }
 
         /// <summary>
         /// A model object that will be transmitted through the bus

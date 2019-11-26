@@ -3,14 +3,21 @@ using Minor.Miffy.MicroServices;
 using Minor.Miffy.RabbitMQBus;
 using RabbitMQ.Client;
 using System;
+using ExampleMicroService.DAL;
 using System.Threading;
+using System.Threading.Tasks;
+using ExampleMicroService.Commands;
+using ExampleMicroService.Events;
+using ExampleMicroService.Models;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Minor.Miffy.MicroServices.Commands;
+using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
-using VoorbeeldMicroService.DAL;
 
-namespace VoorbeeldMicroService
+namespace ExampleMicroService
 {
     /**
      * An example MicroserviceHost
@@ -34,7 +41,7 @@ namespace VoorbeeldMicroService
              */
             using ILoggerFactory loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole().SetMinimumLevel(LogLevel.Information);
+                configure.AddConsole().SetMinimumLevel(LogLevel.Debug);
             });
 
             /*
@@ -59,6 +66,16 @@ namespace VoorbeeldMicroService
              */
             using IBusContext<IConnection> context = contextBuilder.CreateContext();
 
+            
+            /**
+             * Create a dummy database context for testing with an in-memory database
+             */
+            SqliteConnection connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+            
+            DbContextOptions<PolisContext> options = new DbContextOptionsBuilder<PolisContext>().UseSqlite(connection).Options;
+            PolisContext databaseContext = new PolisContext(options);
+            
             /**
              * Now create a builder that will build our microservice host.
              *
@@ -75,11 +92,7 @@ namespace VoorbeeldMicroService
                 .SetLoggerFactory(loggerFactory)
                 .RegisterDependencies(services =>
                 {
-                    services.AddDbContext<PolisContext>(e =>
-                    {
-                        e.UseNpgsql("Host=localhost;Database=test;Username=root;Password=root");
-                        e.UseLoggerFactory(loggerFactory);
-                    });
+                    services.AddSingleton(databaseContext);
                 })
                 .WithBusContext(context)
                 .UseConventions();
@@ -91,11 +104,42 @@ namespace VoorbeeldMicroService
             host.Start();
 
             /**
-             * Since the host runs in the background, we ensure
-             * it keeps running by waiting for a never-ending manual
-             * reset event.
+             * Now let's pretend this service is running somewhere in a cluster
+             * and is receiving events, let's fire some events at it
              */
-            new ManualResetEvent(false).WaitOne();
+            string[] names = { "Jack", "Jake", "Penny", "Robin", "Rick", "Vinny", "Spencer" };
+            IEventPublisher publisher = new EventPublisher(context, loggerFactory);
+            
+            foreach (string name in names) 
+            {
+                PolisToegevoegdEvent toegevoegdEvent = new PolisToegevoegdEvent
+                {
+                    Polis = new Polis { Klantnaam = name }
+                };
+                publisher.Publish(toegevoegdEvent);
+            }
+            
+            /**
+             * Now let's wait 1 second for all the events to arrive and be processed
+             */
+            Thread.Sleep(1000);
+            
+            /**
+             * Now let's fire a command and retrieve a list of polissen
+             */
+            ICommandPublisher commandPublisher = new CommandPublisher(context, loggerFactory);
+            HaalPolissenOpCommand command = new HaalPolissenOpCommand();
+            
+            Task<HaalPolissenOpCommand> commandResultTask = commandPublisher.PublishAsync<HaalPolissenOpCommand>(command);
+            HaalPolissenOpCommand commandResult = commandResultTask.Result;
+            
+            /**
+             * Now, print the result!
+             */
+            foreach (Polis polis in commandResult.Polisses)
+            {
+                Console.WriteLine($"Found polis for {polis.Klantnaam} with ID {polis.Id}");
+            }
         }
     }
 }

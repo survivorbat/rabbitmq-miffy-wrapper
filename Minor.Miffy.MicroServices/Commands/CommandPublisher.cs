@@ -36,12 +36,13 @@ namespace Minor.Miffy.MicroServices.Commands
         /// </summary>
         public async Task<T> PublishAsync<T>(DomainCommand domainCommand)
         {
-            _logger.LogTrace($"Publishing domain command with type {domainCommand.GetType().Name} and ID {domainCommand.Id}");
-            
+            _logger.LogTrace(
+                $"Publishing domain command with type {domainCommand.GetType().Name} and ID {domainCommand.Id}");
+
             var json = JsonConvert.SerializeObject(domainCommand);
-            
+
             _logger.LogDebug($"Publishing domain event {domainCommand.Id} with body: {json}");
-            
+
             var message = new CommandMessage
             {
                 Timestamp = domainCommand.Timestamp,
@@ -50,11 +51,26 @@ namespace Minor.Miffy.MicroServices.Commands
                 Body = Encoding.Unicode.GetBytes(json),
                 DestinationQueue = domainCommand.DestinationQueue
             };
-            
+
             var result = await _sender.SendCommandAsync(message);
-            string jsonBody = Encoding.Unicode.GetString(result.Body);
-            
-            return (T) JsonConvert.DeserializeObject(jsonBody, typeof(T));
+
+            try
+            {
+                string jsonBody = Encoding.Unicode.GetString(result.Body);
+                return (T) JsonConvert.DeserializeObject(jsonBody, typeof(T));
+            }
+            catch (ArgumentNullException exception)
+            {
+                _logger.LogError(
+                    $"Deserializing response from queue {domainCommand.DestinationQueue} ended with an ArgumentNullException");
+
+                throw new DestinationQueueException(
+                    $"ArgumentNullException was thrown, most likely because the destination queue {domainCommand.DestinationQueue} replied with an empty body.",
+                    exception,
+                    "Unknown",
+                    domainCommand.DestinationQueue,
+                    domainCommand.Id);
+            }
         }
     }
 }

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
+using ExampleMicroService.Models;
 using Minor.Miffy.MicroServices.Commands;
-using VoorbeeldMicroService.Constants;
-using VoorbeeldMicroService.Models;
 
-namespace VoorbeeldMicroService.Commands
+namespace ExampleMicroService.Commands
 {
     /// <summary>
     /// An example command that inherits from the DomainCommand
@@ -23,6 +22,6 @@ namespace VoorbeeldMicroService.Commands
         ///
         /// This is essentially the queue that this command will be sent to
         /// </summary>
-        public HaalPolissenOpCommand() : base(QueueNames.HaalPolissenOpQueue) { }
+        public HaalPolissenOpCommand() : base("MVM.TestService.HaalPolissenOpQueue") { }
     }
 }

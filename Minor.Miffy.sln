@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.Core", "Minor.M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.MicroServices", "Minor.Miffy.MicroServices\Minor.Miffy.MicroServices.csproj", "{7D36EFF3-C185-41F8-958D-5DBB55E7B344}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoorbeeldMicroService", "VoorbeeldMicroService\VoorbeeldMicroService.csproj", "{43AEDA7E-2E10-42DD-8967-74D2B1EE1DFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleMicroService", "ExampleMicroService\ExampleMicroService.csproj", "{43AEDA7E-2E10-42DD-8967-74D2B1EE1DFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus", "Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj", "{183F572D-7160-4B29-ABC3-367A9E874488}"
 EndProject

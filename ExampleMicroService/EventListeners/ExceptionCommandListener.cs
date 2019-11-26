@@ -1,8 +1,8 @@
 using System;
+using ExampleMicroService.Commands;
 using Minor.Miffy.MicroServices.Events;
-using VoorbeeldMicroService.Commands;
 
-namespace VoorbeeldMicroService.EventListeners
+namespace ExampleMicroService.EventListeners
 {
     /// <summary>
     /// An example command listener that throws an exception to
@@ -16,7 +16,9 @@ namespace VoorbeeldMicroService.EventListeners
         /// </summary>
         /// <param name="polissenOpCommand">Command</param>
         /// <returns>An exception</returns>
-        public HaalPolissenOpCommand Handles(HaalPolissenOpCommand polissenOpCommand) => 
+        public HaalPolissenOpCommand Handles(HaalPolissenOpCommand polissenOpCommand)
+        {
             throw new Exception("Something mysterious happened!");
+        }
     }
 }

@@ -236,7 +236,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             
             // Arrange
             var exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act);
-            Assert.AreEqual(message, exception.Result.Message);
+            Assert.AreEqual("Received error command from queue Test.Command.Listener", exception.Result.Message);
         }
 
         [TestInitialize]

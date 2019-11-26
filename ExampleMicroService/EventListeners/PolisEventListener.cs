@@ -1,10 +1,8 @@
-﻿using System;
+﻿using ExampleMicroService.DAL;
+using ExampleMicroService.Events;
 using Minor.Miffy.MicroServices.Events;
-using VoorbeeldMicroService.Constants;
-using VoorbeeldMicroService.DAL;
-using VoorbeeldMicroService.Events;
 
-namespace VoorbeeldMicroService.EventListeners
+namespace ExampleMicroService.EventListeners
 {
     /// <summary>
     /// Example class that demonstrates how to create an event listener
@@ -15,9 +13,9 @@ namespace VoorbeeldMicroService.EventListeners
     /// of the assignment.
     ///
     /// For this reason, creating a new event listener class for each
-    /// event listener is quite excessive and this procces will be changed in the feature
+    /// event listener is quite excessive and this process will be changed in the feature
     /// </summary>
-    [EventListener(QueueNames.PolisListenerEventQueue)]
+    [EventListener("MVM.TestService.PolisEventListenerQueue")]
     public class PolisEventListener
     {
         /// <summary>
@@ -29,13 +27,16 @@ namespace VoorbeeldMicroService.EventListeners
         /// Services that this handler requires
         /// </summary>
         /// <param name="context">Database Context</param>
-        public PolisEventListener(PolisContext context) => _context = context;
+        public PolisEventListener(PolisContext context)
+        {
+            _context = context;
+        }
 
         /// <summary>
         /// Command that handles the incoming event, in this case saving it
         /// </summary>
         /// <param name="evt">incoming event</param>
-        [Topic(TopicNames.MvmPolisbeheerPolisToegevoegd)]
+        [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(PolisToegevoegdEvent evt)
         {
             _context.Polissen.Add(evt.Polis);

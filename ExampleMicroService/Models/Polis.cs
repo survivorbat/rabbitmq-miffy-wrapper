@@ -1,4 +1,4 @@
-namespace VoorbeeldMicroService.Models
+namespace ExampleMicroService.Models
 {
     /// <summary>
     /// An example model object that will be transmitted
