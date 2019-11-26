@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>MaartenH.Minor.Miffy.Microservices</Title>
     <Description>The microservice host package of the Miffy Framework</Description>
-    <PackageVersion>0.5.2</PackageVersion>
+    <PackageVersion>0.6.0</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Microservices</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ Events Commands Bus</PackageTags>
@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/survivorbat/rabbitmq-miffy-wrapper</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageLicenseUrl>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</PackageLicenseUrl>
+    <PackageReleaseNotes>Changed CommandError significantly, instead of only transmatting the exception message we now just send over the entire exception.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
