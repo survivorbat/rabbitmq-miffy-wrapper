@@ -1,8 +1,13 @@
 namespace VoorbeeldMicroService.Constants
 {
-    public static class QueueNames
+    /// <summary>
+    /// To reduce the amount of typo-bugs, this
+    /// class has been created to keep track of
+    /// all the queue names.
+    /// </summary>
+    internal static class QueueNames
     {
-        public const string PolisListenerEventQueue = "MVM.TestService.PolisEventListenerQueue";
-        public const string HaalPolissenOpQueue = "MVM.TestService.HaalPolissenOpQueue";
+        internal const string PolisListenerEventQueue = "MVM.TestService.PolisEventListenerQueue";
+        internal const string HaalPolissenOpQueue = "MVM.TestService.HaalPolissenOpQueue";
     }
 }
