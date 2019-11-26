@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -10,6 +12,8 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandReceiver : ICommandReceiver
     {
+        private static readonly string CommandErrorType = "CommandError";
+        
         /// <summary>
         /// Testbus context
         /// </summary>
@@ -105,8 +109,8 @@ namespace Minor.Miffy.RabbitMQBus
                     
                     response = new CommandError
                     {
-                        ExceptionMessage = e.Message,
-                        EventType = "CommandError"
+                        ExceptionMessage = e.InnerException?.Message ?? e.Message,
+                        EventType = CommandErrorType
                     };
                 }
                 

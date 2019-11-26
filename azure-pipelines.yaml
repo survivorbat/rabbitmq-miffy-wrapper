@@ -31,11 +31,11 @@ variables:
   projectName: MaartenH Miffy
 
 stages:
-  - stage: PreRelease
-    displayName: PreRelease
+  - stage: Build
+    displayName: Build
     jobs:
-      - job: PreRelease
-        displayName: PreRelease
+      - job: Build
+        displayName: Build
         pool:
           vmImage: 'windows-latest'
         steps:
@@ -70,23 +70,6 @@ stages:
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
               SonarQube: 'SonarQube Service Connection'
-        
-          - task: DotNetCoreCLI@2
-            displayName: 'dotnet pack'
-            inputs:
-              command: 'pack'
-              packagesToPack: '**/*.csproj'
-              versioningScheme: byPrereleaseNumber
-              patchVersion: $(Build.BuildId)
-              nobuild: true
-        
-          - task: DotNetCoreCLI@2
-            displayName: 'nuget push'
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-              nuGetFeedType: 'internal'
-              publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
   - stage: Release
     displayName: Release
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
@@ -102,7 +85,7 @@ stages:
               projects: $(projects)
               arguments: '--configuration $(BuildConfiguration)'
 
-          # To be sure
+          # To be sure ;-)
           - task: DotNetCoreCLI@2
             displayName: 'dotnet test'
             inputs:
@@ -115,23 +98,21 @@ stages:
             inputs:
               command: 'pack'
               packagesToPack: '**/*.csproj'
-              versioningScheme: byReleaseNumber
               patchVersion: $(Build.BuildId)
               nobuild: true
 
           - task: DotNetCoreCLI@2
-            displayName: 'nuget push'
+            displayName: 'internal nuget push'
             inputs:
               command: 'push'
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
               
-          - task: DotNetCoreCLI@2
-              displayName: 'nuget push'
-              inputs:
-                command: 'push'
-                packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-                nuGetFeedType: 'external'
-                publishFeedCredentials: 'NuGet feed'
-  
+          - task: NuGetCommand@2
+            displayName: 'nuget.org nuget push'
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'NuGet feed'

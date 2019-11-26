@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices;
+using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
 using Minor.Miffy.MicroServices.Test.Integration.EventListeners;
@@ -29,7 +32,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            MicroserviceHost host = new MicroserviceHostBuilder()
+            using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<PersonEventListener>()
                 .CreateHost();
@@ -68,7 +71,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            MicroserviceHost host = new MicroserviceHostBuilder()
+            using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<WildCardPersonEventListener>()
                 .AddEventListener<WildCardPersonEventListener2>()
@@ -109,7 +112,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            MicroserviceHost host = new MicroserviceHostBuilder()
+            using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<FanInEventListener>()
                 .CreateHost();
@@ -148,7 +151,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            MicroserviceHost host = new MicroserviceHostBuilder()
+            using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<PersonEventListener>()
                 .AddEventListener<CatEventListener>()
@@ -184,11 +187,12 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            new MicroserviceHostBuilder()
+            using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<SpamEventListener>()
-                .CreateHost()
-                .Start();
+                .CreateHost();
+            
+            host.Start();
             
             var publisher = new EventPublisher(busContext);
 
@@ -203,6 +207,36 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             Thread.Sleep(1000);
 
             CollectionAssert.AreEquivalent(catEvents, SpamEventListener.ResultEvents);
+        }
+        
+        [TestMethod]
+        [DataRow("TestException")]
+        [DataRow("NullPointerException")]
+        [DataRow("EverythingIsOnFireException")]
+        public void CommandReturnsProperException(string message)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+
+            using var host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<ErrorEventListener>()
+                .CreateHost();
+            
+            host.Start();
+
+            var command = new DummyCommand(message);
+            var publisher = new CommandPublisher(busContext);
+
+            // Act
+            Task<DummyCommand> Act() => publisher.PublishAsync<DummyCommand>(command);
+            
+            // Arrange
+            var exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act);
+            Assert.AreEqual(message, exception.Result.Message);
         }
 
         [TestInitialize]

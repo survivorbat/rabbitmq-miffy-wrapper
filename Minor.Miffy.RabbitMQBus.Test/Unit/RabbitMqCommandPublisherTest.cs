@@ -139,6 +139,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         [TestMethod]
         [DataRow("TestQueue", "TestExchange")]
         [DataRow("queue.test", "exchange.test")]
+        [DataRow("TestQueue", "ExchangeTest")]
         public void SendCommandCallsBasicPublishThrowsExceptionOnTimeout(string queueName, string exchangeName)
         {
             // Arrange
@@ -168,8 +169,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             async Task<CommandMessage> Act() => await sender.SendCommandAsync(command);
             
             // Assert
-            var exception = Assert.ThrowsExceptionAsync<BusConfigurationException>(Act);
-            Assert.AreEqual($"No response received from queue {queueName}, timeout is {RabbitMqCommandSender.CommandTimeout}ms", exception.Result.Message);
+            var exception = Assert.ThrowsExceptionAsync<MessageTimeoutException>(Act);
+            Assert.AreEqual($"No response received from queue {queueName} after {RabbitMqCommandSender.CommandTimeout}ms", exception.Result.Message);
         }
         
         [TestMethod]
@@ -261,13 +262,13 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             modelMock.Verify(e => e.BasicAck(20, false), Times.Never);
         }
-        
+
         [TestMethod]
-        [DataRow("a9daf3b7-03f7-4593-877d-e9b541f2a0e1")]
-        [DataRow("9c304340-3903-4cf3-96d1-2a8d333ee789")]
-        [DataRow("2377db9d-5e3c-4a8b-9f98-0c567aa812f8")]
-        [DataRow("d415f231-a3db-4b26-9c41-ab82638a249a")]
-        public void CommandErrorIsCreatedIfEventTypeIsCommandError(string correlationId)
+        [DataRow("NullReferenceException")]
+        [DataRow("Something terrible happened!")]
+        [DataRow("Oh noes")]
+        [DataRow("Something went wrong! An error was returned :o")]
+        public void ExceptionIsThrownIfEventTypeIsCommandError(string exceptionMessage)
         {
             // Arrange
             var connectionMock = new Mock<IConnection>();
@@ -290,39 +291,44 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             var sender = new RabbitMqCommandSender(contextMock.Object);
             
+            Guid guid = Guid.NewGuid();
             var command = new CommandMessage
             {
                 DestinationQueue = "test.queue",
-                CorrelationId = Guid.Parse(correlationId)
+                CorrelationId = guid,
+                ReplyQueue = "reply.queue"
             };
-            
-            var result = sender.SendCommandAsync(command);
-            
-            Thread.Sleep(1000);
 
-            BasicProperties testBasicProperties = new BasicProperties {CorrelationId = correlationId};
+            BasicProperties testBasicProperties = new BasicProperties {CorrelationId = guid.ToString()};
             
             var body = new CommandError
             {
                 EventType = "CommandError",
-                ExceptionMessage = "TestException",
-                CorrelationId = Guid.Parse(correlationId)
+                ExceptionMessage = exceptionMessage,
+                CorrelationId = guid
             };
 
             var bodyJson = JsonConvert.SerializeObject(body);
 
+            // Ensure that response arrives 3 seconds later
+            Task.Run(() =>
+            {
+                Thread.Sleep(3000);
+                consumer.HandleBasicDeliver("tag",
+                    20,
+                    false,
+                    "",
+                    "",
+                    testBasicProperties,
+                    Encoding.Unicode.GetBytes(bodyJson));
+            });
+
             // Act
-            consumer.HandleBasicDeliver("tag", 
-                20, 
-                false, 
-                "", 
-                "", 
-                testBasicProperties, 
-                Encoding.Unicode.GetBytes(bodyJson));
-            
+            Task Act() => sender.SendCommandAsync(command);
+
             // Assert
-            Assert.AreEqual("CommandError", result.Result.EventType);
-            Assert.IsInstanceOfType(result.Result, typeof(CommandError));
+            Task<DestinationQueueException> exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act);
+            Assert.AreEqual(exceptionMessage, exception.Result.Message);
         }
         
         [TestMethod]
@@ -382,7 +388,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 "", 
                 testBasicProperties, 
                 Encoding.Unicode.GetBytes(bodyJson));
-            
+
             // Assert
             Assert.IsInstanceOfType(result.Result, typeof(CommandMessage));
         }
