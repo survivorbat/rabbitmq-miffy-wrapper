@@ -157,6 +157,12 @@ namespace Minor.Miffy.MicroServices.Host
                         _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                         object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
                         
+                        if (jsonObject == null)
+                        {
+                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                        }
+                        
                         _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                         method.Invoke(instance, new[] {jsonObject});
                     }
@@ -201,7 +207,13 @@ namespace Minor.Miffy.MicroServices.Host
                         
                         _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                         object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-                        
+
+                        if (jsonObject == null)
+                        {
+                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                        }
+
                         _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                         DomainCommand command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
 

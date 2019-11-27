@@ -35,13 +35,14 @@ namespace ExampleMicroService.EventListeners
         }
 
         /// <summary>
-        /// Receives a command, then returns a changed command or a entirely new one
+        /// Receives a command, then returns a changed command
         /// </summary>
         /// <param name="command">Received command from a certain source</param>
         /// <returns>A new or modified command with new data</returns>
         public HaalPolissenOpCommand Handle(HaalPolissenOpCommand command)
         {
-            return new HaalPolissenOpCommand {Polisses = _context.Polissen.ToArray()};
+            command.Polisses = _context.Polissen.ToArray();
+            return command;
         }
     }
 }

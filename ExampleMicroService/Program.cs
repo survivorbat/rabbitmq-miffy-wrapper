@@ -41,7 +41,7 @@ namespace ExampleMicroService
              */
             using ILoggerFactory loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole().SetMinimumLevel(LogLevel.Debug);
+                configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
             });
 
             /*
