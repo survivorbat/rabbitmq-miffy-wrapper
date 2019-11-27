@@ -1,3 +1,5 @@
+using System;
+
 namespace ExampleMicroService.Models
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace ExampleMicroService.Models
         /// <summary>
         /// ID of the Polis
         /// </summary>
-        public long Id { get; set; }
+        public Guid Id { get; } = Guid.NewGuid();
         
         /// <summary>
         /// Name of the customer

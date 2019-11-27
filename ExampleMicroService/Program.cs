@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using ExampleMicroService.Commands;
 using ExampleMicroService.Events;
 using ExampleMicroService.Models;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy.MicroServices.Commands;
@@ -70,11 +68,7 @@ namespace ExampleMicroService
             /**
              * Create a dummy database context for testing with an in-memory database
              */
-            SqliteConnection connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
-            
-            DbContextOptions<PolisContext> options = new DbContextOptionsBuilder<PolisContext>().UseSqlite(connection).Options;
-            PolisContext databaseContext = new PolisContext(options);
+            PolisContext databaseContext = new PolisContext();
             
             /**
              * Now create a builder that will build our microservice host.

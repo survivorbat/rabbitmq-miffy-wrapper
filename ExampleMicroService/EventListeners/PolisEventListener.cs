@@ -40,7 +40,6 @@ namespace ExampleMicroService.EventListeners
         public void Handles(PolisToegevoegdEvent evt)
         {
             _context.Polissen.Add(evt.Polis);
-            _context.SaveChanges();
         }
     }
 }
