@@ -223,10 +223,10 @@ namespace Minor.Miffy.MicroServices.Host
                         _logger.LogTrace($"Returning new CommandMessage with timestamp {command?.Timestamp}, id {command?.Id}, EventType {command?.GetType().Name}, body {jsonReturn}");
                         return new CommandMessage
                         {
-                            Timestamp = command.Timestamp,
+                            Timestamp = message.Timestamp,
                             Body = Encoding.Unicode.GetBytes(jsonReturn),
-                            CorrelationId = command.Id,
-                            EventType = command.GetType().Name
+                            CorrelationId = message.CorrelationId,
+                            EventType = message.EventType
                         };
                     }
                 });
