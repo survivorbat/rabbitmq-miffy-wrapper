@@ -74,7 +74,7 @@ namespace Minor.Miffy.MicroServices.Host
             Assembly callingAssembly = Assembly.GetCallingAssembly();
             _logger.LogDebug($"Using conventions, applying types from assembly: {callingAssembly.GetName()}");
             
-            foreach (var type in callingAssembly.DefinedTypes)
+            foreach (TypeInfo type in callingAssembly.DefinedTypes)
             {
                 RegisterListener(type);
             }
@@ -115,11 +115,15 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterEventListener(TypeInfo type, string queueName)
         {
-            var methods = GetRelevantMethods(type);
+            _logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
+            IEnumerable<MethodInfo> methods = GetRelevantMethods(type);
 
-            foreach (var method in methods)
+            foreach (MethodInfo method in methods)
             {
-                var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+                _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
+                Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+                
+                _logger.LogDebug($"Found parameter type {parameterType?.Name} on method {method.Name} of type {type.Name}");
                 
                 // If method is not suitable, skip it
                 if (parameterType == null)
@@ -128,19 +132,32 @@ namespace Minor.Miffy.MicroServices.Host
                     continue;
                 }
                 
-                var topicPatterns = method.GetCustomAttributes<TopicAttribute>()
+                _logger.LogTrace($"Evaluating parameter type {type.Name} of method {method.Name}");
+                string[] topicPatterns = method.GetCustomAttributes<TopicAttribute>()
                     .Select(e => e.TopicPattern)
                     .ToArray();
                 
+                _logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
+
+                _logger.LogDebug($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
                 _eventListeners.Add(new MicroserviceListener
                 {
                     TopicExpressions = topicPatterns,
                     Queue = queueName,
                     Callback = message =>
                     {
-                        var instance = InstantiatePopulatedType(type);
-                        var text = Encoding.Unicode.GetString(message.Body);
-                        var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+                        _logger.LogDebug($"Received message in queue {queueName} with id {message.CorrelationId}");
+                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceListener callback");
+                        
+                        object instance = InstantiatePopulatedType(type);
+                        
+                        _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
+                        string text = Encoding.Unicode.GetString(message.Body);
+                        
+                        _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
+                        object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+                        
+                        _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                         method.Invoke(instance, new[] {jsonObject});
                     }
                 });
@@ -152,12 +169,16 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterCommandListener(TypeInfo type, string queueName)
         {
-            var methods = GetRelevantMethods(type);
+            _logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
+            IEnumerable<MethodInfo> methods = GetRelevantMethods(type);
             
-            foreach (var method in methods)
+            foreach (MethodInfo method in methods)
             {
-                var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+                _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
+                Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
                 
+                _logger.LogDebug($"Found parameter type {parameterType?.Name} on method {method.Name} of type {type.Name}");
+
                 // If method is not suitable, skip it
                 if (parameterType == null)
                 {
@@ -165,21 +186,33 @@ namespace Minor.Miffy.MicroServices.Host
                     continue;
                 }
                 
+                _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
                 _commandListeners.Add(new MicroserviceCommandListener
                 {
                     Queue = queueName,
                     Callback = message =>
-                    {
-                        var instance = InstantiatePopulatedType(type);
+                    { 
+                        _logger.LogDebug($"Received message in queue {queueName} with id {message.CorrelationId}");
+                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceListener callback");
+                        object instance = InstantiatePopulatedType(type);
 
-                        var text = Encoding.Unicode.GetString(message.Body);
-                        var jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-                        var command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
+                        _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
+                        string text = Encoding.Unicode.GetString(message.Body);
                         
+                        _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
+                        object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+                        
+                        _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                        DomainCommand command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
+
+                        _logger.LogTrace("Serializing result command");
+                        string jsonReturn = JsonConvert.SerializeObject(command);
+                        
+                        _logger.LogTrace($"Returning new CommandMessage with timestamp {command?.Timestamp}, id {command?.Id}, EventType {command?.GetType().Name}, body {jsonReturn}");
                         return new CommandMessage
                         {
                             Timestamp = command.Timestamp,
-                            Body = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(command)),
+                            Body = Encoding.Unicode.GetBytes(jsonReturn),
                             CorrelationId = command.Id,
                             EventType = command.GetType().Name
                         };
@@ -218,6 +251,7 @@ namespace Minor.Miffy.MicroServices.Host
             _loggerFactory = loggerFactory;
             _serviceCollection.AddSingleton(loggerFactory);
             _logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
+            _logger.LogInformation("Successfully set logger factory :-)");
             return this;
         }
 
@@ -226,6 +260,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
         {
+            _logger.LogDebug("Registering dependencies");
             servicesConfiguration.Invoke(_serviceCollection);
             return this;
         }
@@ -234,11 +269,14 @@ namespace Minor.Miffy.MicroServices.Host
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost() =>
-            new MicroserviceHost(
+        public MicroserviceHost CreateHost()
+        {
+            _logger.LogDebug($"Instantiating microservicehost with {_eventListeners.Count} eventlisteners and {_commandListeners.Count} commandlisteners");
+            return new MicroserviceHost(
                 _context,
                 _eventListeners,
                 _commandListeners,
                 _loggerFactory.CreateLogger<MicroserviceHost>());
+        }
     }
 }

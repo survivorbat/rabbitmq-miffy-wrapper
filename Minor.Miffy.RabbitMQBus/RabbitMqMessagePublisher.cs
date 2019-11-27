@@ -36,7 +36,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void SendMessage(EventMessage message)
         {
-            using var channel = _connection.CreateModel();
+            using IModel channel = _connection.CreateModel();
             
             _logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
                                    $", topic {message.Topic} and type {message.EventType}");

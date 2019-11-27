@@ -66,21 +66,21 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public void Start()
         {
-            foreach (var callback in Listeners)
+            foreach (MicroserviceListener callback in Listeners)
             {
                 _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
                 
-                var receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
+                IMessageReceiver receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();
                 receiver.StartHandlingMessages(callback.Callback);
                 _messageReceivers.Add(receiver);
             }
 
-            foreach (var callback in CommandListeners)
+            foreach (MicroserviceCommandListener callback in CommandListeners)
             {
                 _logger.LogInformation($"Registering command queue {callback.Queue}");
 
-                var receiver = Context.CreateCommandReceiver(callback.Queue);
+                ICommandReceiver receiver = Context.CreateCommandReceiver(callback.Queue);
                 receiver.DeclareCommandQueue();
                 receiver.StartReceivingCommands(callback.Callback);
                 _commandReceivers.Add(receiver);

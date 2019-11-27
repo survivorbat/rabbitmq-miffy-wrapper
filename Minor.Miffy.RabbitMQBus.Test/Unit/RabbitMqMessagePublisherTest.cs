@@ -14,9 +14,9 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         public void MessagePublisherCreatesChannel()
         {
             // Arrange
-            var connectionMock = new Mock<IConnection>();
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var modelMock = new Mock<IModel>();
+            Mock<IConnection> connectionMock = new Mock<IConnection>();
+            Mock<IBusContext<IConnection>> contextMock = new Mock<IBusContext<IConnection>>();
+            Mock<IModel> modelMock = new Mock<IModel>();
             
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);

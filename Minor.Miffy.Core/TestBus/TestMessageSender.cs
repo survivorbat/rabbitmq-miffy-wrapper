@@ -36,7 +36,7 @@ namespace Minor.Miffy.TestBus
             
             _logger.LogDebug($"Message {message.CorrelationId} received with matching topics {string.Join(", ", matchingTopics)}");
             
-            foreach (var key in matchingTopics)
+            foreach (TestBusKey key in matchingTopics)
             {
                 _context.DataQueues[key].Queue.Enqueue(message);
                 _context.DataQueues[key].AutoResetEvent.Set();

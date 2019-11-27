@@ -83,7 +83,7 @@ namespace Minor.Miffy.TestBus
             {
                 _logger.LogDebug($"Creating thread for queue {QueueName} with topic {topic}");
                 
-                var thread = new Thread(() => {
+                Thread thread = new Thread(() => {
                     while (true)
                     {
                         TestBusKey key = new TestBusKey(QueueName, topic);
@@ -91,7 +91,7 @@ namespace Minor.Miffy.TestBus
                         _logger.LogTrace($"Waiting for message on queue {QueueName} with topic {topic}");
 
                         Context.DataQueues[key].AutoResetEvent.WaitOne();
-                        Context.DataQueues[key].Queue.TryDequeue(out var result);
+                        Context.DataQueues[key].Queue.TryDequeue(out EventMessage result);
                         
                         _logger.LogDebug($"Message received on queue {QueueName} with topic {topic}");
 

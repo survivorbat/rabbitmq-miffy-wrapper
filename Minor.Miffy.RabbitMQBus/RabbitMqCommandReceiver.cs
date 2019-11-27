@@ -78,7 +78,7 @@ namespace Minor.Miffy.RabbitMQBus
 
             _logger.LogTrace($"Start receiving commands on queue {QueueName}");
 
-            var consumer = new EventingBasicConsumer(_model);
+            EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
             
             consumer.Received += (model, ea) =>
             {

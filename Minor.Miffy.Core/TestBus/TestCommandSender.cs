@@ -31,7 +31,7 @@ namespace Minor.Miffy.TestBus
                 _context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
 
                 _context.CommandQueues[randomReplyQueueName].AutoResetEvent.WaitOne();
-                _context.CommandQueues[randomReplyQueueName].Queue.TryDequeue(out var output);
+                _context.CommandQueues[randomReplyQueueName].Queue.TryDequeue(out CommandMessage output);
                 return output;
             });
     }

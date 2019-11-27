@@ -24,7 +24,7 @@ namespace Minor.Miffy.MicroServices.Events
         public EventPublisher(IBusContext<IConnection> context, ILoggerFactory loggerFactory = null)
         {
             _sender = context.CreateMessageSender();
-            loggerFactory = loggerFactory ?? new NullLoggerFactory();
+            loggerFactory ??= new NullLoggerFactory();
             _logger = loggerFactory.CreateLogger<EventPublisher>();
         }
 
@@ -35,7 +35,7 @@ namespace Minor.Miffy.MicroServices.Events
         {
             _logger.LogTrace($"Publishing domain event with type {domainEvent.GetType().Name} and ID {domainEvent.Id}");
             
-            var json = JsonConvert.SerializeObject(domainEvent);
+            string json = JsonConvert.SerializeObject(domainEvent);
             
             _logger.LogDebug($"Publishing domain event {domainEvent.Id} with body: {json}");
             

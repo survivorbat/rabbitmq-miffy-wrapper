@@ -11,11 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleMicroService", "Exam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus", "Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj", "{183F572D-7160-4B29-ABC3-367A9E874488}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{ED2CE3AD-1A03-4708-B2BB-9D37D513824D}"
-	ProjectSection(SolutionItems) = preProject
-		Miffy Opdracht.md = Miffy Opdracht.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.Core.Test", "Minor.Miffy.Core.Test\Minor.Miffy.Core.Test.csproj", "{6628A592-5D27-4F54-9C0F-2B36D42C0023}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus.Test", "Minor.Miffy.RabbitMQBus.Test\Minor.Miffy.RabbitMQBus.Test.csproj", "{019C1378-C135-425A-A59B-80285364165E}"

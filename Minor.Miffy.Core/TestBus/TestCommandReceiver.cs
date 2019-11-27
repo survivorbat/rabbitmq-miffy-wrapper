@@ -49,7 +49,7 @@ namespace Minor.Miffy.TestBus
                 throw new BusConfigurationException($"Queue {QueueName} has not been declared yet.");
             }
 
-            var thread = new Thread(() =>
+            Thread thread = new Thread(() =>
             {
                 while (true)
                 {

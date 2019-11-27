@@ -14,15 +14,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Events
         public void PublishCallsSendMessageOnSender()
         {
             // Arrange
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var senderMock = new Mock<IMessageSender>();
+            Mock<IBusContext<IConnection>> contextMock = new Mock<IBusContext<IConnection>>();
+            Mock<IMessageSender> senderMock = new Mock<IMessageSender>();
 
             contextMock.Setup(e => e.CreateMessageSender())
                 .Returns(senderMock.Object);
             
-            var publisher = new EventPublisher(contextMock.Object);
+            EventPublisher publisher = new EventPublisher(contextMock.Object);
             
-            var domainEvent = new TestEvent("Topic");
+            TestEvent domainEvent = new TestEvent("Topic");
             
             // Act
             publisher.Publish(domainEvent);
@@ -39,8 +39,8 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Events
         public void PublishCallsSendMessageWithExpectedMessageOnSender(string topic, string body)
         {
             // Arrange
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var senderMock = new Mock<IMessageSender>();
+            Mock<IBusContext<IConnection>> contextMock = new Mock<IBusContext<IConnection>>();
+            Mock<IMessageSender> senderMock = new Mock<IMessageSender>();
 
             contextMock.Setup(e => e.CreateMessageSender())
                 .Returns(senderMock.Object);
@@ -50,10 +50,10 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Events
             senderMock.Setup(e => e.SendMessage(It.IsAny<EventMessage>()))
                 .Callback<EventMessage>(e => result = e);
             
-            var publisher = new EventPublisher(contextMock.Object);
+            EventPublisher publisher = new EventPublisher(contextMock.Object);
             
-            var domainEvent = new TestEvent(topic) { DataField = body };
-            var jsonBody = JsonConvert.SerializeObject(domainEvent);
+            TestEvent domainEvent = new TestEvent(topic) { DataField = body };
+            string jsonBody = JsonConvert.SerializeObject(domainEvent);
             
             // Act
             publisher.Publish(domainEvent);

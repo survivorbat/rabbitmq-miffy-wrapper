@@ -10,7 +10,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void QueueIsInitialized()
         {
             // Act
-            var queue = new TestBusQueueWrapper<EventMessage>();
+            TestBusQueueWrapper<EventMessage> queue = new TestBusQueueWrapper<EventMessage>();
 
             // Assert
             Assert.IsNotNull(queue.Queue);
@@ -20,7 +20,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void ResetEventIsInitialized()
         {
             // Act
-            var queue = new TestBusQueueWrapper<EventMessage>();
+            TestBusQueueWrapper<EventMessage> queue = new TestBusQueueWrapper<EventMessage>();
 
             // Assert
             Assert.IsNotNull(queue.AutoResetEvent);
@@ -30,7 +30,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void ResetEventInitialStateIsFalse()
         {
             // Act
-            var queue = new TestBusQueueWrapper<EventMessage>();
+            TestBusQueueWrapper<EventMessage> queue = new TestBusQueueWrapper<EventMessage>();
 
             // Assert
             Assert.IsFalse(queue.AutoResetEvent.WaitOne(0));
