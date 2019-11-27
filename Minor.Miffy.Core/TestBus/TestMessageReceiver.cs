@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -38,6 +39,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Empty dispose since we don't have anything to dispose of
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public void Dispose()
         {
             // Nothing to dispose of

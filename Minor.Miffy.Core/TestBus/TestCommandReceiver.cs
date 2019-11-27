@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using RabbitMQ.Client;
@@ -68,6 +69,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Empty dispose since there is nothing to dispose of
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public void Dispose()
         {
             // Nothing to dispose of

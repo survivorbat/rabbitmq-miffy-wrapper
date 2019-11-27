@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
@@ -16,6 +17,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Unimplemented since we don't use a connection
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public void Dispose()
         {
             // Nothing to dispose of

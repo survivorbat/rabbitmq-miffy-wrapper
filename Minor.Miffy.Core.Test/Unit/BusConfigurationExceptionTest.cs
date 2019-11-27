@@ -6,13 +6,6 @@ namespace Minor.Miffy.Test.Unit
     public class BusConfigurationExceptionTest
     {
         [TestMethod]
-        public void BusConfigurationExceptionCanBeInstantiatedWithoutParameters()
-        {
-            // Act
-            var instance = new BusConfigurationException();
-        }
-
-        [TestMethod]
         [DataRow("Something went wrong!")]
         [DataRow("Not again! :/")]
         public void BusConfigurationExceptionCanBeInstantiatedWithMessage(string message)
