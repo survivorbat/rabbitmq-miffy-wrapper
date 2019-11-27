@@ -175,20 +175,20 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterCommandListener(TypeInfo type, string queueName)
         {
-            _logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
+            _logger.LogTrace($"Retrieving relevant methods from type {type.Name} as command listener");
             IEnumerable<MethodInfo> methods = GetRelevantMethods(type);
             
             foreach (MethodInfo method in methods)
             {
-                _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
+                _logger.LogDebug($"Evaluating parameter type {type.Name} of command method {method.Name}");
                 Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
                 
-                _logger.LogDebug($"Found parameter type {parameterType?.Name} on method {method.Name} of type {type.Name}");
+                _logger.LogDebug($"Found parameter type {parameterType?.Name} on command method {method.Name} of type {type.Name}");
 
                 // If method is not suitable, skip it
                 if (parameterType == null)
                 {
-                    _logger.LogWarning($"Method {method.Name} in {type.Name} is not an event callback, skipping");
+                    _logger.LogWarning($"Method {method.Name} in {type.Name} is not a command callback, skipping");
                     continue;
                 }
                 
@@ -198,23 +198,23 @@ namespace Minor.Miffy.MicroServices.Host
                     Queue = queueName,
                     Callback = message =>
                     { 
-                        _logger.LogDebug($"Received message in queue {queueName} with id {message.CorrelationId}");
-                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceListener callback");
+                        _logger.LogDebug($"Received command message in queue {queueName} with id {message.CorrelationId}");
+                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceCommandListener callback");
                         object instance = InstantiatePopulatedType(type);
 
-                        _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
+                        _logger.LogTrace($"Retrieving string command data from message with id {message.CorrelationId}");
                         string text = Encoding.Unicode.GetString(message.Body);
                         
-                        _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
+                        _logger.LogTrace($"Deserialized command object from message with id {message.CorrelationId} and body {text}");
                         object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
                         if (jsonObject == null)
                         {
-                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object in commandlistener");
-                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object in commandlistener");
+                            _logger.LogCritical($"Deserializing {text} to command type {parameterType.Name} resulted in a null object in commandlistener");
+                            throw new BusConfigurationException($"Deserializing {text} to command type {parameterType.Name} resulted in a null object in commandlistener");
                         }
 
-                        _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                        _logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                         DomainCommand command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
 
                         _logger.LogTrace("Serializing result command");
