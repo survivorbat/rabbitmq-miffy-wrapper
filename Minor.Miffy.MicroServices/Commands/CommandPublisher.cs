@@ -27,7 +27,7 @@ namespace Minor.Miffy.MicroServices.Commands
         public CommandPublisher(IBusContext<IConnection> context, ILoggerFactory loggerFactory = null)
         {
             _sender = context.CreateCommandSender();
-            loggerFactory = loggerFactory ?? new NullLoggerFactory();
+            loggerFactory ??= new NullLoggerFactory();
             _logger = loggerFactory.CreateLogger<EventPublisher>();
         }
 
