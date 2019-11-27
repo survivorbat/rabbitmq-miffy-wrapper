@@ -159,8 +159,8 @@ namespace Minor.Miffy.MicroServices.Host
                         
                         if (jsonObject == null)
                         {
-                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
-                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object in eventlistener");
+                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object in eventlistener");
                         }
                         
                         _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
@@ -210,8 +210,8 @@ namespace Minor.Miffy.MicroServices.Host
 
                         if (jsonObject == null)
                         {
-                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
-                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object");
+                            _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object in commandlistener");
+                            throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object in commandlistener");
                         }
 
                         _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
