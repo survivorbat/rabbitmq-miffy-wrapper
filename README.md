@@ -209,4 +209,5 @@ And that's about it! Have fun rabbiting :)
 
 ## Notes
 - A commandlistener or eventlistener must have only one handle command with a unique queue name
-- Exceptions thrown in Command callbacks **MUST** implement Serializable or have a [Serializable] attribute
+- Exceptions thrown in Command callbacks **MUST** implement Serializable or have a _[Serializable]_ attribute
+- Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized

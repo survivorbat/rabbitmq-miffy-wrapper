@@ -155,7 +155,7 @@ namespace ExampleMicroService
                 /**
                  * Now the expectedException.Innerexception will reveal all the info we need
                  */
-                Console.WriteLine($"Exception: {destinationQueueException?.InnerException?.Message}");
+                Console.WriteLine($"{destinationQueueException?.InnerException?.GetType().Name} {destinationQueueException?.InnerException?.Message}");
                 Console.WriteLine($"Destination queue: {destinationQueueException?.DestinationQueueName}, " +
                                   $"Reply queue: {destinationQueueException?.ReplyQueueName}, " +
                                   $"Id: {destinationQueueException?.CorrelationId}");

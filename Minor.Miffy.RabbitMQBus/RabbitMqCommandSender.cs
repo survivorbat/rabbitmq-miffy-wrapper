@@ -90,6 +90,7 @@ namespace Minor.Miffy.RabbitMQBus
                 {
                     _logger.LogError($"Received error command with id {request.DestinationQueue} " +
                                      $"from queue {request.DestinationQueue} in reply queue {replyQueue}. " +
+                                     $"Type: {error.Exception.GetType().Name} " +
                                      $"Errormessage: {error.Exception.Message}");
                     
                     throw new DestinationQueueException($"Received error command from queue {request.DestinationQueue}", 

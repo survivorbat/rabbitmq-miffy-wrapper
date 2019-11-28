@@ -8,6 +8,8 @@ namespace Minor.Miffy
     public class CommandError : CommandMessage
     {
         /// <summary>
+        /// TODO: Replace exception type with something more specific
+        /// 
         /// Exception thrown
         /// </summary>
         public Exception Exception { get; set; }
