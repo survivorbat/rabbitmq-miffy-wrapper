@@ -101,14 +101,6 @@ stages:
               patchVersion: $(Build.BuildId)
               nobuild: true
 
-          - task: DotNetCoreCLI@2
-            displayName: 'internal nuget push'
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-              nuGetFeedType: 'internal'
-              publishVstsFeed: 'd2d10d82-d2e1-4909-9810-5bf6d3a2eba4'
-              
           - task: NuGetCommand@2
             displayName: 'nuget.org nuget push'
             inputs:

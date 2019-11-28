@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
 using Minor.Miffy.MicroServices.Test.Component.EventListeners;
@@ -55,13 +57,13 @@ namespace Minor.Miffy.MicroServices.Test.Component
         public void AddingListenerRegistersProperCommandReceiver()
         {
             // Arrange
-            var testContext = new TestBusContext();
-            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            TestBusContext testContext = new TestBusContext();
+            MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             hostBuilder.AddEventListener<CommandListenerDummy>();
             
-            var result = hostBuilder.CreateHost().CommandListeners.ToList();
+            List<MicroserviceCommandListener> result = hostBuilder.CreateHost().CommandListeners.ToList();
             
             // Assert
             Assert.AreEqual(1, result.Count);

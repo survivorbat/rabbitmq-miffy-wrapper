@@ -214,6 +214,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             Assert.AreEqual(topic, eventMessage.Topic);
             Assert.AreEqual(eventType, eventMessage.EventType);
+            Assert.AreEqual(guid, eventMessage.CorrelationId);
         }
 
         [TestMethod]

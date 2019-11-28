@@ -102,12 +102,31 @@ namespace Minor.Miffy.MicroServices.Host
         {
             ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
             _logger.LogTrace($"Instantiating {type.Name} with provided services.");
-            return ActivatorUtilities.CreateInstance(serviceProvider, type);
+
+            try
+            {
+                object instance = ActivatorUtilities.CreateInstance(serviceProvider, type);
+                return instance;
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.LogCritical($"Type {type.Name} could not be properly instantiated " +
+                                    "with provided services. Did you register all your dependencies? " +
+                                    "Listener will NOT be called!");
+                throw;
+            }
         }
 
-        private IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type) =>
-            type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+        /// <summary>
+        /// Retrieve all the publicly declared instance methods from a type
+        /// </summary>
+        /// <param name="type">Type to analyze</param>
+        /// <returns>A list of methods</returns>
+        private IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type)
+        {
+            return type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Where(e => !e.IsSpecialName);
+        }
 
 
         /// <summary>
@@ -146,9 +165,7 @@ namespace Minor.Miffy.MicroServices.Host
                     Queue = queueName,
                     Callback = message =>
                     {
-                        _logger.LogDebug($"Received message in queue {queueName} with id {message.CorrelationId}");
-                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceListener callback");
-                        
+                        _logger.LogDebug($"Attempting to instantiate type {type.Name} in queue {queueName}");
                         object instance = InstantiatePopulatedType(type);
                         
                         _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
@@ -198,8 +215,7 @@ namespace Minor.Miffy.MicroServices.Host
                     Queue = queueName,
                     Callback = message =>
                     { 
-                        _logger.LogDebug($"Received command message in queue {queueName} with id {message.CorrelationId}");
-                        _logger.LogTrace($"Instantiating type {type.Name} in MicroserviceCommandListener callback");
+                        _logger.LogTrace($"Attempting to instantiate type {type.Name} in queue {queueName}");
                         object instance = InstantiatePopulatedType(type);
 
                         _logger.LogTrace($"Retrieving string command data from message with id {message.CorrelationId}");

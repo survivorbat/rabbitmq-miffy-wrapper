@@ -71,7 +71,7 @@ namespace Minor.Miffy.RabbitMQBus
             
             _logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
             _model.QueueDeclare(QueueName, true, false);
-            foreach (var topicExpression in TopicFilters)
+            foreach (string topicExpression in TopicFilters)
             {
                 _model.QueueBind(QueueName, _context.ExchangeName, topicExpression);
             }
@@ -96,12 +96,13 @@ namespace Minor.Miffy.RabbitMQBus
                                        $"of type {args.BasicProperties.Type} " +
                                        $"with topic {args.RoutingKey}");
                 
-                var eventMessage = new EventMessage
+                EventMessage eventMessage = new EventMessage
                 {
                     Body = args.Body,
                     Timestamp = args.BasicProperties.Timestamp.UnixTime,
                     Topic = args.RoutingKey,
-                    EventType = args.BasicProperties.Type
+                    EventType = args.BasicProperties.Type,
+                    CorrelationId = new Guid(args.BasicProperties.CorrelationId)
                 };
 
                 callback(eventMessage);
