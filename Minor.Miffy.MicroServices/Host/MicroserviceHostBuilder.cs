@@ -108,11 +108,11 @@ namespace Minor.Miffy.MicroServices.Host
                 object instance = ActivatorUtilities.CreateInstance(serviceProvider, type);
                 return instance;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 _logger.LogCritical($"Type {type.Name} could not be properly instantiated " +
                                     "with provided services. Did you register all your dependencies? " +
-                                    "Listener will NOT be called!");
+                                    $"Listener will NOT be called! Exception: {e.Message}");
                 throw;
             }
         }
