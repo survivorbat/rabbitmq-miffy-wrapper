@@ -35,7 +35,7 @@ namespace Minor.Miffy.RabbitMQBus
         private bool _queueDeclared;
 
         /// <summary>
-        /// Name of the queue for th ecommands
+        /// Name of the queue for the commands
         /// </summary>
         public string QueueName { get; }
 
@@ -109,7 +109,7 @@ namespace Minor.Miffy.RabbitMQBus
                     
                     response = new CommandError
                     {
-                        Exception = e?.InnerException ?? e,
+                        Exception = e.InnerException ?? e,
                         EventType = CommandErrorType
                     };
                 }

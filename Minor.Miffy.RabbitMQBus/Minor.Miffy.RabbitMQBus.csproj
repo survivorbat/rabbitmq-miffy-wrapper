@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/survivorbat/rabbitmq-miffy-wrapper</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageLicenseUrl>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</PackageLicenseUrl>
-    <PackageReleaseNotes>Add LogCritical exception</PackageReleaseNotes>
+    <PackageReleaseNotes>First release with a new API</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
