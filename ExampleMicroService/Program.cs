@@ -3,6 +3,7 @@ using Minor.Miffy.MicroServices;
 using Minor.Miffy.RabbitMQBus;
 using RabbitMQ.Client;
 using System;
+using System.Linq;
 using ExampleMicroService.DAL;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace ExampleMicroService
              */
             using ILoggerFactory loggerFactory = LoggerFactory.Create(configure =>
             {
-                configure.AddConsole().SetMinimumLevel(LogLevel.Trace);
+                configure.AddConsole().SetMinimumLevel(LogLevel.Information);
             });
 
             /*
@@ -133,6 +134,31 @@ namespace ExampleMicroService
             foreach (Polis polis in commandResult.Polisses)
             {
                 Console.WriteLine($"Found polis for {polis.Klantnaam} with ID {polis.Id}");
+            }
+            
+            /**
+             * Lastly, let's see how the queue deals with exceptions on the other side
+             */
+            ExceptionCommand exceptionCommand = new ExceptionCommand();
+
+            try
+            {
+                /**
+                 * This will throw an exception in the receiver
+                 */
+                _ = commandPublisher.PublishAsync<ExceptionCommand>(exceptionCommand).Result;
+            }
+            catch (AggregateException expectedException)
+            {
+                DestinationQueueException destinationQueueException = expectedException.InnerExceptions.First() as DestinationQueueException;
+                
+                /**
+                 * Now the expectedException.Innerexception will reveal all the info we need
+                 */
+                Console.WriteLine($"Exception: {destinationQueueException?.InnerException?.Message}");
+                Console.WriteLine($"Destination queue: {destinationQueueException?.DestinationQueueName}, " +
+                                  $"Reply queue: {destinationQueueException?.ReplyQueueName}, " +
+                                  $"Id: {destinationQueueException?.CorrelationId}");
             }
         }
     }
