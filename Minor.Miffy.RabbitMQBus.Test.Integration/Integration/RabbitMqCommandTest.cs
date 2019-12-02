@@ -118,5 +118,11 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             var personResult = JsonConvert.DeserializeObject<Person>(stringResult);
             Assert.AreEqual($"{firstName} {lastName}", personResult.FullName);
         }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            RabbitMqCleanUp.DeleteExchange("TestExchange", "amqp://guest:guest@localhost");
+        }
     }
 }

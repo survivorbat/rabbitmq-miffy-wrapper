@@ -250,6 +250,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             WildCardPersonEventListener2.ResultEvent = null;
             PersonEventListener.ResultEvent = null;
             FanInEventListener.ResultEvent = null;
+            RabbitMqCleanUp.DeleteExchange("TestExchange", "amqp://guest:guest@localhost");
         }
     }
 }

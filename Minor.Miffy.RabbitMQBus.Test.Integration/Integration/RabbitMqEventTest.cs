@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RabbitMQ.Client;
 
 namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
 {
@@ -63,7 +64,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
         public void CallbackIsCalledOnReceivedEventWithSpecificTopic(string topicPattern, string topic, bool expected)
         {
             // arrange
-            using var context = new RabbitMqContextBuilder()
+            using IBusContext<IConnection> context = new RabbitMqContextBuilder()
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .WithExchange("HelloExchange")
                 .CreateContext();
@@ -89,6 +90,13 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             Thread.Sleep(WaitTime);
 
             Assert.AreEqual(messageReceived, expected);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            RabbitMqCleanUp.DeleteQueue("topic.queue.test", "amqp://guest:guest@localhost");
+            RabbitMqCleanUp.DeleteExchange("TestExchange", "amqp://guest:guest@localhost");
         }
     }
 }
