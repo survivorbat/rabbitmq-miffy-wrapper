@@ -75,7 +75,7 @@ stages:
               SonarQube: 'SonarQube Service Connection'
   - stage: Integration Tests
     displayName: Integration Tests
-    depends_on: Build
+    dependsOn: Build
     jobs:
       - job: Integration Tests
         displayName: Integration Tests
@@ -97,7 +97,7 @@ stages:
     
   - stage: Release
     displayName: Release
-    depends_on: Integration Tests
+    dependsOn: Integration Tests
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - job: Release
