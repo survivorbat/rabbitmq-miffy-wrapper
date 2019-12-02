@@ -41,8 +41,9 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          # Not the cleanest way, but it works and it means I don't need a running server
           - bash: |
-              docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3.6-alpine
+              docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3-alpine
             displayName: 'docker run rabbitmq'
           
           - task: SonarQubePrepare@4
