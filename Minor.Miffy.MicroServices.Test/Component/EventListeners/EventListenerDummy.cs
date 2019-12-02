@@ -2,14 +2,16 @@ using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
 {
-    [EventListener(queueName: "TestQueue")]
     public class EventListenerDummy
     {
         /// <summary>
         /// Reset the result
         /// </summary>
-        public EventListenerDummy() => HandlesResult = null;
-        
+        public EventListenerDummy()
+        {
+            HandlesResult = null;
+        }
+
         /// <summary>
         /// Result of the handles method
         /// </summary>
@@ -18,6 +20,7 @@ namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
         /// <summary>
         /// Put the result in a static variable so we can use it in tests
         /// </summary>
+        [EventListener(queueName: "TestQueue")]
         [Topic("TestTopic")]
         public void Handles(DummyEvent dummyEvent) => HandlesResult = dummyEvent;
     }

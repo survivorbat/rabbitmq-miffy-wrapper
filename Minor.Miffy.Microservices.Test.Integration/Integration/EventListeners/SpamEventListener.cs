@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
-namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
 {
-    [EventListener("PeopleApp.Cats.Spam")]
     public class SpamEventListener
     {
         /// <summary>
@@ -17,7 +14,11 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// Listener for all events
         /// </summary>
+        [EventListener("PeopleApp.Cats.Spam")]
         [Topic("PeopleApp.Cats.New")]
-        public void Handles(CatAddedEvent addedEvent) => ResultEvents.Add(addedEvent);
+        public void Handles(CatAddedEvent addedEvent)
+        {
+            ResultEvents.Add(addedEvent);
+        }
     }
 }

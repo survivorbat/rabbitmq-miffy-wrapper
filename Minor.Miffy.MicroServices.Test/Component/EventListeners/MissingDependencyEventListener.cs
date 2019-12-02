@@ -3,7 +3,6 @@ using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
 {
-    [EventListener("TestDependency")]
     public class MissingDependencyEventListener
     {
         /// <summary>
@@ -19,6 +18,7 @@ namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
         /// Unreachable code because of missing dependency
         /// </summary>
         /// <param name="dummyEvent"></param>
+        [EventListener("TestDependency")]
         [Topic("test.topic")]
         public void Handle(DummyEvent dummyEvent)
         {

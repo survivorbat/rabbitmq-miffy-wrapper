@@ -2,7 +2,6 @@ using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Conventions.Component
 {
-    [EventListener(queueName: "TestQueue2")]
     public class EventListenerDummy2
     {
         /// <summary>
@@ -13,6 +12,7 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
         /// <summary>
         /// Put the result in a static variable so we can use it in tests
         /// </summary>
+        [EventListener(queueName: "TestQueue2")]
         [Topic("TestTopic")]
         public void Handles(DummyEvent dummyEvent) => HandlesResult = dummyEvent;
     }

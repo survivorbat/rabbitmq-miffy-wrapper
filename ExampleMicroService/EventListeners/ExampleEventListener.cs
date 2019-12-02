@@ -6,17 +6,8 @@ namespace ExampleMicroService.EventListeners
 {
     /// <summary>
     /// Example class that demonstrates how to create an event listener
-    ///
-    /// NOTE:
-    /// The base framework was originally provided by an external entity
-    /// and was not entirely suitable for my personal implementation
-    /// of the assignment.
-    ///
-    /// For this reason, creating a new event listener class for each
-    /// event listener is quite excessive and this process will be changed in the feature
     /// </summary>
-    [EventListener("MVM.TestService.PolisEventListenerQueue")]
-    public class PolisEventListener
+    public class ExampleEventListener
     {
         /// <summary>
         /// Injected Database context
@@ -27,7 +18,7 @@ namespace ExampleMicroService.EventListeners
         /// Services that this handler requires
         /// </summary>
         /// <param name="context">Database Context</param>
-        public PolisEventListener(PolisContext context)
+        public ExampleEventListener(PolisContext context)
         {
             _context = context;
         }
@@ -36,6 +27,7 @@ namespace ExampleMicroService.EventListeners
         /// Command that handles the incoming event, in this case saving it
         /// </summary>
         /// <param name="evt">incoming event</param>
+        [EventListener("MVM.TestService.PolisEventListenerQueue")]
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(PolisToegevoegdEvent evt)
         {

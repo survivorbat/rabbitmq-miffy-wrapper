@@ -3,9 +3,9 @@ using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
 {
-    [CommandListener("command.queue")]
     public class CommandListenerDummy
     {
+        [CommandListener("command.queue")]
         public DummyCommand Handle(DummyCommand eventCommand)
         {
             HandlesResult = eventCommand;

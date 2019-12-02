@@ -1,16 +1,18 @@
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
-namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
 {
-    [EventListener("PeopleApp.Persons")]
     public class PersonEventListener
     {
         /// <summary>
         /// Reset the static variable
         /// </summary>
-        public PersonEventListener() => ResultEvent = null;
-        
+        public PersonEventListener()
+        {
+            ResultEvent = null;
+        }
+
         /// <summary>
         /// Static variable to keep track of the event
         /// </summary>
@@ -19,7 +21,11 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// Listener for the event
         /// </summary>
+        [EventListener("PeopleApp.Persons")]
         [Topic("PeopleApp.Persons.New")]
-        public void Handles(PersonAddedEvent addedEvent) => ResultEvent = addedEvent;
+        public void Handles(PersonAddedEvent addedEvent)
+        {
+            ResultEvent = addedEvent;
+        }
     }
 }

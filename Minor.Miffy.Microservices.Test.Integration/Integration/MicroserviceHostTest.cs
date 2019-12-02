@@ -8,7 +8,6 @@ using Minor.Miffy.MicroServices;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
-using Minor.Miffy.MicroServices.Test.Integration.EventListeners;
 using Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Models;

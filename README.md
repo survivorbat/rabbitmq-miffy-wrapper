@@ -80,9 +80,9 @@ public class ExampleEvent : DomainEvent
 Then, you're going to need a callback function that handles such an event.
 
 ```c#
-[EventListener("UniqueQueueName")]
 public class ExampleEventListener 
 {
+    [EventListener("UniqueQueueName")]
     [Topic("ExampleTopic")]
     public void Handles(ExampleEvent exampleEvent) 
     {
@@ -155,9 +155,9 @@ public class ExampleCommand : DomainCommand
 
 ```c#
 // Note: The name of this queue corresponds to the DestinationQueue of the ExampleCommand
-[CommandListener("command.queue.somewhere")]
 public class ExampleEventListener 
 {
+    [CommandListener("command.queue.somewhere")]
     public ExampleCommand Handles(ExampleCommand command) 
     {
         command.ExampleData = "Hello World!";
@@ -208,6 +208,6 @@ Assert.AreEqual("Hello world!", result.Result.ExampleData);
 And that's about it! Have fun rabbiting :)
 
 ## Notes
-- A commandlistener or eventlistener must have only one handle command with a unique queue name
+- Queue names **MUST** be unique
 - Exceptions thrown in Command callbacks **MUST** implement Serializable or have a _[Serializable]_ attribute
 - Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized

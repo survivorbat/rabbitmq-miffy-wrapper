@@ -1,17 +1,18 @@
-using System.Diagnostics.Tracing;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
-namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
+namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
 {
-    [EventListener("PeopleApp.Persons.Wild2")]
     public class WildCardPersonEventListener2
     {
         /// <summary>
         /// Reset the static variable
         /// </summary>
-        public WildCardPersonEventListener2() => ResultEvent = null;
-        
+        public WildCardPersonEventListener2()
+        {
+            ResultEvent = null;
+        }
+
         /// <summary>
         /// To keep track of this event
         /// </summary>
@@ -20,7 +21,11 @@ namespace Minor.Miffy.MicroServices.Test.Integration.EventListeners
         /// <summary>
         /// Listener for events
         /// </summary>
+        [EventListener("PeopleApp.Persons.Wild2")]
         [Topic("PeopleApp.#")]
-        public void Handles(PersonAddedEvent addedEvent) => ResultEvent = addedEvent;
+        public void Handles(PersonAddedEvent addedEvent)
+        {
+            ResultEvent = addedEvent;
+        }
     }
 }

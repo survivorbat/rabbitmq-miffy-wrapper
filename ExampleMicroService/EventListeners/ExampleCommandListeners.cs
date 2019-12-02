@@ -1,24 +1,14 @@
-using System;
-using System.Linq;
 using ExampleMicroService.Commands;
 using ExampleMicroService.DAL;
+using ExampleMicroService.Exceptions;
 using Minor.Miffy.MicroServices.Events;
 
 namespace ExampleMicroService.EventListeners
 {
     /// <summary>
     /// An example command listeners that listens for incoming commands.
-    ///
-    /// NOTE:
-    /// The base framework was originally provided by an external entity
-    /// and was not entirely suitable for my personal implementation
-    /// of the assignment.
-    ///
-    /// For this reason, creating a new command listener class for each
-    /// command listeners is quite excessive and this process will be changed in the feature
     /// </summary>
-    [CommandListener("MVM.TestService.HaalPolissenOpQueue")]
-    public class HaalPolissenOpCommandListener
+    public class ExampleCommandListener
     {
         /// <summary>
         /// Database context as an example
@@ -29,7 +19,7 @@ namespace ExampleMicroService.EventListeners
         /// Constructor with injected dependencies
         /// </summary>
         /// <param name="context">Database Context</param>
-        public HaalPolissenOpCommandListener(PolisContext context)
+        public ExampleCommandListener(PolisContext context)
         {
             _context = context;
         }
@@ -39,10 +29,22 @@ namespace ExampleMicroService.EventListeners
         /// </summary>
         /// <param name="command">Received command from a certain source</param>
         /// <returns>A new or modified command with new data</returns>
-        public HaalPolissenOpCommand Handle(HaalPolissenOpCommand command)
+        [CommandListener("MVM.TestService.HaalPolissenOpQueue")]
+        public HaalPolissenOpCommand Handles(HaalPolissenOpCommand command)
         {
             command.Polisses = _context.Polissen.ToArray();
             return command;
+        }
+        
+        /// <summary>
+        /// Handle a Command and immediately throw an exception without any reason
+        /// </summary>
+        /// <param name="polissenOpCommand">Command</param>
+        /// <returns>An exception</returns>
+        [CommandListener("exception.test")]
+        public ExceptionCommand Handles(ExceptionCommand polissenOpCommand)
+        {
+            throw new MysteriousException("Something mysterious happened!");
         }
     }
 }
