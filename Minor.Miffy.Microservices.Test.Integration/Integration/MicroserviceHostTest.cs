@@ -19,6 +19,8 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
     [TestClass]
     public class MicroserviceHostTest
     {
+        private const int WaitTime = 1500;
+            
         [TestMethod]
         [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
@@ -52,7 +54,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             
             // Act
             publisher.Publish(personEvent);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
@@ -92,7 +94,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             
             // Act
             publisher.Publish(personEvent);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.AreEqual(personEvent, WildCardPersonEventListener.ResultEvent);
@@ -132,7 +134,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             
             // Act
             publisher.Publish(personEvent);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.AreEqual(personEvent, FanInEventListener.ResultEvent);
@@ -165,7 +167,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             
             // Act
             publisher.Publish(catEvent);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsNull(PersonEventListener.ResultEvent);
@@ -204,7 +206,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 publisher.Publish(@event);
             }
             
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             CollectionAssert.AreEquivalent(catEvents, SpamEventListener.ResultEvents);
         }

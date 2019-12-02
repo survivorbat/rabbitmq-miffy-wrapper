@@ -26,7 +26,9 @@ variables:
     Minor.Miffy.Core.Test
     Minor.Miffy.MicroServices.Test
     Minor.Miffy.MicroServices.Test.Conventions
+    Minor.Miffy.MicroServices.Test.Integration
     Minor.Miffy.RabbitMQBus.Test
+    Minor.Miffy.RabbitMQBus.Test.Integration
   projectKey: MaartenH:Miffy
   projectName: MaartenH Miffy
 
@@ -39,6 +41,10 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          - bash: |
+              docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3.6-alpine
+            displayName: 'docker run rabbitmq'
+          
           - task: SonarQubePrepare@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
@@ -46,7 +52,7 @@ stages:
               scannerMode: 'MSBuild'
               projectKey: $(projectKey)
               projectName: $(projectName)
-        
+              
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
             inputs:

@@ -8,6 +8,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
     [TestClass]
     public class RabbitMqEventTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         [DataRow("listen.queuee", "Jan")]
         [DataRow("add.hello.queue", "Bart")]
@@ -41,7 +43,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             var sender = context.CreateMessageSender();
             sender.SendMessage(eventMessage);
             
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             Assert.IsTrue(messageReceived);
         }
@@ -84,7 +86,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             var sender = context.CreateMessageSender();
             sender.SendMessage(eventMessage);
             
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
 
             Assert.AreEqual(messageReceived, expected);
         }
