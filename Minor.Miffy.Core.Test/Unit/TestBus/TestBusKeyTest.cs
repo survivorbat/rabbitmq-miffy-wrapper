@@ -70,5 +70,18 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Assert
             Assert.AreEqual(result, expected);
         }
+
+        [TestMethod]
+        public void EqualsWithNullReturnsFalse()
+        {
+            // Arrange
+            var keyA = new TestBusKey("testQueue", "testTopic");
+            
+            // Act
+            bool result = keyA.Equals(null);
+            
+            // Assert
+            Assert.IsFalse(result);
+        }
     }
 }
