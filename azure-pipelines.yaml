@@ -73,11 +73,11 @@ stages:
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
               SonarQube: 'SonarQube Service Connection'
-  - stage: Integration Tests
+  - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
     jobs:
-      - job: Integration Tests
+      - job: Integration
         displayName: Integration Tests
         pool:
           vmImage: 'ubuntu-latest'
@@ -97,7 +97,7 @@ stages:
     
   - stage: Release
     displayName: Release
-    dependsOn: Integration Tests
+    dependsOn: Integration
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - job: Release
