@@ -12,6 +12,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
     [TestClass]
     public class RabbitMqMessageReceiverTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         [DataRow("test.queue")]
         [DataRow("queue.test")]
@@ -208,7 +210,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             };
             
             // Act
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             consumer.HandleBasicDeliver("", 0, false, exchangeName, topic, properties, new byte[0]);
 
             // Assert

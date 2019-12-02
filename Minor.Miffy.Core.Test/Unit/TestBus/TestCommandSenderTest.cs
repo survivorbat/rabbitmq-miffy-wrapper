@@ -12,6 +12,8 @@ namespace Minor.Miffy.Test.Unit.TestBus
     [TestClass]
     public class TestCommandSenderTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         public void SendCommandCreatesReplyQueue()
         {
@@ -32,7 +34,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Act
             sender.SendCommandAsync(request);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.AreEqual(1, dictionary.Keys.Count);
@@ -66,7 +68,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Act
             sender.SendCommandAsync(request);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsTrue(dictionary.ContainsKey(queueName));

@@ -28,8 +28,7 @@ variables:
     Minor.Miffy.MicroServices.Test.Conventions
     Minor.Miffy.RabbitMQBus.Test
   integrationTestProjects: |
-    Minor.Miffy.MicroServices.Test.Integration
-    Minor.Miffy.RabbitMQBus.Test.Integration
+    **/*.Integration/*.csproj
   projectKey: MaartenH:Miffy
   projectName: MaartenH Miffy
 
@@ -73,6 +72,7 @@ stages:
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
               SonarQube: 'SonarQube Service Connection'
+
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
@@ -84,7 +84,6 @@ stages:
         steps:
           # Not the cleanest way, but it works and it means I don't need a running server
           - bash: |
-              docker pull --platform linux --experimental rabbitmq:3-alpine
               docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3-alpine
             displayName: 'docker run rabbitmq'
 

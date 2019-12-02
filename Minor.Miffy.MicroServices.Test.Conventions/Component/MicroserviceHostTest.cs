@@ -9,6 +9,8 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
     [TestClass]
     public class MicroserviceHostTest
     {
+        private const int WaitTime = 1500;
+
         [TestCleanup]
         public void TestCleanup()
         {
@@ -38,7 +40,7 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
             
             new EventPublisher(testContext).Publish(message);
             
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
             Assert.AreEqual(message, EventListenerDummy2.HandlesResult);
@@ -64,7 +66,7 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
             
             new EventPublisher(testContext).Publish(message);
             
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             Assert.IsNull(EventListenerDummy.HandlesResult);
             Assert.IsNull(EventListenerDummy2.HandlesResult);

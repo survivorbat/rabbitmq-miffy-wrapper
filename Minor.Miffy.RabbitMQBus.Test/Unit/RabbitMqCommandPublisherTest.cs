@@ -16,6 +16,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
     [TestClass]
     public class RabbitMqCommandPublisherTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         public void SendCommandCreatesChannel()
         {
@@ -32,7 +34,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             // Assert
             connectionMock.Verify(e => e.CreateModel(), Times.Once);
@@ -57,7 +59,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             // Assert
             modelMock.Verify(e => 
@@ -90,7 +92,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             // Assert
             modelMock.Verify(e => e.QueueBind(queueName, exchangeName, queueName, null));
@@ -124,7 +126,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             // Assert
             modelMock.Verify(e => e.BasicConsume(queueName, 
@@ -206,7 +208,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Act
             sender.SendCommandAsync(command);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             // Assert
             modelMock.Verify(e => e.BasicPublish(exchangeName, queueName, true, It.IsAny<BasicProperties>(), It.IsAny<byte[]>()));
@@ -246,7 +248,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             
             sender.SendCommandAsync(command);
             
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             BasicProperties testBasicProperties = new BasicProperties {CorrelationId = "ID"};
             
@@ -365,7 +367,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             
             var result = sender.SendCommandAsync(command);
             
-            Thread.Sleep(1000);
+            Thread.Sleep(WaitTime);
 
             BasicProperties testBasicProperties = new BasicProperties {CorrelationId = correlationId};
             

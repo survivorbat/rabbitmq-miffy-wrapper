@@ -7,6 +7,8 @@ namespace Minor.Miffy.Test.Component.TestBus
     [TestClass]
     public class TestBusContextTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         public void SendingMessageCallsCallback()
         {
@@ -24,7 +26,7 @@ namespace Minor.Miffy.Test.Component.TestBus
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsTrue(callbackCalled);
@@ -51,7 +53,7 @@ namespace Minor.Miffy.Test.Component.TestBus
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsTrue(callbackCalled);
@@ -81,7 +83,7 @@ namespace Minor.Miffy.Test.Component.TestBus
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsTrue(callbackCalled);
@@ -115,7 +117,7 @@ namespace Minor.Miffy.Test.Component.TestBus
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.AreEqual(shouldHaveBeenCalled, callbackCalled);
@@ -141,7 +143,7 @@ namespace Minor.Miffy.Test.Component.TestBus
             
             // Act
             sender.SendMessage(message);
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             // Assert
             Assert.IsTrue(callbackCalled);

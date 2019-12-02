@@ -13,6 +13,8 @@ namespace Minor.Miffy.MicroServices.Test.Component
     [TestClass]
     public class MicroserviceHostTest
     {
+        private const int WaitTime = 1500;
+        
         [TestMethod]
         public void AddingListenerRegistersProperReceiver()
         {
@@ -29,7 +31,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var message = new DummyEvent("TestTopic");
             new EventPublisher(testContext).Publish(message);
             
-            Thread.Sleep(500);
+            Thread.Sleep(WaitTime);
             
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
         }
