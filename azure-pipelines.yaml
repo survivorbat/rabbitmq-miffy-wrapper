@@ -26,8 +26,9 @@ variables:
     Minor.Miffy.Core.Test
     Minor.Miffy.MicroServices.Test
     Minor.Miffy.MicroServices.Test.Conventions
-    Minor.Miffy.MicroServices.Test.Integration
     Minor.Miffy.RabbitMQBus.Test
+  integrationTestProjects: |
+    Minor.Miffy.MicroServices.Test.Integration
     Minor.Miffy.RabbitMQBus.Test.Integration
   projectKey: MaartenH:Miffy
   projectName: MaartenH Miffy
@@ -41,12 +42,6 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
-          # Not the cleanest way, but it works and it means I don't need a running server
-          - bash: |
-              docker pull --platform linux --experimental rabbitmq:3-alpine
-              docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3-alpine
-            displayName: 'docker run rabbitmq'
-          
           - task: SonarQubePrepare@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
@@ -78,8 +73,31 @@ stages:
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
               SonarQube: 'SonarQube Service Connection'
+  - stage: Integration Tests
+    displayName: Integration Tests
+    depends_on: Build
+    jobs:
+      - job: Integration Tests
+        displayName: Integration Tests
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # Not the cleanest way, but it works and it means I don't need a running server
+          - bash: |
+              docker pull --platform linux --experimental rabbitmq:3-alpine
+              docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3-alpine
+            displayName: 'docker run rabbitmq'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet test'
+            inputs:
+              command: test
+              projects: $(integrationTestProjects)
+              arguments: '--configuration $(BuildConfiguration)'
+    
   - stage: Release
     displayName: Release
+    depends_on: Integration Tests
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - job: Release
