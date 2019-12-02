@@ -8,7 +8,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
     [TestClass]
     public class RabbitMqEventTest
     {
-        private const int WaitTime = 1500;
+        private const int WaitTime = 2000;
 
         [TestMethod]
         [DataRow("listen.queuee", "Jan")]

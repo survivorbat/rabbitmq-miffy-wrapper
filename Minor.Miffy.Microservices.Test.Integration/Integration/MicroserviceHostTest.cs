@@ -19,7 +19,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
     [TestClass]
     public class MicroserviceHostTest
     {
-        private const int WaitTime = 1500;
+        private const int WaitTime = 2500;
             
         [TestMethod]
         [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
