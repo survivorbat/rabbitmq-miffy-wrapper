@@ -17,7 +17,6 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Services that this handler requires
         /// </summary>
-        /// <param name="context">Database Context</param>
         public ExampleEventListener(PolisContext context)
         {
             _context = context;
@@ -26,7 +25,6 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Command that handles the incoming event, in this case saving it
         /// </summary>
-        /// <param name="evt">incoming event</param>
         [EventListener("MVM.TestService.PolisEventListenerQueue")]
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(PolisToegevoegdEvent evt)

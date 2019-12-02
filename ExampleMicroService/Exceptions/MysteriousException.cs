@@ -19,7 +19,6 @@ namespace ExampleMicroService.Exceptions
         /// <summary>
         /// Exception with message
         /// </summary>
-        /// <param name="message"></param>
         public MysteriousException(string message) : base(message)
         {
             // Instantiate a mysterious exception with a message

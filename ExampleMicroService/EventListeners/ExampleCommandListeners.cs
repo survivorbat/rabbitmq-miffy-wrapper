@@ -18,7 +18,6 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Constructor with injected dependencies
         /// </summary>
-        /// <param name="context">Database Context</param>
         public ExampleCommandListener(PolisContext context)
         {
             _context = context;
@@ -27,8 +26,6 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Receives a command, then returns a changed command
         /// </summary>
-        /// <param name="command">Received command from a certain source</param>
-        /// <returns>A new or modified command with new data</returns>
         [CommandListener("MVM.TestService.HaalPolissenOpQueue")]
         public HaalPolissenOpCommand Handles(HaalPolissenOpCommand command)
         {
@@ -39,8 +36,6 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Handle a Command and immediately throw an exception without any reason
         /// </summary>
-        /// <param name="polissenOpCommand">Command</param>
-        /// <returns>An exception</returns>
         [CommandListener("exception.test")]
         public ExceptionCommand Handles(ExceptionCommand polissenOpCommand)
         {
