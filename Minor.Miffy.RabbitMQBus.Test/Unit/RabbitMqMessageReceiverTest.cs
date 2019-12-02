@@ -102,7 +102,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingMessages();
 
             // Assert
-            modelMock.Verify(e => e.QueueDeclare(queueName, true, false, true, null));
+            modelMock.Verify(e => e.QueueDeclare(queueName, true, false, false, null));
         }
         
         [TestMethod]
