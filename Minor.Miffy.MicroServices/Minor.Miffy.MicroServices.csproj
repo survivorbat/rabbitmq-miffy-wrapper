@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>MaartenH.Minor.Miffy.Microservices</Title>
     <Description>The microservice host package of the Miffy Framework</Description>
-    <PackageVersion>0.7.0</PackageVersion>
+    <PackageVersion>0.7.1</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Microservices</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ Events Commands Bus</PackageTags>
@@ -22,7 +22,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0-preview3.19553.2" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>

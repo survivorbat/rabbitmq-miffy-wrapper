@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 0.7.1
+
+- Removed test dependency of microservices project.
+
 ## 0.7.0
 
 - Command and Event listener attributes now belong on top of the method instead of the class
