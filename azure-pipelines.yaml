@@ -105,26 +105,11 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - task: DotNetCoreCLI@2
-            displayName: 'dotnet build'
-            inputs:
-              projects: $(projects)
-              arguments: '--configuration $(BuildConfiguration)'
-
-          # To be sure ;-)
-          - task: DotNetCoreCLI@2
-            displayName: 'dotnet test'
-            inputs:
-              command: test
-              projects: $(testProjects)
-              arguments: '--configuration $(BuildConfiguration)'
-
-          - task: DotNetCoreCLI@2
             displayName: 'dotnet pack'
             inputs:
               command: 'pack'
               packagesToPack: '**/*.csproj'
               patchVersion: $(Build.BuildId)
-              nobuild: true
 
           - task: NuGetCommand@2
             displayName: 'nuget.org nuget push'

@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Minor.Miffy.RabbitMQBus
 {
-    // TODO: Remove
-    [ExcludeFromCodeCoverage]
     public static class RabbitMqLoggerFactory
     {
         /// <summary>
