@@ -139,6 +139,25 @@ publisher.Publish(exampleEvent);
 
 Publishers can be injected using the IEventPublisher interface and accept any event that inherits from DomainEvent.
 
+#### Listening for raw json data
+
+In case you don't want to listen to specific events or want to
+serialize your own data. You can simply create an event listener with an input
+type of _string_ like so:
+
+```c#
+public class JsonEventListener
+{
+    [EventListener("UniqueQueueName")]
+    [Topic("ExampleTopic")]
+    public void Handles(string rawJson) 
+    {
+        DoSomethingWithJson(rawJsoon);
+    }
+}
+```
+
+
 ### Commands
 
 Sending commands over the bus is also possible, first create a bus context from the **Events** section.
