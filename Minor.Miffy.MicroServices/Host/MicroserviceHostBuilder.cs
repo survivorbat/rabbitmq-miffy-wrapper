@@ -14,8 +14,23 @@ using RabbitMQ.Client;
 
 namespace Minor.Miffy.MicroServices.Host
 {
-    public class MicroserviceHostBuilder 
+    public class MicroserviceHostBuilder
     {
+        /// <summary>
+        /// The parent type of all domain events
+        /// </summary>
+        private static readonly Type DomainEventType = typeof(DomainEvent);
+        
+        /// <summary>
+        /// The parent type of all domain commands
+        /// </summary>
+        private static readonly Type DomainCommandType = typeof(DomainCommand);
+
+        /// <summary>
+        /// Type of a string
+        /// </summary>
+        private static readonly Type StringType = typeof(string);
+        
         /// <summary>
         /// Bus context that houses configuration for the message bus
         /// </summary>
@@ -121,8 +136,6 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Retrieve all the publicly declared instance methods from a type
         /// </summary>
-        /// <param name="type">Type to analyze</param>
-        /// <returns>A list of methods</returns>
         private IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
@@ -135,26 +148,21 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterEventListener(TypeInfo type, MethodInfo method, string queueName)
         {
-            _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
-            Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
-            
-            _logger.LogDebug($"Found parameter type {parameterType?.Name} on method {method.Name} of type {type.Name}");
-            
-            // If method is not suitable, skip it
-            if (parameterType == null)
+            if (!IsMethodSuitableEvent(method, false))
             {
-                _logger.LogWarning($"Method {method.Name} in {type.Name} is not an event callback, skipping");
-                return;
+                throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
             }
             
-            _logger.LogTrace($"Evaluating parameter type {type.Name} of method {method.Name}");
+            _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
+            Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+
             string[] topicPatterns = method.GetCustomAttributes<TopicAttribute>()
                 .Select(e => e.TopicPattern)
                 .ToArray();
             
             _logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
 
-            _logger.LogDebug($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
+            _logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
             _eventListeners.Add(new MicroserviceListener
             {
                 TopicExpressions = topicPatterns,
@@ -166,14 +174,22 @@ namespace Minor.Miffy.MicroServices.Host
                     
                     _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
+
+
+                    if (parameterType == StringType)
+                    {
+                        _logger.LogTrace($"Parameter type is a string, invoking method for message {message.CorrelationId} with body {text}");
+                        method.Invoke(instance, new object[] {text});
+                        return;
+                    }
                     
                     _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
                     
                     if (jsonObject == null)
                     {
-                        _logger.LogCritical($"Deserializing {text} to type {parameterType.Name} resulted in a null object in eventlistener");
-                        throw new BusConfigurationException($"Deserializing {text} to type {parameterType.Name} resulted in a null object in eventlistener");
+                        _logger.LogCritical($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
+                        throw new BusConfigurationException($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
                     }
                     
                     _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
@@ -187,17 +203,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         private void RegisterCommandListener(TypeInfo type, MethodInfo method, string queueName)
         {
-            _logger.LogDebug($"Evaluating parameter type {type.Name} of command method {method.Name}");
-            Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
-            
-            _logger.LogDebug($"Found parameter type {parameterType?.Name} on command method {method.Name} of type {type.Name}");
-
-            // If method is not suitable, skip it
-            if (parameterType == null)
+            if (!IsMethodSuitableEvent(method, true))
             {
-                _logger.LogWarning($"Method {method.Name} in {type.Name} is not a command callback, skipping");
-                return;
+                throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
             }
+            
+            Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
             
             _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
             _commandListeners.Add(new MicroserviceCommandListener
@@ -210,14 +221,14 @@ namespace Minor.Miffy.MicroServices.Host
 
                     _logger.LogTrace($"Retrieving string command data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
-                    
+
                     _logger.LogTrace($"Deserialized command object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
                     if (jsonObject == null)
                     {
-                        _logger.LogCritical($"Deserializing {text} to command type {parameterType.Name} resulted in a null object in commandlistener");
-                        throw new BusConfigurationException($"Deserializing {text} to command type {parameterType.Name} resulted in a null object in commandlistener");
+                        _logger.LogCritical($"Deserializing {text} to command type {parameterType?.Name} resulted in a null object in commandlistener");
+                        throw new BusConfigurationException($"Deserializing {text} to command type {parameterType?.Name} resulted in a null object in commandlistener");
                     }
 
                     _logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
@@ -263,6 +274,53 @@ namespace Minor.Miffy.MicroServices.Host
                     _logger.LogTrace($"Method {methodInfo.Name} does not contain listener attributes.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if method has a suitable signature to be used as a command or event listener
+        /// </summary>
+        private bool IsMethodSuitableEvent(MethodInfo method, bool isCommandListener)
+        {
+            _logger.LogTrace($"Evaluating whether {method.Name} has 1 parameter");
+            ParameterInfo[] parameters = method.GetParameters();
+
+            if (parameters.Length != 1)
+            {
+                return false;
+            }
+
+            ParameterInfo parameter = parameters.First();
+            Type parameterType = parameter.ParameterType;
+            
+            _logger.LogTrace($"Evaluating whether method {method.Name}'s parameter {parameter.Name} is " +
+                                    "a string or is derived from DomainEvent or CommandEvent");
+
+            if ((!isCommandListener && parameterType.IsAssignableFrom(DomainEventType)
+                || isCommandListener && parameterType.IsAssignableFrom(DomainCommandType))
+                && parameterType != StringType)
+            {
+                _logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +
+                                    $"type {parameterType.Name} which is not a proper type for a " +
+                                    $"{(isCommandListener ? "Command" : "Event")}Listener");
+
+                return false;
+            }
+
+            if (isCommandListener)
+            {
+                _logger.LogTrace($"Method {method.Name} appears to be a command listener. " +
+                                 "Evaluating its return type.");
+
+                if (method.ReturnType != parameterType)
+                {
+                    _logger.LogCritical($"Return type {method.ReturnType.Name} is not equal " +
+                                        $"to parameter type {parameterType.Name} of method {method.Name}");
+
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

@@ -1,5 +1,15 @@
 # Changelog Miffy Framework
 
+**This changelog is deprecated, for proper changelogs please
+refer to the CHANGELOG files in the individual projects**
+
+## 0.8.0
+
+- Add better listener method evaluation
+- Separate pipeline into 3 pieces
+- Allow strings to be input types for event listeners
+- Migrate changelog to individual packages ;-)
+
 ## 0.7.1
 
 - Removed test dependency of microservices project.
