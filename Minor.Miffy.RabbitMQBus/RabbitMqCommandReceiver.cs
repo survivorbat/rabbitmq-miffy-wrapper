@@ -12,18 +12,18 @@ namespace Minor.Miffy.RabbitMQBus
 {
     public class RabbitMqCommandReceiver : ICommandReceiver
     {
-        private static readonly string CommandErrorType = "CommandError";
-        
+        private const string CommandErrorType = "CommandError";
+
         /// <summary>
         /// Testbus context
         /// </summary>
         private readonly IBusContext<IConnection> _context;
-        
+
         /// <summary>
         /// Model used to send messages
         /// </summary>
         private readonly IModel _model;
-        
+
         /// <summary>
         /// Logger
         /// </summary>
@@ -59,7 +59,7 @@ namespace Minor.Miffy.RabbitMQBus
             {
                 throw new BusConfigurationException($"Queue {QueueName} has already been declared!");
             }
-            
+
             _logger.LogTrace($"Declaring command queue {QueueName}");
             _model.QueueDeclare(QueueName, true, false, false, null);
             _model.QueueBind(QueueName, _context.ExchangeName, QueueName, null);
@@ -79,7 +79,7 @@ namespace Minor.Miffy.RabbitMQBus
             _logger.LogTrace($"Start receiving commands on queue {QueueName}");
 
             EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
-            
+
             consumer.Received += (model, ea) =>
             {
                 _logger.LogInformation(
@@ -96,7 +96,7 @@ namespace Minor.Miffy.RabbitMQBus
                     ReplyQueue = ea.BasicProperties.ReplyTo,
                     CorrelationId = Guid.Parse(ea.BasicProperties.CorrelationId)
                 };
-                
+
                 CommandMessage response;
                 try
                 {
@@ -106,25 +106,25 @@ namespace Minor.Miffy.RabbitMQBus
                 {
                     _logger.LogError($"Error occured while handling command, command id {ea.BasicProperties.CorrelationId} " +
                                      $"with exception {e.Message}");
-                    
+
                     response = new CommandError
                     {
                         Exception = e.InnerException ?? e,
                         EventType = CommandErrorType
                     };
                 }
-                
+
                 string responseMessage = JsonConvert.SerializeObject(response);
-                
+
                 _model.BasicPublish(
-                    _context.ExchangeName, 
-                    ea.BasicProperties.ReplyTo, 
-                    replyProps, 
+                    _context.ExchangeName,
+                    ea.BasicProperties.ReplyTo,
+                    replyProps,
                     Encoding.Unicode.GetBytes(responseMessage));
-            
+
                 _model.BasicAck(ea.DeliveryTag, false);
             };
-            
+
             _model.BasicConsume(QueueName, false, "", false, false, null, consumer);
         }
 
