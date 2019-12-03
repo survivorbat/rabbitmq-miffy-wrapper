@@ -46,8 +46,8 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         [TestCleanup]
         public void TestCleanup()
         {
-            var prop = typeof(RabbitMqLoggerFactory).GetField("_loggerFactory", BindingFlags.Static);
-            prop?.SetValue(null, new NullLoggerFactory());
+            var prop = typeof(RabbitMqLoggerFactory).GetField("_loggerFactory", BindingFlags.Static | BindingFlags.NonPublic);
+            prop.SetValue(null, new NullLoggerFactory());
         }
     }
 }

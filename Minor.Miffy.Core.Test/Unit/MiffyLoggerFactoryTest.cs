@@ -46,7 +46,7 @@ namespace Minor.Miffy.Test.Unit
         [TestCleanup]
         public void TestCleanup()
         {
-            var prop = typeof(MiffyLoggerFactory).GetField("_loggerFactory", BindingFlags.Static);
+            var prop = typeof(MiffyLoggerFactory).GetField("_loggerFactory", BindingFlags.Static | BindingFlags.NonPublic);
             prop?.SetValue(null, new NullLoggerFactory());
         }
     }

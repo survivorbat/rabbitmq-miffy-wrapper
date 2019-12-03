@@ -16,7 +16,7 @@ namespace Minor.Miffy
             internal get => _loggerFactory;
             set
             {
-                if (LoggerFactory is NullLoggerFactory)
+                if (_loggerFactory is NullLoggerFactory)
                 {
                     _loggerFactory = value;
                 }
