@@ -113,10 +113,11 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
             
-            using var host = new MicroserviceHostBuilder()
+            using var builder = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
-                .AddEventListener<FanInEventListener>()
-                .CreateHost();
+                .AddEventListener<FanInEventListener>();
+            
+            using var host = builder.CreateHost();
             
             host.Start();
             

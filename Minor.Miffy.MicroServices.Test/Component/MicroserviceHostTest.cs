@@ -20,7 +20,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             hostBuilder.AddEventListener<EventListenerDummy>();
@@ -41,11 +41,12 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
+            using var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
                 .AddEventListener<MethodEventListener>();
 
             // Act
-            var result = builder.CreateHost().Listeners.ToList();
+            using var host = builder.CreateHost();
+            var result = host.Listeners.ToList();
             
             // Assert
             Assert.AreEqual(1, result.Count);
@@ -60,7 +61,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             TestBusContext testContext = new TestBusContext();
-            MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            using MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             hostBuilder.AddEventListener<CommandListenerDummy>();

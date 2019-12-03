@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Host;
 using Moq;
@@ -12,7 +13,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void RegisterDependenciesInvokesConfigMethod()
         {
             // Arrange
-            var host = new MicroserviceHostBuilder();
+            using var host = new MicroserviceHostBuilder();
             bool hasBeenCalled = false;
 
             // Act
@@ -29,7 +30,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var contextMock = new Mock<IBusContext<IConnection>>();
             var context = contextMock.Object;
             
-            var builder = new MicroserviceHostBuilder();
+            using var builder = new MicroserviceHostBuilder();
             builder.WithBusContext(context);
 
             // Act
@@ -37,6 +38,23 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             
             // Arrange
             Assert.AreSame(context, host.Context);
+        }
+        
+        [TestMethod]
+        public void LoggerFactoryIsProperlyDisposed()
+        {
+            // Arrange
+            var loggerFactoryMock = new Mock<ILoggerFactory>();
+            var loggerFactory = loggerFactoryMock.Object;
+
+            using var builder = new MicroserviceHostBuilder();
+            builder.SetLoggerFactory(loggerFactory);
+
+            // Act
+            builder.Dispose();
+            
+            // Arrange
+            loggerFactoryMock.Verify(e => e.Dispose());
         }
     }
 }

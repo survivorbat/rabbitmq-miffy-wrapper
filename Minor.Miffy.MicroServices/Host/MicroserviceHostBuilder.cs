@@ -14,7 +14,7 @@ using RabbitMQ.Client;
 
 namespace Minor.Miffy.MicroServices.Host
 {
-    public class MicroserviceHostBuilder
+    public class MicroserviceHostBuilder : IDisposable
     {
         /// <summary>
         /// The parent type of all domain events
@@ -351,12 +351,20 @@ namespace Minor.Miffy.MicroServices.Host
         /// <returns></returns>
         public MicroserviceHost CreateHost()
         {
-            _logger.LogDebug($"Instantiating microservicehost with {_eventListeners.Count} eventlisteners and {_commandListeners.Count} commandlisteners");
+            _logger.LogDebug($"Instantiating microservicehost with {_eventListeners.Count} event listeners and {_commandListeners.Count} command listeners");
             return new MicroserviceHost(
                 _context,
                 _eventListeners,
                 _commandListeners,
                 _loggerFactory.CreateLogger<MicroserviceHost>());
+        }
+
+        /// <summary>
+        /// Dispose of the logger factoryu
+        /// </summary>
+        public void Dispose()
+        {
+            _loggerFactory?.Dispose();
         }
     }
 }

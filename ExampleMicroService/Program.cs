@@ -83,7 +83,7 @@ namespace ExampleMicroService
              *
              * UseConventions could be replaced by multiple AddEventListener calls.
              */
-            MicroserviceHostBuilder builder = new MicroserviceHostBuilder()
+            using MicroserviceHostBuilder builder = new MicroserviceHostBuilder()
                 .SetLoggerFactory(loggerFactory)
                 .RegisterDependencies(services =>
                 {
