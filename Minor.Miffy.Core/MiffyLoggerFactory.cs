@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Minor.Miffy
 {
-    // TODO: Remove
-    [ExcludeFromCodeCoverage]
     public static class MiffyLoggerFactory
     {
         /// <summary>

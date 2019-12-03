@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 0.8.2
+
+- Bring back single pipeline
+
 ## 0.8.1
 
 - Ensure that loggers can only be set once
