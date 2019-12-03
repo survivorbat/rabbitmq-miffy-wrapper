@@ -5,20 +5,32 @@ trigger:
       - develop
   paths:
     include:
+      - Minor.Miffy.Core/
+      - Minor.Miffy.Core.Test/
+      - Minor.Miffy.MicroServices/
+      - Minor.Miffy.MicroServices.Test/
+      - Minor.Miffy.MicroServices.Test.Conventions/
+      - Minor.Miffy.Microservices.Test.Integration/
       - Minor.Miffy.RabbitMQBus/
       - Minor.Miffy.RabbitMQBus.Test/
       - Minor.Miffy.RabbitMQBus.Test.Integration/
+      - azure-pipelines.yaml
 
 variables:
   buildConfiguration: 'Release'
   projects: |
+    Minor.Miffy.Core/Minor.Miffy.Core.csproj
+    Minor.Miffy.Microservices/Minor.Miffy.Microservices.csproj
     Minor.Miffy.RabbitMQBus/Minor.Miffy.RabbitMQBus.csproj
   testProjects: |
+    Minor.Miffy.Core.Test
+    Minor.Miffy.MicroServices.Test
+    Minor.Miffy.MicroServices.Test.Conventions
     Minor.Miffy.RabbitMQBus.Test
   integrationTestProjects: |
-    Minor.Miffy.RabbitMQBus.Test.Integration/*.csproj
-  projectKey: MaartenH:Miffy-RabbitMQ
-  projectName: MaartenH Miffy RabbitMQ
+    **/*.Integration/*.csproj
+  projectKey: MaartenH:Miffy
+  projectName: MaartenH Miffy
 
 stages:
   - stage: Build
@@ -110,7 +122,7 @@ stages:
             displayName: 'dotnet pack'
             inputs:
               command: 'pack'
-              packagesToPack: $(projects)
+              packagesToPack: '**/*.csproj'
               patchVersion: $(Build.BuildId)
               nobuild: true
 

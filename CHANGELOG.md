@@ -1,7 +1,8 @@
 # Changelog Miffy Framework
 
-**This changelog is deprecated, for proper changelogs please
-refer to the CHANGELOG files in the individual projects**
+## 0.8.1
+
+- Ensure that loggers can only be set once
 
 ## 0.8.0
 
