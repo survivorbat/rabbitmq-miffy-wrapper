@@ -2,6 +2,8 @@ using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.MicroServices.Test.Conventions.Component.Event;
+using Minor.Miffy.MicroServices.Test.Conventions.Component.EventListeners;
 using Minor.Miffy.TestBus;
 
 namespace Minor.Miffy.MicroServices.Test.Conventions.Component
@@ -32,20 +34,20 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
 
             // Act
             hostBuilder.UseConventions();
-            
+
             hostBuilder.CreateHost().Start();
 
             // Assert
             var message = new DummyEvent("TestTopic") { DummyText = messageText };
-            
+
             new EventPublisher(testContext).Publish(message);
-            
+
             Thread.Sleep(WaitTime);
-            
+
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
             Assert.AreEqual(message, EventListenerDummy2.HandlesResult);
         }
-        
+
         [TestMethod]
         [DataRow("Dummy text")]
         [DataRow("Example text")]
@@ -63,11 +65,11 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
 
             // Assert
             var message = new DummyEvent("IrrelevantTopic") { DummyText = messageText };
-            
+
             new EventPublisher(testContext).Publish(message);
-            
+
             Thread.Sleep(WaitTime);
-            
+
             Assert.IsNull(EventListenerDummy.HandlesResult);
             Assert.IsNull(EventListenerDummy2.HandlesResult);
             Assert.AreEqual(message, EventListenerDummy3.HandlesResult);

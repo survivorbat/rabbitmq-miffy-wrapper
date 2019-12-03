@@ -1,11 +1,11 @@
 using Minor.Miffy.MicroServices.Events;
 
-namespace Minor.Miffy.MicroServices.Test.Conventions.Component
+namespace Minor.Miffy.MicroServices.Test.Conventions.Component.Event
 {
     public class DummyEvent : DomainEvent
     {
         public DummyEvent(string topic) : base(topic) { }
-        
+
         public string DummyText { get; set; } = "";
 
         private bool Equals(DummyEvent other) =>

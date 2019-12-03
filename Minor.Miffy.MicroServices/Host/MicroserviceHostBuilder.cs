@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -20,7 +19,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// The parent type of all domain events
         /// </summary>
         private static readonly Type DomainEventType = typeof(DomainEvent);
-        
+
         /// <summary>
         /// The parent type of all domain commands
         /// </summary>
@@ -30,12 +29,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// Type of a string
         /// </summary>
         private static readonly Type StringType = typeof(string);
-        
+
         /// <summary>
         /// Bus context that houses configuration for the message bus
         /// </summary>
         private IBusContext<IConnection> _context;
-        
+
         /// <summary>
         /// Loggerfactory to create logging instances
         /// </summary>
@@ -55,12 +54,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// Registered event listeners
         /// </summary>
         private readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
-        
+
         /// <summary>
         /// Registered command listeners
         /// </summary>
         private readonly List<MicroserviceCommandListener> _commandListeners = new List<MicroserviceCommandListener>();
-        
+
         /// <summary>
         /// Initialize a new builder with a null logger factory
         /// </summary>
@@ -70,7 +69,7 @@ namespace Minor.Miffy.MicroServices.Host
             _serviceCollection.AddSingleton(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<MicroserviceHostBuilder>();
         }
-        
+
         /// <summary>
         /// Configures the connection to the message broker
         /// </summary>
@@ -89,12 +88,12 @@ namespace Minor.Miffy.MicroServices.Host
         {
             Assembly callingAssembly = Assembly.GetCallingAssembly();
             _logger.LogDebug($"Using conventions, applying types from assembly: {callingAssembly.GetName()}");
-            
+
             foreach (TypeInfo type in callingAssembly.DefinedTypes)
             {
                 RegisterListener(type);
             }
-            
+
             return this;
         }
 
@@ -104,9 +103,9 @@ namespace Minor.Miffy.MicroServices.Host
         public MicroserviceHostBuilder AddEventListener<T>()
         {
             TypeInfo type = typeof(T).GetTypeInfo();
-            
+
             _logger.LogDebug($"Adding event listeners for type {type.FullName}");
-            
+
             RegisterListener(type);
             return this;
         }
@@ -152,14 +151,14 @@ namespace Minor.Miffy.MicroServices.Host
             {
                 throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
             }
-            
+
             _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
 
             string[] topicPatterns = method.GetCustomAttributes<TopicAttribute>()
                 .Select(e => e.TopicPattern)
                 .ToArray();
-            
+
             _logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
 
             _logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
@@ -171,7 +170,7 @@ namespace Minor.Miffy.MicroServices.Host
                 {
                     _logger.LogDebug($"Attempting to instantiate type {type.Name} in queue {queueName}");
                     object instance = InstantiatePopulatedType(type);
-                    
+
                     _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
 
@@ -182,16 +181,16 @@ namespace Minor.Miffy.MicroServices.Host
                         method.Invoke(instance, new object[] {text});
                         return;
                     }
-                    
+
                     _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-                    
+
                     if (jsonObject == null)
                     {
                         _logger.LogCritical($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
                         throw new BusConfigurationException($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
                     }
-                    
+
                     _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                     method.Invoke(instance, new[] {jsonObject});
                 }
@@ -207,15 +206,15 @@ namespace Minor.Miffy.MicroServices.Host
             {
                 throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
             }
-            
+
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
-            
+
             _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
             _commandListeners.Add(new MicroserviceCommandListener
             {
                 Queue = queueName,
                 Callback = message =>
-                { 
+                {
                     _logger.LogTrace($"Attempting to instantiate type {type.Name} in queue {queueName}");
                     object instance = InstantiatePopulatedType(type);
 
@@ -236,7 +235,7 @@ namespace Minor.Miffy.MicroServices.Host
 
                     _logger.LogTrace("Serializing result command");
                     string jsonReturn = JsonConvert.SerializeObject(command);
-                    
+
                     _logger.LogTrace($"Returning new CommandMessage with timestamp {command?.Timestamp}, id {command?.Id}, EventType {command?.GetType().Name}, body {jsonReturn}");
                     return new CommandMessage
                     {
@@ -255,12 +254,12 @@ namespace Minor.Miffy.MicroServices.Host
         private void RegisterListener(TypeInfo type)
         {
             _logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
-            
+
             foreach (MethodInfo methodInfo in GetRelevantMethods(type))
             {
                 string eventQueueName = methodInfo.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
                 string commandQueueName = methodInfo.GetCustomAttribute<CommandListenerAttribute>()?.QueueName;
-                
+
                 if (eventQueueName != null)
                 {
                     RegisterEventListener(type, methodInfo, eventQueueName);
@@ -291,12 +290,12 @@ namespace Minor.Miffy.MicroServices.Host
 
             ParameterInfo parameter = parameters.First();
             Type parameterType = parameter.ParameterType;
-            
+
             _logger.LogTrace($"Evaluating whether method {method.Name}'s parameter {parameter.Name} is " +
-                                    "a string or is derived from DomainEvent or CommandEvent");
+                             "a string or is derived from DomainEvent or CommandEvent");
 
             if ((!isCommandListener && parameterType.IsAssignableFrom(DomainEventType)
-                || isCommandListener && parameterType.IsAssignableFrom(DomainCommandType))
+                 || isCommandListener && parameterType.IsAssignableFrom(DomainCommandType))
                 && parameterType != StringType)
             {
                 _logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +
@@ -318,9 +317,11 @@ namespace Minor.Miffy.MicroServices.Host
 
                     return false;
                 }
+
+                return true;
             }
 
-            return true;
+            return method.ReturnType == typeof(void);
         }
 
         /// <summary>

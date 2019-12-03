@@ -14,7 +14,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
     public class MicroserviceHostTest
     {
         private const int WaitTime = 1500;
-        
+
         [TestMethod]
         public void AddingListenerRegistersProperReceiver()
         {
@@ -24,15 +24,15 @@ namespace Minor.Miffy.MicroServices.Test.Component
 
             // Act
             hostBuilder.AddEventListener<EventListenerDummy>();
-            
+
             hostBuilder.CreateHost().Start();
 
             // Assert
             var message = new DummyEvent("TestTopic");
             new EventPublisher(testContext).Publish(message);
-            
+
             Thread.Sleep(WaitTime);
-            
+
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
         }
 
@@ -47,7 +47,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             // Act
             using var host = builder.CreateHost();
             var result = host.Listeners.ToList();
-            
+
             // Assert
             Assert.AreEqual(1, result.Count);
 
@@ -55,7 +55,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             Assert.AreEqual("PersonApp.Cats.Test", firstItem?.Queue);
             Assert.AreEqual("testPattern", firstItem?.TopicExpressions.FirstOrDefault());
         }
-        
+
         [TestMethod]
         public void AddingListenerRegistersProperCommandReceiver()
         {
@@ -65,14 +65,79 @@ namespace Minor.Miffy.MicroServices.Test.Component
 
             // Act
             hostBuilder.AddEventListener<CommandListenerDummy>();
-            
+
             List<MicroserviceCommandListener> result = hostBuilder.CreateHost().CommandListeners.ToList();
-            
+
             // Assert
             Assert.AreEqual(1, result.Count);
-            
+
             var firstItem = result.FirstOrDefault();
             Assert.AreEqual("command.queue", firstItem?.Queue);
+        }
+
+        [TestMethod]
+        public void ListenerWithWrongParameterThrowsException()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            // Act
+            void Act() => hostBuilder.AddEventListener<WrongParameterEventListener>();
+
+            // Assert
+            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Method Handle does not have a proper " +
+                            "commandlistener signature in type WrongParameterEventListener", exception.Message);
+
+        }
+
+        [TestMethod]
+        public void ListenerWithWrongReturnTypeThrowsException()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            // Act
+            void Act() => hostBuilder.AddEventListener<WrongReturnEventListener>();
+
+            // Assert
+            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Method Handle does not have a proper " +
+                            "commandlistener signature in type WrongReturnEventListener", exception.Message);
+        }
+
+        [TestMethod]
+        public void ListenerWithWrongParameterCountThrowsException()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            // Act
+            void Act() => hostBuilder.AddEventListener<WrongParameterAmountEventListener>();
+
+            // Assert
+            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Method Handle does not have a proper " +
+                            "commandlistener signature in type WrongParameterAmountEventListener", exception.Message);
+        }
+
+        [TestMethod]
+        public void EventListenerWithReturnTypeThrowsException()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            // Act
+            void Act() => hostBuilder.AddEventListener<EventWithReturnTypeEventListener>();
+
+            // Assert
+            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Method Handle does not have a proper " +
+                            "commandlistener signature in type EventWithReturnTypeEventListener", exception.Message);
         }
     }
 }

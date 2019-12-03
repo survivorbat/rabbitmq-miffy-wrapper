@@ -18,7 +18,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// Connection string
         /// </summary>
         public Uri ConnectionString { get; private set; }
-        
+
         /// <summary>
         /// Exchange name
         /// </summary>
@@ -27,7 +27,10 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Initialize a builder with a logger
         /// </summary>
-        public RabbitMqContextBuilder() => _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqContextBuilder>();
+        public RabbitMqContextBuilder()
+        {
+            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqContextBuilder>();
+        }
 
         /// <summary>
         /// Set up an exchange name
@@ -56,9 +59,9 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public RabbitMqContextBuilder ReadFromEnvironmentVariables()
         {
-            string url = Environment.GetEnvironmentVariable(EnvVarNames.BrokerConnectionString) ?? 
+            string url = Environment.GetEnvironmentVariable(EnvVarNames.BrokerConnectionString) ??
                            throw new BusConfigurationException($"{EnvVarNames.BrokerConnectionString} env variable not set");
-            ExchangeName = Environment.GetEnvironmentVariable(EnvVarNames.BrokerExchangeName) ?? 
+            ExchangeName = Environment.GetEnvironmentVariable(EnvVarNames.BrokerExchangeName) ??
                            throw new BusConfigurationException($"{EnvVarNames.BrokerExchangeName} env variable not set");
 
             _logger.LogDebug($"Setting exchange name as {ExchangeName} and setting connection string");
@@ -68,23 +71,34 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
-        /// Creates a context with 
+        /// Creates a context with
         ///  - an opened connection (based on the URI)
         ///  - a declared Topic-Exchange (based on ExchangeName)
         /// </summary>
-        public IBusContext<IConnection> CreateContext()
+        /// <param name="connectionFactory">Use a custom connection factory</param>
+        public IBusContext<IConnection> CreateContext(IConnectionFactory connectionFactory)
         {
-            ConnectionFactory factory = new ConnectionFactory { Uri = ConnectionString };
-            IConnection connection = factory.CreateConnection();
-            
+            connectionFactory.Uri = ConnectionString;
+
+            IConnection connection = connectionFactory.CreateConnection();
+
             using (var channel = connection.CreateModel())
             {
                 _logger.LogDebug($"Declaring exchange {ExchangeName}");
                 channel.ExchangeDeclare(ExchangeName, ExchangeType.Topic);
             }
-            
+
             return new RabbitMqBusContext(connection, ExchangeName);
         }
-    }
 
+        /// <summary>
+        /// Creates a context with
+        ///  - an opened connection (based on the URI)
+        ///  - a declared Topic-Exchange (based on ExchangeName)
+        /// </summary>
+        public IBusContext<IConnection> CreateContext()
+        {
+            return CreateContext(new ConnectionFactory());
+        }
+    }
 }
