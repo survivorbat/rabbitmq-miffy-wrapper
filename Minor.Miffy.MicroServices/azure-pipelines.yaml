@@ -119,6 +119,7 @@ stages:
           - task: NuGetCommand@2
             displayName: 'nuget.org nuget push'
             inputs:
+              allowPackageConflicts: true
               command: 'push'
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'external'
