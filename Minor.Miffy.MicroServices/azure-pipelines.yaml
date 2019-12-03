@@ -38,13 +38,13 @@ stages:
               scannerMode: 'MSBuild'
               projectKey: $(projectKey)
               projectName: $(projectName)
-              
+
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
             inputs:
               projects: $(projects)
               arguments: '--configuration $(BuildConfiguration)'
-        
+
           - task: DotNetCoreCLI@2
             displayName: 'dotnet test'
             inputs:
@@ -83,7 +83,7 @@ stages:
               command: test
               projects: $(integrationTestProjects)
               arguments: '--configuration $(BuildConfiguration)'
-    
+
   - stage: Release
     displayName: Release
     dependsOn: Integration
@@ -112,7 +112,7 @@ stages:
             displayName: 'dotnet pack'
             inputs:
               command: 'pack'
-              packagesToPack: '**/*.csproj'
+              packagesToPack: $(projects)
               patchVersion: $(Build.BuildId)
               nobuild: true
 
