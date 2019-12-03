@@ -5,6 +5,17 @@ namespace Minor.Miffy.Test.Unit
     [TestClass]
     public class BusConfigurationExceptionTest
     {
+
+        [TestMethod]
+        public void BusConfigurationExceptionCanBeInstantiated()
+        {
+            // Act
+            new BusConfigurationException();
+
+            // Assert
+            // No exception \o/
+        }
+
         [TestMethod]
         [DataRow("Something went wrong!")]
         [DataRow("Not again! :/")]
@@ -12,7 +23,7 @@ namespace Minor.Miffy.Test.Unit
         {
             // Act
             var exception = new BusConfigurationException(message);
-            
+
             // Assert
             Assert.AreEqual(message, exception.Message);
         }
@@ -27,7 +38,7 @@ namespace Minor.Miffy.Test.Unit
 
             // Act
             var exception = new BusConfigurationException(message, innerException);
-            
+
             // Assert
             Assert.AreEqual(exception.Message, message);
             Assert.AreEqual(innerException, exception.InnerException);
