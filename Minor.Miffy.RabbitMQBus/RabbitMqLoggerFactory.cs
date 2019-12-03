@@ -1,16 +1,19 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Minor.Miffy.RabbitMQBus
 {
+    // TODO: Remove
+    [ExcludeFromCodeCoverage]
     public static class RabbitMqLoggerFactory
     {
         /// <summary>
         /// Logger factory defaults to Null to prevent errors from popping up
         /// </summary>
         private static ILoggerFactory _loggerFactory = new NullLoggerFactory();
-        
+
         /// <summary>
         /// The loggerfactory can only be used internally and can
         /// only be set once.
@@ -24,7 +27,7 @@ namespace Minor.Miffy.RabbitMQBus
                 {
                     _loggerFactory = value;
                 }
-                else 
+                else
                 {
                     throw new InvalidOperationException("Loggerfactory has already been set");
                 }

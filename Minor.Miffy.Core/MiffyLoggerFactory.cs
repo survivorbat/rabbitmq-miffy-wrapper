@@ -1,16 +1,19 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Minor.Miffy
 {
+    // TODO: Remove
+    [ExcludeFromCodeCoverage]
     public static class MiffyLoggerFactory
     {
         /// <summary>
         /// Initialize a loggerfactory field
         /// </summary>
         private static ILoggerFactory _loggerFactory = new NullLoggerFactory();
-        
+
         public static ILoggerFactory LoggerFactory
         {
             internal get => _loggerFactory;
@@ -20,13 +23,13 @@ namespace Minor.Miffy
                 {
                     _loggerFactory = value;
                 }
-                else 
+                else
                 {
                     throw new InvalidOperationException("Loggerfactory has already been set");
                 }
             }
         }
-        
+
         internal static ILogger<T> CreateInstance<T>() => LoggerFactory.CreateLogger<T>();
     }
 }
