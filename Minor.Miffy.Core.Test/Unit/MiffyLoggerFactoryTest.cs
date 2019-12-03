@@ -5,23 +5,23 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Minor.Miffy.RabbitMQBus.Test.Unit
+namespace Minor.Miffy.Test.Unit
 {
     [TestClass]
-    public class RabbitMqLoggerFactoryTest
+    public class MiffyLoggerFactoryTest
     {
         [TestMethod]
         public void LoggerFactoryIsStandardNullFactory()
         {
             // Assert
-            Assert.IsInstanceOfType(RabbitMqLoggerFactory.LoggerFactory, typeof(NullLoggerFactory));
+            Assert.IsInstanceOfType(MiffyLoggerFactory.LoggerFactory, typeof(NullLoggerFactory));
         }
 
         [TestMethod]
         public void CreateInstanceReturnsDesiredInstance()
         {
             // Act
-            var logger = RabbitMqLoggerFactory.CreateInstance<string>();
+            var logger = MiffyLoggerFactory.CreateInstance<string>();
             
             // Assert
             Assert.IsInstanceOfType(logger, typeof(Logger<string>));
@@ -33,20 +33,20 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Arrange
             Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>();
 
-            RabbitMqLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
+            MiffyLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
             
             // Act
-            void Act() => RabbitMqLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
+            void Act() => MiffyLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
 
             // Assert
             InvalidOperationException exception = Assert.ThrowsException<InvalidOperationException>(Act);
             Assert.AreEqual("Loggerfactory has already been set", exception.Message);
         }
-
+        
         [TestCleanup]
         public void TestCleanup()
         {
-            var prop = typeof(RabbitMqLoggerFactory).GetField("_loggerFactory", BindingFlags.Static);
+            var prop = typeof(MiffyLoggerFactory).GetField("_loggerFactory", BindingFlags.Static);
             prop?.SetValue(null, new NullLoggerFactory());
         }
     }

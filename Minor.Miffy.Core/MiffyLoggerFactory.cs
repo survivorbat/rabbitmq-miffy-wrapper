@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -5,7 +6,27 @@ namespace Minor.Miffy
 {
     public static class MiffyLoggerFactory
     {
-        public static ILoggerFactory LoggerFactory { get; set; } = new NullLoggerFactory();
-        public static ILogger<T> CreateInstance<T>() => LoggerFactory.CreateLogger<T>();
+        /// <summary>
+        /// Initialize a loggerfactory field
+        /// </summary>
+        private static ILoggerFactory _loggerFactory = new NullLoggerFactory();
+        
+        public static ILoggerFactory LoggerFactory
+        {
+            internal get => _loggerFactory;
+            set
+            {
+                if (LoggerFactory is NullLoggerFactory)
+                {
+                    _loggerFactory = value;
+                }
+                else 
+                {
+                    throw new InvalidOperationException("Loggerfactory has already been set");
+                }
+            }
+        }
+        
+        internal static ILogger<T> CreateInstance<T>() => LoggerFactory.CreateLogger<T>();
     }
 }
