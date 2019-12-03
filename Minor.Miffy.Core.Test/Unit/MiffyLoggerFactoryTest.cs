@@ -22,9 +22,22 @@ namespace Minor.Miffy.Test.Unit
         {
             // Act
             var logger = MiffyLoggerFactory.CreateInstance<string>();
-            
+
             // Assert
             Assert.IsInstanceOfType(logger, typeof(Logger<string>));
+        }
+
+        [TestMethod]
+        public void SettingLoggerWorks()
+        {
+            // Arrange
+            Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>();
+
+            // Act
+            MiffyLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
+
+            // Assert
+            Assert.AreSame(MiffyLoggerFactory.LoggerFactory, loggerFactoryMock.Object);
         }
 
         [TestMethod]
@@ -34,7 +47,7 @@ namespace Minor.Miffy.Test.Unit
             Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>();
 
             MiffyLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
-            
+
             // Act
             void Act() => MiffyLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
 
@@ -42,7 +55,7 @@ namespace Minor.Miffy.Test.Unit
             InvalidOperationException exception = Assert.ThrowsException<InvalidOperationException>(Act);
             Assert.AreEqual("Loggerfactory has already been set", exception.Message);
         }
-        
+
         [TestCleanup]
         public void TestCleanup()
         {

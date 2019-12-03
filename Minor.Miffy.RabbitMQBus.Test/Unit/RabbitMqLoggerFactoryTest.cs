@@ -22,9 +22,22 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         {
             // Act
             var logger = RabbitMqLoggerFactory.CreateInstance<string>();
-            
+
             // Assert
             Assert.IsInstanceOfType(logger, typeof(Logger<string>));
+        }
+
+        [TestMethod]
+        public void SettingLoggerWorks()
+        {
+            // Arrange
+            Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>();
+
+            // Act
+            RabbitMqLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
+
+            // Assert
+            Assert.AreSame(RabbitMqLoggerFactory.LoggerFactory, loggerFactoryMock.Object);
         }
 
         [TestMethod]
@@ -34,7 +47,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>();
 
             RabbitMqLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
-            
+
             // Act
             void Act() => RabbitMqLoggerFactory.LoggerFactory = loggerFactoryMock.Object;
 
