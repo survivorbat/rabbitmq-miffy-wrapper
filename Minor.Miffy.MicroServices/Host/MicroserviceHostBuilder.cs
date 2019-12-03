@@ -331,7 +331,6 @@ namespace Minor.Miffy.MicroServices.Host
             _loggerFactory = loggerFactory;
             _serviceCollection.AddSingleton(loggerFactory);
             _logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
-            _logger.LogInformation("Successfully set logger factory :-)");
             return this;
         }
 

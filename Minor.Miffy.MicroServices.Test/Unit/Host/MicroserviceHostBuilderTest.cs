@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Host;
 using Moq;
@@ -45,6 +46,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         {
             // Arrange
             var loggerFactoryMock = new Mock<ILoggerFactory>();
+
             var loggerFactory = loggerFactoryMock.Object;
 
             using var builder = new MicroserviceHostBuilder();
