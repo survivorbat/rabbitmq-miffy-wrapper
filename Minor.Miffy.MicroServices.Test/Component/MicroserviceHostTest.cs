@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -138,6 +139,29 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Method Handle does not have a proper " +
                             "commandlistener signature in type EventWithReturnTypeEventListener", exception.Message);
+        }
+
+        [TestMethod]
+        public void EventListenerWithReturnsInvalidOperationException()
+        {
+            //Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            using var host = hostBuilder
+                .AddEventListener<MissingDependencyEventListener>()
+                .CreateHost();
+
+            var eventListener = host.Listeners.First();
+
+            //Act
+            void Act() => eventListener.Callback.Invoke(new EventMessage());
+
+            //Assert
+            var exception = Assert.ThrowsException<InvalidOperationException>(Act);
+            bool containsErrorMessage = exception.Message.Contains(
+                "Unable to resolve service for type 'Minor.Miffy.MicroServices.Test.Component.EventListeners.MethodEventListener");
+            Assert.IsTrue(containsErrorMessage);
         }
     }
 }

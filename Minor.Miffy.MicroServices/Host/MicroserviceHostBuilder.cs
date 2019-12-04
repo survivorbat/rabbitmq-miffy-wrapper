@@ -182,7 +182,7 @@ namespace Minor.Miffy.MicroServices.Host
                         return;
                     }
 
-                    _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
+                    _logger.LogTrace($"Deserialized objectMissingEv from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
                     if (jsonObject == null)

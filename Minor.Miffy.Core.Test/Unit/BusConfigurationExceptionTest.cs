@@ -10,7 +10,7 @@ namespace Minor.Miffy.Test.Unit
         public void BusConfigurationExceptionCanBeInstantiated()
         {
             // Act
-            new BusConfigurationException();
+            var test = new BusConfigurationException();
 
             // Assert
             // No exception \o/
