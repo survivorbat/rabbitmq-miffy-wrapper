@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 0.8.3
+
+- Add several tests
+
 ## 0.8.2
 
 - Bring back single pipeline

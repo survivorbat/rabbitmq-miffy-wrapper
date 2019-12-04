@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
@@ -305,23 +306,23 @@ namespace Minor.Miffy.MicroServices.Host
                 return false;
             }
 
-            if (isCommandListener)
+            if (!isCommandListener)
             {
-                _logger.LogTrace($"Method {method.Name} appears to be a command listener. " +
-                                 "Evaluating its return type.");
+                return method.ReturnType == typeof(void);
+            }
 
-                if (method.ReturnType != parameterType)
-                {
-                    _logger.LogCritical($"Return type {method.ReturnType.Name} is not equal " +
-                                        $"to parameter type {parameterType.Name} of method {method.Name}");
+            _logger.LogTrace($"Method {method.Name} appears to be a command listener. " +
+                             "Evaluating its return type.");
 
-                    return false;
-                }
-
+            if (method.ReturnType == parameterType)
+            {
                 return true;
             }
 
-            return method.ReturnType == typeof(void);
+            _logger.LogCritical($"Return type {method.ReturnType.Name} is not equal " +
+                                $"to parameter type {parameterType.Name} of method {method.Name}");
+
+            return false;
         }
 
         /// <summary>
