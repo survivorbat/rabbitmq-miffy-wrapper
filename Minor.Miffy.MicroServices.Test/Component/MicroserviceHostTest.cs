@@ -194,6 +194,32 @@ namespace Minor.Miffy.MicroServices.Test.Component
             Assert.AreEqual(expectedResult, StringEventListenerDummy.ReceivedData);
         }
 
+        [TestMethod]
+        [DataRow("TestMessage")]
+        [DataRow("Very Important Data")]
+        [DataRow("{ secret }")]
+        public void CommandListenerWithNullReturnsNullProperly(string text)
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            using var host = hostBuilder
+                .AddEventListener<NullCommandListener>()
+                .CreateHost();
+
+            host.Start();
+
+            var publisher = new CommandPublisher(testContext);
+            var message = new DummyCommand {Text = text};
+
+            //Act
+            var result = publisher.PublishAsync<DummyCommand>(message);
+
+            // Assert
+            Assert.IsNull(result.Result);
+        }
+
         [TestInitialize]
         public void TestInitialize()
         {
