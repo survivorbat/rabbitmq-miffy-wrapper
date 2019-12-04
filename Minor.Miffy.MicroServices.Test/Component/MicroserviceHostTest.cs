@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
@@ -191,32 +192,6 @@ namespace Minor.Miffy.MicroServices.Test.Component
             var expectedResult = JsonConvert.SerializeObject(message);
 
             Assert.AreEqual(expectedResult, StringEventListenerDummy.ReceivedData);
-        }
-
-        [TestMethod]
-        [DataRow("TestMessage")]
-        [DataRow("Very Important Data")]
-        [DataRow("{ secret }")]
-        public void CommandListenerWithNullReturnsNullProperly(string text)
-        {
-            // Arrange
-            var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
-
-            using var host = hostBuilder
-                .AddEventListener<NullCommandListener>()
-                .CreateHost();
-
-            host.Start();
-
-            var publisher = new CommandPublisher(testContext);
-            var message = new DummyCommand {Text = text};
-
-            //Act
-            var result = publisher.PublishAsync<DummyCommand>(message);
-
-            // Assert
-            Assert.IsNull(result.Result);
         }
 
         [TestInitialize]

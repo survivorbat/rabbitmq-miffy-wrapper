@@ -183,14 +183,8 @@ namespace Minor.Miffy.MicroServices.Host
                         return;
                     }
 
-                    _logger.LogTrace($"Deserialized objectMissingEv from message with id {message.CorrelationId} and body {text}");
+                    _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-
-                    if (jsonObject == null)
-                    {
-                        _logger.LogCritical($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
-                        throw new BusConfigurationException($"Deserializing {text} to type {parameterType?.Name} resulted in a null object in eventlistener");
-                    }
 
                     _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                     method.Invoke(instance, new[] {jsonObject});
@@ -224,12 +218,6 @@ namespace Minor.Miffy.MicroServices.Host
 
                     _logger.LogTrace($"Deserialized command object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
-
-                    if (jsonObject == null)
-                    {
-                        _logger.LogCritical($"Deserializing {text} to command type {parameterType?.Name} resulted in a null object in commandlistener");
-                        throw new BusConfigurationException($"Deserializing {text} to command type {parameterType?.Name} resulted in a null object in commandlistener");
-                    }
 
                     _logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                     DomainCommand command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
