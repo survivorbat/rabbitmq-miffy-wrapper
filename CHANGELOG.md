@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 0.8.4-0.8.5
+
+- Add more tests to bring code coverage above 98%
+
 ## 0.8.3
 
 - Add several tests
