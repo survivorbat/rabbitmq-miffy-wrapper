@@ -8,13 +8,14 @@ using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
 using Minor.Miffy.MicroServices.Test.Component.EventListeners;
 using Minor.Miffy.TestBus;
+using Newtonsoft.Json;
 
 namespace Minor.Miffy.MicroServices.Test.Component
 {
     [TestClass]
     public class MicroserviceHostTest
     {
-        private const int WaitTime = 1500;
+        private const int WaitTime = 1000;
 
         [TestMethod]
         public void AddingListenerRegistersProperReceiver()
@@ -162,6 +163,40 @@ namespace Minor.Miffy.MicroServices.Test.Component
             bool containsErrorMessage = exception.Message.Contains(
                 "Unable to resolve service for type 'Minor.Miffy.MicroServices.Test.Component.EventListeners.MethodEventListener");
             Assert.IsTrue(containsErrorMessage);
+        }
+
+        [TestMethod]
+        [DataRow("TestMessage")]
+        [DataRow("Very Important Data")]
+        [DataRow("{ secret }")]
+        public void StringEventListenerReceivesProperString(string text)
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+
+            using var host = hostBuilder
+                .AddEventListener<StringEventListenerDummy>()
+                .CreateHost();
+
+            host.Start();
+
+            //Act
+            var message = new DummyEvent("test.topic") { DummyText = text };
+            new EventPublisher(testContext).Publish(message);
+
+            // Assert
+            Thread.Sleep(WaitTime);
+
+            var expectedResult = JsonConvert.SerializeObject(message);
+
+            Assert.AreEqual(expectedResult, StringEventListenerDummy.ReceivedData);
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            StringEventListenerDummy.ReceivedData = "";
         }
     }
 }
