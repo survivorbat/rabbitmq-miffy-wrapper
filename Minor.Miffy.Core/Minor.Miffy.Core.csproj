@@ -5,7 +5,7 @@
     <RootNamespace>Minor.Miffy</RootNamespace>
     <Title>MaartenH.Minor.Miffy.Abstractions</Title>
     <Description>Package containing the interfaces and testbus of the Miffy Framework</Description>
-    <PackageVersion>0.8.3</PackageVersion>
+    <PackageVersion>0.8.4</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Abstractions</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ Events Commands Bus</PackageTags>

@@ -6,7 +6,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
     {
         public string Text { get; set; }
 
-        protected DummyCommand() : base("test.queue")
+        public DummyCommand() : base("test.queue")
         {
         }
     }
