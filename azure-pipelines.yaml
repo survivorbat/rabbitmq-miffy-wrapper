@@ -49,7 +49,7 @@ stages:
               projectKey: $(projectKey)
               projectName: $(projectName)
               extraProperties: |
-                sonar.branch.name=
+                sonar.branch.name=refs/heads/master
 
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
@@ -66,10 +66,17 @@ stages:
 
           - task: SonarQubeAnalyze@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
+            inputs:
+              extraProperties: |
+                sonar.branch.name=refs/heads/master
+
           - task: SonarQubePublish@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
               pollingTimeoutSec: '300'
+              extraProperties: |
+                sonar.branch.name=refs/heads/master
+
           - task: sonar-buildbreaker@8
             condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
