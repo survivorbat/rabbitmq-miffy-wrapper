@@ -49,7 +49,7 @@ stages:
               projectKey: $(projectKey)
               projectName: $(projectName)
               extraProperties: |
-                sonar.branch.name=master
+                sonar.branch.name=refs/heads/master
 
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
