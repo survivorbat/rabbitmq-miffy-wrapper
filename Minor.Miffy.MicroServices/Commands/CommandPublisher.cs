@@ -32,15 +32,6 @@ namespace Minor.Miffy.MicroServices.Commands
         }
 
         /// <summary>
-        /// Synchronous variant of the PublishAsync that basically only
-        /// returns the result of the async one.
-        /// </summary>
-        public TReturn Publish<TReturn>(DomainCommand domainCommand)
-        {
-            return PublishAsync<TReturn>(domainCommand).Result;
-        }
-
-        /// <summary>
         /// Publish a domain command with a specific return result
         /// </summary>
         public async Task<TReturn> PublishAsync<TReturn>(DomainCommand domainCommand)

@@ -4,7 +4,6 @@
 
 - Rename several senders/receivers to make naming consistent
 - Add comments notifying the user that a component is low-level
-- Add a Publish() method to the command publisher
 - Allow a custom command return type to be used in command listeners
 
 ## 0.8.4-0.8.5

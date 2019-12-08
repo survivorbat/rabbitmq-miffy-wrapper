@@ -99,7 +99,7 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
 
             ICommandPublisher publisher = new CommandPublisher(testContext);
 
-            Animal[] animals = publisher.Publish<IEnumerable<Animal>>(message).ToArray();
+            Animal[] animals = publisher.PublishAsync<IEnumerable<Animal>>(message).Result.ToArray();
             Assert.AreEqual(2, animals.Length);
         }
     }

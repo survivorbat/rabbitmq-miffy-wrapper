@@ -125,7 +125,7 @@ namespace ExampleMicroService
              */
             ICommandPublisher commandPublisher = new CommandPublisher(context, loggerFactory);
             HaalPolissenOpCommand command = new HaalPolissenOpCommand();
-            HaalPolissenOpCommandResult commandResult = commandPublisher.Publish<HaalPolissenOpCommandResult>(command);
+            HaalPolissenOpCommandResult commandResult = commandPublisher.PublishAsync<HaalPolissenOpCommandResult>(command).Result;
 
             /**
              * Now, print the result!
