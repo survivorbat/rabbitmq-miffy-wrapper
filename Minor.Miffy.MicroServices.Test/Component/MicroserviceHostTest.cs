@@ -96,22 +96,6 @@ namespace Minor.Miffy.MicroServices.Test.Component
         }
 
         [TestMethod]
-        public void ListenerWithWrongReturnTypeThrowsException()
-        {
-            // Arrange
-            var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
-
-            // Act
-            void Act() => hostBuilder.AddEventListener<WrongReturnEventListener>();
-
-            // Assert
-            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
-            Assert.AreEqual("Method Handle does not have a proper " +
-                            "commandlistener signature in type WrongReturnEventListener", exception.Message);
-        }
-
-        [TestMethod]
         public void ListenerWithWrongParameterCountThrowsException()
         {
             // Arrange

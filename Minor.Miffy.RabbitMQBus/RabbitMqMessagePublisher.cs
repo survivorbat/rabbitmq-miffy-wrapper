@@ -4,13 +4,18 @@ using RabbitMQ.Client.Framing;
 
 namespace Minor.Miffy.RabbitMQBus
 {
+    /// <summary>
+    /// Low-level implementation of sending messages over a bus
+    ///
+    /// If you want to publish events, consider using the CommandPublisher from the microservices package.
+    /// </summary>
     public class RabbitMqMessagePublisher : IMessageSender
     {
         /// <summary>
         /// Connection to the broker
         /// </summary>
         private readonly IConnection _connection;
-        
+
         /// <summary>
         /// Name of the xchange being used
         /// </summary>
@@ -37,7 +42,7 @@ namespace Minor.Miffy.RabbitMQBus
         public void SendMessage(EventMessage message)
         {
             using IModel channel = _connection.CreateModel();
-            
+
             _logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
                                    $", topic {message.Topic} and type {message.EventType}");
 

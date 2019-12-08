@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +5,14 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Framing;
 
 namespace Minor.Miffy.RabbitMQBus
 {
+    /// <summary>
+    /// Low-level implementation of sending commands over a bus
+    ///
+    /// If you want to publish commands, consider using the CommandPublisher from the microservices package.
+    /// </summary>
     public class RabbitMqCommandSender : ICommandSender
     {
         internal const int CommandTimeout = 15000;
@@ -53,7 +54,7 @@ namespace Minor.Miffy.RabbitMQBus
                 props.ReplyTo = replyQueue;
                 request.ReplyQueue = replyQueue;
                 props.Timestamp = new AmqpTimestamp(request.Timestamp);
-                
+
                 _logger.LogInformation($"Sending command with id {props.CorrelationId}, reply queue {props.ReplyTo} and destination {request.DestinationQueue}");
 
                 ManualResetEvent resetEvent = new ManualResetEvent(false);
@@ -67,7 +68,7 @@ namespace Minor.Miffy.RabbitMQBus
                     }
 
                     _logger.LogInformation($"Received response with id {request.CorrelationId} on queue {replyQueue} from {request.DestinationQueue}");
-                    
+
                     var response = Encoding.Unicode.GetString(ea.Body);
 
                     result = JsonConvert.DeserializeObject<CommandMessage>(response);
@@ -76,14 +77,14 @@ namespace Minor.Miffy.RabbitMQBus
                     {
                         result = JsonConvert.DeserializeObject<CommandError>(response);
                     }
-                    
+
                     channel.BasicAck(ea.DeliveryTag, false);
                     resetEvent.Set();
                 };
-                
+
                 channel.BasicConsume(replyQueue, false, "", false, false, null, consumer);
                 channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, true, props, request.Body);
-                
+
                 resetEvent.WaitOne(CommandTimeout);
 
                 if (result is CommandError error)
@@ -92,8 +93,8 @@ namespace Minor.Miffy.RabbitMQBus
                                      $"from queue {request.DestinationQueue} in reply queue {replyQueue}. " +
                                      $"Type: {error.Exception.GetType().Name} " +
                                      $"Errormessage: {error.Exception.Message}");
-                    
-                    throw new DestinationQueueException($"Received error command from queue {request.DestinationQueue}", 
+
+                    throw new DestinationQueueException($"Received error command from queue {request.DestinationQueue}",
                         error.Exception, replyQueue, request.DestinationQueue, request.CorrelationId);
                 }
 

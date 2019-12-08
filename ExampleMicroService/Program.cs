@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using ICommandPublisher = Minor.Miffy.MicroServices.Commands.ICommandPublisher;
 
 namespace ExampleMicroService
 {
@@ -28,7 +29,7 @@ namespace ExampleMicroService
          * MicroserviceHost with RabbitMQ in the Main method
          *
          * Setting up a functioning RabbitMQ instance with docker is as easy as running:
-         * docker run -d -p 15672:15672 -p 5672:5672 rabbitmq:3-management  
+         * docker run -d -p 15672:15672 -p 5672:5672 rabbitmq:3-management
          */
         static void Main(string[] args)
         {
@@ -57,20 +58,20 @@ namespace ExampleMicroService
              */
             RabbitMqContextBuilder contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("MVM.EventExchange")
-                    .WithConnectionString("amqp://guest:guest@localhost");  
-            
+                    .WithConnectionString("amqp://guest:guest@localhost");
+
             /*
              * Now instantiate the context and ensure that it's disposed of by using a
              * 'using' statement.
              */
             using IBusContext<IConnection> context = contextBuilder.CreateContext();
 
-            
+
             /**
              * Create a dummy database context for testing with an in-memory database
              */
             PolisContext databaseContext = new PolisContext();
-            
+
             /**
              * Now create a builder that will build our microservice host.
              *
@@ -104,8 +105,8 @@ namespace ExampleMicroService
              */
             string[] names = { "Jack", "Jake", "Penny", "Robin", "Rick", "Vinny", "Spencer" };
             IEventPublisher publisher = new EventPublisher(context, loggerFactory);
-            
-            foreach (string name in names) 
+
+            foreach (string name in names)
             {
                 PolisToegevoegdEvent toegevoegdEvent = new PolisToegevoegdEvent
                 {
@@ -113,29 +114,27 @@ namespace ExampleMicroService
                 };
                 publisher.Publish(toegevoegdEvent);
             }
-            
+
             /**
              * Now let's wait 1 second for all the events to arrive and be processed
              */
             Thread.Sleep(1000);
-            
+
             /**
              * Now let's fire a command and retrieve a list of polissen
              */
             ICommandPublisher commandPublisher = new CommandPublisher(context, loggerFactory);
             HaalPolissenOpCommand command = new HaalPolissenOpCommand();
-            
-            Task<HaalPolissenOpCommand> commandResultTask = commandPublisher.PublishAsync<HaalPolissenOpCommand>(command);
-            HaalPolissenOpCommand commandResult = commandResultTask.Result;
-            
+            HaalPolissenOpCommandResult commandResult = commandPublisher.Publish<HaalPolissenOpCommandResult>(command);
+
             /**
              * Now, print the result!
              */
-            foreach (Polis polis in commandResult.Polisses)
+            foreach (Polis polis in commandResult.Polissen)
             {
                 Console.WriteLine($"Found polis for {polis.Klantnaam} with ID {polis.Id}");
             }
-            
+
             /**
              * Lastly, let's see how the queue deals with exceptions on the other side
              */
@@ -151,7 +150,7 @@ namespace ExampleMicroService
             catch (AggregateException expectedException)
             {
                 DestinationQueueException destinationQueueException = expectedException.InnerExceptions.First() as DestinationQueueException;
-                
+
                 /**
                  * Now the expectedException.Innerexception will reveal all the info we need
                  */

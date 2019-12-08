@@ -1,9 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.MicroServices.Test.Conventions.Component.Commands;
 using Minor.Miffy.MicroServices.Test.Conventions.Component.Event;
 using Minor.Miffy.MicroServices.Test.Conventions.Component.EventListeners;
+using Minor.Miffy.MicroServices.Test.Conventions.Component.Models;
 using Minor.Miffy.TestBus;
 
 namespace Minor.Miffy.MicroServices.Test.Conventions.Component
@@ -73,6 +79,28 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component
             Assert.IsNull(EventListenerDummy.HandlesResult);
             Assert.IsNull(EventListenerDummy2.HandlesResult);
             Assert.AreEqual(message, EventListenerDummy3.HandlesResult);
+        }
+
+        [TestMethod]
+        public void UseConventionsRegistersProperCommandListeners()
+        {
+            // Arrange
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder()
+                .WithBusContext(testContext);
+
+            // Act
+            hostBuilder.UseConventions();
+
+            hostBuilder.CreateHost().Start();
+
+            // Assert
+            var message = new GetAnimalsCommand();
+
+            ICommandPublisher publisher = new CommandPublisher(testContext);
+
+            Animal[] animals = publisher.Publish<IEnumerable<Animal>>(message).ToArray();
+            Assert.AreEqual(2, animals.Length);
         }
     }
 }

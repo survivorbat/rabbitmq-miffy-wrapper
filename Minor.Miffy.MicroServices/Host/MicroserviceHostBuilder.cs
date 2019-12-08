@@ -203,6 +203,7 @@ namespace Minor.Miffy.MicroServices.Host
             }
 
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
+            Type returnType = method.ReturnType;
 
             _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
             _commandListeners.Add(new MicroserviceCommandListener
@@ -220,18 +221,18 @@ namespace Minor.Miffy.MicroServices.Host
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
                     _logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
-                    DomainCommand command = method.Invoke(instance, new[] {jsonObject}) as DomainCommand;
+                    object returnCommand = method.Invoke(instance, new[] {jsonObject});
 
                     _logger.LogTrace("Serializing result command");
-                    string jsonReturn = JsonConvert.SerializeObject(command);
+                    string jsonReturn = JsonConvert.SerializeObject(returnCommand);
 
-                    _logger.LogTrace($"Returning new CommandMessage with timestamp {command?.Timestamp}, id {command?.Id}, EventType {command?.GetType().Name}, body {jsonReturn}");
+                    _logger.LogTrace($"Returning new CommandMessage with timestamp {message?.Timestamp}, id {message.CorrelationId}, EventType {returnType.Name} and body {jsonReturn}");
                     return new CommandMessage
                     {
                         Timestamp = message.Timestamp,
                         Body = Encoding.Unicode.GetBytes(jsonReturn),
                         CorrelationId = message.CorrelationId,
-                        EventType = message.EventType
+                        EventType = returnType.Name
                     };
                 }
             });
@@ -299,18 +300,7 @@ namespace Minor.Miffy.MicroServices.Host
                 return method.ReturnType == typeof(void);
             }
 
-            _logger.LogTrace($"Method {method.Name} appears to be a command listener. " +
-                             "Evaluating its return type.");
-
-            if (method.ReturnType == parameterType)
-            {
-                return true;
-            }
-
-            _logger.LogCritical($"Return type {method.ReturnType.Name} is not equal " +
-                                $"to parameter type {parameterType.Name} of method {method.Name}");
-
-            return false;
+            return true;
         }
 
         /// <summary>

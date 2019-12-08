@@ -27,12 +27,14 @@ namespace ExampleMicroService.EventListeners
         /// Receives a command, then returns a changed command
         /// </summary>
         [CommandListener("MVM.TestService.HaalPolissenOpQueue")]
-        public HaalPolissenOpCommand Handles(HaalPolissenOpCommand command)
+        public HaalPolissenOpCommandResult Handles(HaalPolissenOpCommand command)
         {
-            command.Polisses = _context.Polissen.ToArray();
-            return command;
+            return new HaalPolissenOpCommandResult
+            {
+                Polissen = _context.Polissen.ToArray()
+            };
         }
-        
+
         /// <summary>
         /// Handle a Command and immediately throw an exception without any reason
         /// </summary>

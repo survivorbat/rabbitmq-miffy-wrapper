@@ -42,7 +42,7 @@ stages:
           vmImage: 'windows-latest'
         steps:
           - task: SonarQubePrepare@4
-            condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
+            condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
               SonarQube: 'SonarQube Service Connection'
               scannerMode: 'MSBuild'
@@ -63,13 +63,13 @@ stages:
               arguments: '--configuration $(BuildConfiguration) --collect:"Code Coverage"'
 
           - task: SonarQubeAnalyze@4
-            condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
+            condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
           - task: SonarQubePublish@4
-            condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
+            condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
               pollingTimeoutSec: '300'
           - task: sonar-buildbreaker@8
-            condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
+            condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
               SonarQube: 'SonarQube Service Connection'
 

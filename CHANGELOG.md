@@ -1,5 +1,12 @@
 # Changelog Miffy Framework
 
+## 0.9.0
+
+- Rename several senders/receivers to make naming consistent
+- Add comments notifying the user that a component is low-level
+- Add a Publish() method to the command publisher
+- Allow a custom command return type to be used in command listeners
+
 ## 0.8.4-0.8.5
 
 - Add more tests to bring code coverage above 98%
