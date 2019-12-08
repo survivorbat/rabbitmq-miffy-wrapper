@@ -41,7 +41,6 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
-          - bash: git checkout -b master
           - task: SonarQubePrepare@4
             condition: eq(variables['build.sourcebranch'], 'refs/heads/develop')
             inputs:
@@ -49,6 +48,8 @@ stages:
               scannerMode: 'MSBuild'
               projectKey: $(projectKey)
               projectName: $(projectName)
+              extraProperties: |
+                sonar.branch.name=master
 
           - task: DotNetCoreCLI@2
             displayName: 'dotnet build'
