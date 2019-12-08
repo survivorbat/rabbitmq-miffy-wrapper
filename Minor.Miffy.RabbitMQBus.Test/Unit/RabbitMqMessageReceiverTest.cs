@@ -23,14 +23,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            
+
             // Act
             var result = new RabbitMqMessageReceiver(contextMock.Object, queueName, null);
 
             // Assert
             Assert.AreEqual(queueName, result.QueueName);
         }
-        
+
         [TestMethod]
         [DataRow("test,topic,random")]
         [DataRow("routing,key,is,what,we,call,it")]
@@ -41,14 +41,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            
+
             // Act
             var result = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", topicNames);
 
             // Assert
             Assert.AreSame(topicNames, result.TopicFilters);
         }
-        
+
         [TestMethod]
         public void CreateModelIsCalledInConstructor()
         {
@@ -56,9 +56,9 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            
+
             // Act
-            new RabbitMqMessageReceiver(contextMock.Object, "test.queue", null);
+            _ = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", null);
 
             // Assert
             connectionMock.Verify(e => e.CreateModel());
@@ -73,19 +73,19 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var modelMock = new Mock<IModel>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
 
             receiver.StartReceivingMessages();
 
             // Act
             void Act() => receiver.StartReceivingMessages();
-            
+
             // Assert
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Receiver is already listening to events!", exception.Message);
         }
-        
+
         [TestMethod]
         [DataRow("test.queue")]
         [DataRow("queue.test")]
@@ -97,7 +97,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var modelMock = new Mock<IModel>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, queueName, new string[0]);
 
             // Act
@@ -106,7 +106,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             modelMock.Verify(e => e.QueueDeclare(queueName, true, false, false, null));
         }
-        
+
         [TestMethod]
         [DataRow("test.exchange", "test.queue", "huis,boom,beest")]
         [DataRow("TestExchange", "QueueTest", "blackjack,player")]
@@ -153,7 +153,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Receiver is not listening to events", exception.Message);
         }
-        
+
         [TestMethod]
         [DataRow("test.queue")]
         [DataRow("TestQueue")]
@@ -170,7 +170,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, queueName, new string[0]);
 
             receiver.StartReceivingMessages();
-            
+
             // Act
             receiver.StartHandlingMessages(e => {});
 
@@ -191,7 +191,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
 
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
             modelMock.Setup(e => e.BasicConsume("test.queue", true, "", false, false, null, It.IsAny<IBasicConsumer>()))
@@ -208,7 +208,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 CorrelationId = guid.ToString(),
                 Type = eventType
             };
-            
+
             // Act
             Thread.Sleep(WaitTime);
             consumer.HandleBasicDeliver("", 0, false, exchangeName, topic, properties, new byte[0]);
@@ -226,17 +226,17 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
 
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
-            
+
             // Act
             receiver.Dispose();
-            
+
             // Assert
             modelMock.Verify(e => e.Dispose());
-        } 
+        }
     }
 }

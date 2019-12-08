@@ -22,14 +22,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            
+
             // Act
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
 
             // Assert
             Assert.AreEqual(queueName, receiver.QueueName);
         }
-        
+
         [TestMethod]
         public void CreateModelIsCalledInConstructor()
         {
@@ -37,9 +37,9 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            
+
             // Act
-            new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
+            _ = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
 
             // Assert
             connectionMock.Verify(e => e.CreateModel());
@@ -54,12 +54,12 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
-            
+
             // Act
             receiver.DeclareCommandQueue();
 
@@ -67,7 +67,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             modelMock.Verify(
                 e => e.QueueDeclare(queueName, true, false, false, null));
         }
-        
+
         [TestMethod]
         [DataRow("test.queue", "test.exchange")]
         [DataRow("test.queue", "exchange.test")]
@@ -79,20 +79,20 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             contextMock.SetupGet(e => e.ExchangeName).Returns(exchangeName);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
-            
+
             // Act
             receiver.DeclareCommandQueue();
 
             // Assert
             modelMock.Verify(e => e.QueueBind(queueName, exchangeName, queueName, null));
         }
-        
+
         [TestMethod]
         [DataRow("test.queue")]
         [DataRow("queue.test")]
@@ -102,12 +102,12 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
-            
+
             receiver.DeclareCommandQueue();
 
             // Act
@@ -117,7 +117,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual($"Queue {queueName} has already been declared!", exception.Message);
         }
-        
+
         [TestMethod]
         [DataRow("test.queue")]
         [DataRow("queue.test")]
@@ -127,10 +127,10 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-            
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
 
             // Act
@@ -148,15 +148,15 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
 
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             // Act
             receiver.Dispose();
-            
+
             // Assert
             modelMock.Verify(e => e.Dispose());
         }
@@ -171,17 +171,17 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
 
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
-            
+
             receiver.DeclareCommandQueue();
-            
+
             // Act
             receiver.StartReceivingCommands(e => new CommandMessage());
-            
+
             // Assert
             modelMock.Verify(e => e.BasicConsume(queueName, false, "", false, false, null, It.IsAny<IBasicConsumer>()));
         }
@@ -194,21 +194,21 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         {
             // Arrange
             byte[] byteBody = Encoding.Unicode.GetBytes(body);
-            
+
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
-                
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             CommandMessage result = new CommandMessage();
-            
+
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
@@ -220,20 +220,20 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 Type = type,
                 CorrelationId = guid.ToString()
             };
-            
+
             receiver.DeclareCommandQueue();
             receiver.StartReceivingCommands(e => result = e);
 
             // Act
             consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, byteBody);
-            
+
             // Assert
             Assert.AreEqual(byteBody, result.Body);
             Assert.AreEqual(guid, result.CorrelationId);
             Assert.AreEqual(type, result.EventType);
             Assert.AreEqual(replyQueue, result.ReplyQueue);
         }
-        
+
         [TestMethod]
         [DataRow("Random exception was thrown")]
         [DataRow("Apocalyptic exception was thrown")]
@@ -244,30 +244,30 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
-                
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
-            // Retrieve basic publish data 
+            // Retrieve basic publish data
             byte[] resultBody = null;
-            modelMock.Setup(e => e.BasicPublish(It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                false, 
+            modelMock.Setup(e => e.BasicPublish(It.IsAny<string>(),
+                It.IsAny<string>(),
+                false,
                 It.IsAny<IBasicProperties>(),
                 It.IsAny<byte[]>()))
                 .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => resultBody = body);
-            
+
             var properties = new BasicProperties { CorrelationId = Guid.NewGuid().ToString() };
-            
+
             receiver.DeclareCommandQueue();
             receiver.StartReceivingCommands(e => throw new Exception(message));
 
@@ -279,7 +279,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var commandError = JsonConvert.DeserializeObject<CommandError>(stringBody);
             Assert.AreEqual(message, commandError.Exception.Message);
         }
-        
+
         [TestMethod]
         [DataRow("test.exchange", "reply.queue", "Hello World")]
         public void ConsumerCallsBasicPublishWithValues(string exchangeName, string replyTo, string message)
@@ -288,28 +288,28 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             contextMock.SetupGet(e => e.ExchangeName).Returns(exchangeName);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
-                
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
-            
+
             var properties = new BasicProperties
             {
                 CorrelationId = Guid.NewGuid().ToString(),
                 ReplyTo = replyTo
             };
-            
+
             var responseMessage = new CommandMessage {Body = Encoding.Unicode.GetBytes(message) };
-            
+
             receiver.DeclareCommandQueue();
             receiver.StartReceivingCommands(e => responseMessage);
 
@@ -319,10 +319,10 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             var jsonResponse = JsonConvert.SerializeObject(responseMessage);
             var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
-            modelMock.Verify(e => e.BasicPublish(exchangeName, 
+            modelMock.Verify(e => e.BasicPublish(exchangeName,
                 replyTo,
-                false, 
-                It.IsAny<IBasicProperties>(), 
+                false,
+                It.IsAny<IBasicProperties>(),
                 bodyResponse));
         }
 
@@ -336,45 +336,45 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             contextMock.SetupGet(e => e.ExchangeName).Returns("test.exchange");
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
-                
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
-            
+
             var properties = new BasicProperties
             {
                 CorrelationId = Guid.NewGuid().ToString(),
                 ReplyTo = "reply.queue"
             };
-            
+
             var exception = new Exception(exceptionMessage);
             receiver.DeclareCommandQueue();
             receiver.StartReceivingCommands(e => throw exception);
 
             var expectedBody = new byte[0];
-            modelMock.Setup(e => e.BasicPublish("test.exchange", 
+            modelMock.Setup(e => e.BasicPublish("test.exchange",
                 "reply.queue",
-                false, 
-                It.IsAny<IBasicProperties>(), 
+                false,
+                It.IsAny<IBasicProperties>(),
                 It.IsAny<byte[]>()))
                 .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => expectedBody = body);
-            
+
             // Act
             consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
 
             // Assert
             var stringBody = Encoding.Unicode.GetString(expectedBody);
             CommandError error = JsonConvert.DeserializeObject<CommandError>(stringBody);
-            
+
             Assert.AreEqual(error.Exception.Message, exceptionMessage);
         }
 
@@ -386,25 +386,25 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         {
             // Arrange
             ulong deliveryTag = UInt64.Parse(deliveryTagLong.ToString());
-            
+
             var connectionMock = new Mock<IConnection>();
             var contextMock = new Mock<IBusContext<IConnection>>();
             var modelMock = new Mock<IModel>();
-            
+
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
-                
+
             var receiver = new RabbitMqCommandReceiver(contextMock.Object, "test.queue");
-            
+
             IBasicConsumer consumer = null;
-            
+
             // Retrieve consumer from callback
             modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
-            
+
             var properties = new BasicProperties { CorrelationId = Guid.NewGuid().ToString() };
-            
+
             receiver.DeclareCommandQueue();
             receiver.StartReceivingCommands(e => new CommandMessage());
 
