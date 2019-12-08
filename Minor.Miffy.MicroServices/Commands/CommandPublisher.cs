@@ -14,7 +14,7 @@ namespace Minor.Miffy.MicroServices.Commands
         /// <summary>
         /// Sender to send a message through the bus
         /// </summary>
-        private readonly Miffy.ICommandSender _sender;
+        private readonly ICommandSender _sender;
 
         /// <summary>
         /// Logger

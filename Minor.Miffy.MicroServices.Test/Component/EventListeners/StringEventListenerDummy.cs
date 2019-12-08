@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Component.EventListeners

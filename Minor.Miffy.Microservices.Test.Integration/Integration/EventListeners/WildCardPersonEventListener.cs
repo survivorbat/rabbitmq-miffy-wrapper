@@ -1,4 +1,3 @@
-using Minor.Miffy.MicroServices;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 

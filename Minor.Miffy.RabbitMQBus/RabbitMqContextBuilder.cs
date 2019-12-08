@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy.RabbitMQBus.Constants;
 using RabbitMQ.Client;

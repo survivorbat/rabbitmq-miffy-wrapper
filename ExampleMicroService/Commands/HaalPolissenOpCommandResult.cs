@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using ExampleMicroService.Models;
-using Minor.Miffy.MicroServices.Commands;
 
 namespace ExampleMicroService.Commands
 {

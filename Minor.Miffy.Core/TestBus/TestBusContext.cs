@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
 
 namespace Minor.Miffy.TestBus
 {

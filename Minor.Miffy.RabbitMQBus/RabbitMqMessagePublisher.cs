@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Framing;
 
 namespace Minor.Miffy.RabbitMQBus
 {
