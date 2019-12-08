@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 0.9.1
+
+- Optimize imports
+
 ## 0.9.0
 
 - Rename several senders/receivers to make naming consistent
