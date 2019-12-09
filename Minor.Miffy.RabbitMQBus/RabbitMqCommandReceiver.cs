@@ -17,11 +17,6 @@ namespace Minor.Miffy.RabbitMQBus
         private const string CommandErrorType = "CommandError";
 
         /// <summary>
-        /// Testbus context
-        /// </summary>
-        private readonly IBusContext<IConnection> _context;
-
-        /// <summary>
         /// Model used to send messages
         /// </summary>
         private readonly IModel _model;
@@ -46,7 +41,6 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public RabbitMqCommandReceiver(IBusContext<IConnection> context, string queueName)
         {
-            _context = context;
             _model = context.Connection.CreateModel();
             QueueName = queueName;
             _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqCommandReceiver>();
