@@ -1,7 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
-using RabbitMQ.Client;
 
 namespace Minor.Miffy.TestBus
 {

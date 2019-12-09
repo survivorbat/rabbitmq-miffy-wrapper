@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Minor.Miffy
+﻿namespace Minor.Miffy
 {
     public interface IMessageSender
     {

@@ -16,7 +16,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Commands
         [DataRow("MVM.Blackjack.AddUser", "Nijntje, lief klein konijntje")]
         [DataRow("MVM.Blackjack.Begin", "Nieuwe speler toegevoegd")]
         [DataRow("EDA.Start.Machine", "The machine has started!")]
-        public void CreateCommandSenderCallsPublishOnSender(string destQueue, string body)
+        public void PublishAsyncCallsPublishAsyncOnSender(string destQueue, string body)
         {
             // Arrange
             var contextMock = new Mock<IBusContext<IConnection>>();
@@ -24,7 +24,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Commands
 
             contextMock.Setup(e => e.CreateCommandSender())
                 .Returns(senderMock.Object);
-            
+
             CommandMessage message = new CommandMessage();
 
             senderMock.Setup(e => e.SendCommandAsync(It.IsAny<CommandMessage>()))
@@ -33,12 +33,12 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Commands
             var sender = new CommandPublisher(contextMock.Object);
 
             var command = new TestCommand(destQueue);
-            
+
             var jsonBody = JsonConvert.SerializeObject(command);
-            
+
             // Act
             sender.PublishAsync<TestCommand>(command);
-            
+
             // Assert
             Assert.AreEqual(destQueue, message.DestinationQueue);
             Assert.AreEqual(command.Id, message.CorrelationId);
@@ -59,17 +59,17 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Commands
 
             contextMock.Setup(e => e.CreateCommandSender())
                 .Returns(senderMock.Object);
-            
+
             senderMock.Setup(e => e.SendCommandAsync(It.IsAny<CommandMessage>()))
                 .Returns(Task.Run(() => new CommandMessage {Body = null}));
 
             var sender = new CommandPublisher(contextMock.Object);
-            
+
             var command = new TestCommand(destQueue);
 
             // Act
             async Task<TestCommand> Act() => await sender.PublishAsync<TestCommand>(command);
-            
+
             // Assert
             DestinationQueueException exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act).Result;
             Assert.AreEqual($"ArgumentNullException was thrown, most likely because the destination queue {destQueue} replied with an empty body.", exception.Message);

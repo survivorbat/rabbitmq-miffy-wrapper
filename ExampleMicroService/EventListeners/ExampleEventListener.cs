@@ -42,15 +42,14 @@ namespace ExampleMicroService.EventListeners
         }
 
         /// <summary>
-        /// A string listener that gets
+        /// A string listener that gets the json result of the item
         /// </summary>
-        /// <param name="evt"></param>
         [EventListener("MVM.TestService.StringListener")]
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(string evt)
         {
             _logger.LogInformation($"Received a string event! String: {evt}");
-            Console.WriteLine(evt);
+            Console.WriteLine($"String listener received: {evt}");
         }
     }
 }

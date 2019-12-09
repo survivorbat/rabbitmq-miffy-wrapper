@@ -9,6 +9,6 @@ namespace Minor.Miffy
         void DeclareCommandQueue();
         void StartReceivingCommands(CommandReceivedCallback callback);
     }
-    
+
     public delegate CommandMessage CommandReceivedCallback(CommandMessage commandMessage);
 }

@@ -1,19 +1,18 @@
-﻿using Minor.Miffy;
-using Minor.Miffy.RabbitMQBus;
-using RabbitMQ.Client;
-using System;
+﻿using System;
 using System.Linq;
-using ExampleMicroService.DAL;
 using System.Threading;
-using System.Threading.Tasks;
 using ExampleMicroService.Commands;
+using ExampleMicroService.DAL;
 using ExampleMicroService.Events;
 using ExampleMicroService.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Minor.Miffy;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.RabbitMQBus;
+using RabbitMQ.Client;
 
 namespace ExampleMicroService
 {
@@ -123,14 +122,12 @@ namespace ExampleMicroService
              */
             ICommandPublisher commandPublisher = new CommandPublisher(context, loggerFactory);
             HaalPolissenOpCommand command = new HaalPolissenOpCommand();
-
-            Task<HaalPolissenOpCommand> commandResultTask = commandPublisher.PublishAsync<HaalPolissenOpCommand>(command);
-            HaalPolissenOpCommand commandResult = commandResultTask.Result;
+            HaalPolissenOpCommandResult commandResult = commandPublisher.PublishAsync<HaalPolissenOpCommandResult>(command).Result;
 
             /**
              * Now, print the result!
              */
-            foreach (Polis polis in commandResult.Polisses)
+            foreach (Polis polis in commandResult.Polissen)
             {
                 Console.WriteLine($"Found polis for {polis.Klantnaam} with ID {polis.Id}");
             }

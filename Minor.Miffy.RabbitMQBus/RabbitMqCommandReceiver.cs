@@ -1,8 +1,5 @@
 using System;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -10,6 +7,11 @@ using RabbitMQ.Client.Events;
 
 namespace Minor.Miffy.RabbitMQBus
 {
+    /// <summary>
+    /// Low-level implementation of receiving commands from a bus
+    ///
+    /// If you want to receive commands in a listener, consider using Commandlisteners in the microservice package
+    /// </summary>
     public class RabbitMqCommandReceiver : ICommandReceiver
     {
         private const string CommandErrorType = "CommandError";
@@ -115,6 +117,9 @@ namespace Minor.Miffy.RabbitMQBus
                 }
 
                 string responseMessage = JsonConvert.SerializeObject(response);
+
+                _logger.LogTrace($"Publishing command response with id {ea.BasicProperties.CorrelationId} " +
+                                 $"reply queue {ea.BasicProperties.ReplyTo} and body {responseMessage}");
 
                 _model.BasicPublish(
                     _context.ExchangeName,

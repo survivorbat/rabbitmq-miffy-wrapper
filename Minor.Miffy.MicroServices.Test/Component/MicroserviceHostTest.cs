@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
@@ -93,22 +92,6 @@ namespace Minor.Miffy.MicroServices.Test.Component
             Assert.AreEqual("Method Handle does not have a proper " +
                             "commandlistener signature in type WrongParameterEventListener", exception.Message);
 
-        }
-
-        [TestMethod]
-        public void ListenerWithWrongReturnTypeThrowsException()
-        {
-            // Arrange
-            var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
-
-            // Act
-            void Act() => hostBuilder.AddEventListener<WrongReturnEventListener>();
-
-            // Assert
-            var exception = Assert.ThrowsException<BusConfigurationException>(Act);
-            Assert.AreEqual("Method Handle does not have a proper " +
-                            "commandlistener signature in type WrongReturnEventListener", exception.Message);
         }
 
         [TestMethod]

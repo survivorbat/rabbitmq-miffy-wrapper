@@ -19,7 +19,7 @@ namespace Minor.Miffy.MicroServices.Commands
         /// </summary>
         [JsonProperty]
         public Guid Id { get; private set; }
-        
+
         /// <summary>
         /// Queue to send message to
         /// </summary>

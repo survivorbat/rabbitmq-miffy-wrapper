@@ -68,6 +68,7 @@ stages:
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:
               pollingTimeoutSec: '300'
+
           - task: sonar-buildbreaker@8
             condition: eq(variables['build.sourcebranch'], 'refs/heads/master')
             inputs:

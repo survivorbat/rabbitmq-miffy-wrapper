@@ -32,9 +32,9 @@ namespace Minor.Miffy.MicroServices.Commands
         }
 
         /// <summary>
-        /// Publish a domain event
+        /// Publish a domain command with a specific return result
         /// </summary>
-        public async Task<T> PublishAsync<T>(DomainCommand domainCommand)
+        public async Task<TReturn> PublishAsync<TReturn>(DomainCommand domainCommand)
         {
             _logger.LogTrace(
                 $"Publishing domain command with type {domainCommand.GetType().Name} and ID {domainCommand.Id}");
@@ -56,8 +56,8 @@ namespace Minor.Miffy.MicroServices.Commands
 
             try
             {
-                string jsonBody = Encoding.Unicode.GetString(result.Body);
-                return (T) JsonConvert.DeserializeObject(jsonBody, typeof(T));
+                string jsonBody = Encoding.Unicode.GetString(result?.Body);
+                return (TReturn) JsonConvert.DeserializeObject(jsonBody, typeof(TReturn));
             }
             catch (ArgumentNullException exception)
             {

@@ -165,9 +165,13 @@ Sending commands over the bus is also possible, first create a bus context from 
 #### Listening for commands
 
 ```c#
-public class ExampleCommand : DomainCommand 
+class ExampleCommand : DomainCommand 
 {
     public ExampleCommand() : base("command.queue.somewhere") {}
+    public string ExampleData { get; set; }
+}
+
+class ExampleCommandResult {
     public string ExampleData { get; set; }
 }
 ```
@@ -179,9 +183,8 @@ public class ExampleEventListener
     [CommandListener("command.queue.somewhere")]
     public ExampleCommand Handles(ExampleCommand command) 
     {
-        command.ExampleData = "Hello World!";
         DoSomethingwithCommand(command);
-        return command;
+        return new ExampleCommandResult { ExampleData = "Hello World" };
     }
 }
 ```
@@ -218,10 +221,10 @@ public class ExampleCommand : DomainCommand
 
 var exampleCommand = new ExampleCommand { ExampleData = "Hello?" };
 
-var publisher = new CommandPublisher(context)
-var result = publisher.PublishAsync<ExampleCommand>(exampleCommand);
+ICommandPublisher publisher = new CommandPublisher(context)
+ExampleCommandResult result = publisher.Publish<ExampleCommandResult>(exampleCommand);
 
-Assert.AreEqual("Hello world!", result.Result.ExampleData);
+Assert.AreEqual("Hello world!", result.ExampleData);
 ```
 
 And that's about it! Have fun rabbiting :)

@@ -1,8 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Commands;
-using Minor.Miffy.MicroServices.Events;
-using Minor.Miffy.MicroServices.Test.Unit.Events;
 using Newtonsoft.Json;
 
 namespace Minor.Miffy.MicroServices.Test.Unit.Commands

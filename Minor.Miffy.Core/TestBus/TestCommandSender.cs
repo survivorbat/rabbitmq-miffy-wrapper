@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Minor.Miffy.TestBus
 {
@@ -24,9 +23,9 @@ namespace Minor.Miffy.TestBus
             {
                 string randomReplyQueueName = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
                 request.ReplyQueue = randomReplyQueueName;
-                
+
                 _context.CommandQueues[randomReplyQueueName] = new TestBusQueueWrapper<CommandMessage>();
-                
+
                 _context.CommandQueues[request.DestinationQueue].Queue.Enqueue(request);
                 _context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
 

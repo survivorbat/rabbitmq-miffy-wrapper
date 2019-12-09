@@ -7,6 +7,11 @@ using RabbitMQ.Client.Events;
 
 namespace Minor.Miffy.RabbitMQBus
 {
+    /// <summary>
+    /// Low-level implementation of receiving messages from a bus
+    ///
+    /// If you want to receive messages in a listener, consider using EventListeners in the microservice package
+    /// </summary>
     public class RabbitMqMessageReceiver : IMessageReceiver
     {
         /// <summary>
@@ -21,7 +26,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// Model used to listen to broker
         /// </summary>
         private readonly IModel _model;
-        
+
         /// <summary>
         /// Context that is connected to the broker
         /// </summary>
@@ -31,7 +36,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// Logger to log received messages
         /// </summary>
         private readonly ILogger<RabbitMqMessageReceiver> _logger;
-        
+
         /// <summary>
         /// Whether the current message receiver is listening to the broker
         /// </summary>
@@ -53,12 +58,12 @@ namespace Minor.Miffy.RabbitMQBus
         /// Name of the queue
         /// </summary>
         public string QueueName { get; }
-        
+
         /// <summary>
         /// Topics that the queue is listening for
         /// </summary>
         public IEnumerable<string> TopicFilters { get; }
-        
+
         /// <summary>
         /// Create a queue and bind it to the exchange and the topic expression
         /// </summary>
@@ -68,7 +73,7 @@ namespace Minor.Miffy.RabbitMQBus
             {
                 throw new BusConfigurationException("Receiver is already listening to events!");
             }
-            
+
             _logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
             _model.QueueDeclare(QueueName, true, false, false);
             foreach (string topicExpression in TopicFilters)
@@ -88,14 +93,14 @@ namespace Minor.Miffy.RabbitMQBus
             {
                 throw new BusConfigurationException("Receiver is not listening to events");
             }
-            
+
             EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
             consumer.Received += (model, args) =>
             {
                 _logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
                                        $"of type {args.BasicProperties.Type} " +
                                        $"with topic {args.RoutingKey}");
-                
+
                 EventMessage eventMessage = new EventMessage
                 {
                     Body = args.Body,
@@ -107,7 +112,7 @@ namespace Minor.Miffy.RabbitMQBus
 
                 callback(eventMessage);
             };
-            
+
             _logger.LogDebug($"Start consuming queue {QueueName}");
             _model.BasicConsume(QueueName, true, "", false, false, null, consumer);
         }
