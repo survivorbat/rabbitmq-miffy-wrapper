@@ -45,7 +45,6 @@ namespace Minor.Miffy.RabbitMQBus
                 _logger.LogDebug($"Sending command with id {request.CorrelationId} to queue {request.DestinationQueue}");
                 using var channel = _context.Connection.CreateModel();
                 var replyQueue = channel.QueueDeclare(durable: true, exclusive: false).QueueName;
-                channel.QueueBind(replyQueue, _context.ExchangeName, replyQueue);
 
                 var consumer = new EventingBasicConsumer(channel);
 
@@ -83,7 +82,7 @@ namespace Minor.Miffy.RabbitMQBus
                 };
 
                 channel.BasicConsume(replyQueue, false, "", false, false, null, consumer);
-                channel.BasicPublish(_context.ExchangeName, request.DestinationQueue, true, props, request.Body);
+                channel.BasicPublish("", request.DestinationQueue, true, props, request.Body);
 
                 resetEvent.WaitOne(CommandTimeout);
 

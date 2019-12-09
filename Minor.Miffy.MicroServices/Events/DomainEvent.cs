@@ -27,6 +27,12 @@ namespace Minor.Miffy.MicroServices.Events
         public Guid Id { get; internal set; }
 
         /// <summary>
+        /// The type of the currently created event
+        /// </summary>
+        [JsonProperty]
+        public Type Type { get; }
+
+        /// <summary>
         /// Creates a domain event by setting the topic and generating a timestamp.
         /// </summary>
         /// <param name="topic">The topic should be of the format domain.eventname</param>
@@ -35,6 +41,7 @@ namespace Minor.Miffy.MicroServices.Events
             Topic = topic;
             Timestamp = DateTime.Now.Ticks;
             Id = Guid.NewGuid();
+            Type = GetType();
         }
     }
 }

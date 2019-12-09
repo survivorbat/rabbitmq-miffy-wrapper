@@ -64,7 +64,6 @@ namespace Minor.Miffy.RabbitMQBus
 
             _logger.LogTrace($"Declaring command queue {QueueName}");
             _model.QueueDeclare(QueueName, true, false, false, null);
-            _model.QueueBind(QueueName, _context.ExchangeName, QueueName, null);
             _queueDeclared = true;
         }
 
@@ -122,7 +121,7 @@ namespace Minor.Miffy.RabbitMQBus
                                  $"reply queue {ea.BasicProperties.ReplyTo} and body {responseMessage}");
 
                 _model.BasicPublish(
-                    _context.ExchangeName,
+                    "",
                     ea.BasicProperties.ReplyTo,
                     replyProps,
                     Encoding.Unicode.GetBytes(responseMessage));

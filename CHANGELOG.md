@@ -1,5 +1,10 @@
 # Changelog Miffy Framework
 
+## 0.10.0
+
+- Remove exchange name from command handlers
+- Add event type to DomainEvents to determine event types
+
 ## 0.9.1
 
 - Optimize imports

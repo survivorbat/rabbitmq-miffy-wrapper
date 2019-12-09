@@ -68,31 +68,6 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         }
 
         [TestMethod]
-        [DataRow("test.queue", "test.exchange")]
-        [DataRow("test.queue", "exchange.test")]
-        [DataRow("queue.test", "exchange.test")]
-        [DataRow("queue.test", "test.exchange")]
-        public void DeclareCommandQueueBindsQueue(string queueName, string exchangeName)
-        {
-            // Arrange
-            var connectionMock = new Mock<IConnection>();
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var modelMock = new Mock<IModel>();
-
-            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            contextMock.SetupGet(e => e.ExchangeName).Returns(exchangeName);
-            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
-
-            var receiver = new RabbitMqCommandReceiver(contextMock.Object, queueName);
-
-            // Act
-            receiver.DeclareCommandQueue();
-
-            // Assert
-            modelMock.Verify(e => e.QueueBind(queueName, exchangeName, queueName, null));
-        }
-
-        [TestMethod]
         [DataRow("test.queue")]
         [DataRow("queue.test")]
         public void DeclareCommandQueueTwiceThrowsException(string queueName)
@@ -280,8 +255,9 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
         }
 
         [TestMethod]
-        [DataRow("test.exchange", "reply.queue", "Hello World")]
-        public void ConsumerCallsBasicPublishWithValues(string exchangeName, string replyTo, string message)
+        [DataRow("reply.queue", "Hello World")]
+        [DataRow("QueueToReply", "GoodBye World")]
+        public void ConsumerCallsBasicPublishWithValues(string replyTo, string message)
         {
             // Arrange
             var connectionMock = new Mock<IConnection>();
@@ -289,7 +265,6 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             var modelMock = new Mock<IModel>();
 
             contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
-            contextMock.SetupGet(e => e.ExchangeName).Returns(exchangeName);
             connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
             modelMock.Setup(e => e.CreateBasicProperties()).Returns(new BasicProperties());
 
@@ -313,12 +288,12 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => responseMessage);
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver("", 0, false, "", "test.queue", properties, new byte[0]);
 
             // Assert
             var jsonResponse = JsonConvert.SerializeObject(responseMessage);
             var bodyResponse = Encoding.Unicode.GetBytes(jsonResponse);
-            modelMock.Verify(e => e.BasicPublish(exchangeName,
+            modelMock.Verify(e => e.BasicPublish("",
                 replyTo,
                 false,
                 It.IsAny<IBasicProperties>(),
@@ -360,7 +335,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => throw exception);
 
             var expectedBody = new byte[0];
-            modelMock.Setup(e => e.BasicPublish("test.exchange",
+            modelMock.Setup(e => e.BasicPublish("",
                 "reply.queue",
                 false,
                 It.IsAny<IBasicProperties>(),
@@ -368,13 +343,13 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => expectedBody = body);
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver("", 0, false, "", "test.queue", properties, new byte[0]);
 
             // Assert
             var stringBody = Encoding.Unicode.GetString(expectedBody);
             CommandError error = JsonConvert.DeserializeObject<CommandError>(stringBody);
 
-            Assert.AreEqual(error.Exception.Message, exceptionMessage);
+            Assert.AreEqual(error.Exception?.Message, exceptionMessage);
         }
 
         [TestMethod]
