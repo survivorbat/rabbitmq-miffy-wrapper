@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.2.0
+
+- Add event publish method that allows user to compose a message
+
 ## 1.1.0
 
 - Add attribute usage to attributes
