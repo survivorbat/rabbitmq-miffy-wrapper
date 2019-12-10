@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.0.0
+
+- Make sure only the name of the event type is transmitted and not the full name
+
 ## 0.10.0
 
 - Remove exchange name from command handlers
