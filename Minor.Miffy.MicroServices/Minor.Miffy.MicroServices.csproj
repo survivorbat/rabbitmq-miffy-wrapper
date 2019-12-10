@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Title>MaartenH.Minor.Miffy.Microservices</Title>
     <Description>The microservice host package of the Miffy Framework</Description>
-    <PackageVersion>1.2.0</PackageVersion>
+    <PackageVersion>1.2.1</PackageVersion>
     <PackageId>MaartenH.Minor.Miffy.Microservices</PackageId>
     <Authors>Maarten van der Heijden</Authors>
     <PackageTags>Miffy RabbitMQ Events Commands Bus</PackageTags>

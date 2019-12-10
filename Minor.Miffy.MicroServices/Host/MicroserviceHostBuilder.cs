@@ -53,12 +53,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Registered event listeners
         /// </summary>
-        public readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
+        public List<MicroserviceListener> EventListeners { get; } = new List<MicroserviceListener>();
 
         /// <summary>
         /// Registered command listeners
         /// </summary>
-        public readonly List<MicroserviceCommandListener> _commandListeners = new List<MicroserviceCommandListener>();
+        public List<MicroserviceCommandListener> CommandListeners { get; } = new List<MicroserviceCommandListener>();
 
         /// <summary>
         /// Initialize a new builder with a null logger factory
@@ -162,7 +162,7 @@ namespace Minor.Miffy.MicroServices.Host
             _logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
 
             _logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
-            _eventListeners.Add(new MicroserviceListener
+            EventListeners.Add(new MicroserviceListener
             {
                 TopicExpressions = topicPatterns,
                 Queue = queueName,
@@ -204,7 +204,7 @@ namespace Minor.Miffy.MicroServices.Host
             Type returnType = method.ReturnType;
 
             _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
-            _commandListeners.Add(new MicroserviceCommandListener
+            CommandListeners.Add(new MicroserviceCommandListener
             {
                 Queue = queueName,
                 Callback = message =>
@@ -328,11 +328,11 @@ namespace Minor.Miffy.MicroServices.Host
         /// <returns></returns>
         public MicroserviceHost CreateHost()
         {
-            _logger.LogDebug($"Instantiating microservicehost with {_eventListeners.Count} event listeners and {_commandListeners.Count} command listeners");
+            _logger.LogDebug($"Instantiating microservicehost with {EventListeners.Count} event listeners and {CommandListeners.Count} command listeners");
             return new MicroserviceHost(
                 _context,
-                _eventListeners,
-                _commandListeners,
+                EventListeners,
+                CommandListeners,
                 _loggerFactory.CreateLogger<MicroserviceHost>());
         }
 
