@@ -53,12 +53,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Registered event listeners
         /// </summary>
-        private readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
+        public readonly List<MicroserviceListener> _eventListeners = new List<MicroserviceListener>();
 
         /// <summary>
         /// Registered command listeners
         /// </summary>
-        private readonly List<MicroserviceCommandListener> _commandListeners = new List<MicroserviceCommandListener>();
+        public readonly List<MicroserviceCommandListener> _commandListeners = new List<MicroserviceCommandListener>();
 
         /// <summary>
         /// Initialize a new builder with a null logger factory

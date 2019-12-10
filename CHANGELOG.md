@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.0.1
+
+- Loosen the accessibility of the fields in the host and the host builder 
+
 ## 1.0.0
 
 - Make sure only the name of the event type is transmitted and not the full name

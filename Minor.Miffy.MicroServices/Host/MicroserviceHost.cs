@@ -20,18 +20,18 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
-        internal readonly IEnumerable<MicroserviceListener> Listeners;
+        public readonly IEnumerable<MicroserviceListener> Listeners;
 
         /// <summary>
         /// A list of queues that are used to receive commands
         /// </summary>
-        internal readonly IEnumerable<MicroserviceCommandListener> CommandListeners;
+        public readonly IEnumerable<MicroserviceCommandListener> CommandListeners;
 
         /// <summary>
         /// List of message receivers
         /// </summary>
         private readonly List<IMessageReceiver> _messageReceivers = new List<IMessageReceiver>();
-        
+
         /// <summary>
         /// List of command receivers
         /// </summary>
@@ -50,8 +50,8 @@ namespace Minor.Miffy.MicroServices.Host
         /// <param name="commandListeners">All the command listeners</param>
         /// <param name="logger">Logging instance</param>
         public MicroserviceHost(IBusContext<
-            IConnection> connection, 
-            IEnumerable<MicroserviceListener> listeners, 
+            IConnection> connection,
+            IEnumerable<MicroserviceListener> listeners,
             IEnumerable<MicroserviceCommandListener> commandListeners,
             ILogger<MicroserviceHost> logger)
         {
@@ -69,7 +69,7 @@ namespace Minor.Miffy.MicroServices.Host
             foreach (MicroserviceListener callback in Listeners)
             {
                 _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
-                
+
                 IMessageReceiver receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();
                 receiver.StartHandlingMessages(callback.Callback);
