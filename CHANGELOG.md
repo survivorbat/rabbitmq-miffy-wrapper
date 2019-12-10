@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.1.0
+
+- Add attribute usage to attributes
+
 ## 1.0.1
 
 - Loosen the accessibility of the fields in the host and the host builder 
