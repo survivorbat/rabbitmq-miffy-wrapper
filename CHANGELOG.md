@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.3.0
+
+- Change accessibility in host and hostbuilder to increase extensibility
+
 ## 1.2.0
 
 - Add event publish method that allows user to compose a message

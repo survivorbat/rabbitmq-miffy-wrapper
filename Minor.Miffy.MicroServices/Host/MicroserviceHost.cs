@@ -15,7 +15,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Connection context
         /// </summary>
-        public IBusContext<IConnection> Context { get; }
+        public readonly IBusContext<IConnection> Context;
 
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
@@ -30,17 +30,17 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// List of message receivers
         /// </summary>
-        private readonly List<IMessageReceiver> _messageReceivers = new List<IMessageReceiver>();
+        protected readonly List<IMessageReceiver> MessageReceivers = new List<IMessageReceiver>();
 
         /// <summary>
         /// List of command receivers
         /// </summary>
-        private readonly List<ICommandReceiver> _commandReceivers = new List<ICommandReceiver>();
+        protected readonly List<ICommandReceiver> CommandReceivers = new List<ICommandReceiver>();
 
         /// <summary>
         /// A logger factory to log the start
         /// </summary>
-        private readonly ILogger _logger;
+        protected readonly ILogger Logger;
 
         /// <summary>
         /// Create a new Microservice host
@@ -49,8 +49,8 @@ namespace Minor.Miffy.MicroServices.Host
         /// <param name="listeners">All the listeners</param>
         /// <param name="commandListeners">All the command listeners</param>
         /// <param name="logger">Logging instance</param>
-        public MicroserviceHost(IBusContext<
-            IConnection> connection,
+        public MicroserviceHost(
+            IBusContext<IConnection> connection,
             IEnumerable<MicroserviceListener> listeners,
             IEnumerable<MicroserviceCommandListener> commandListeners,
             ILogger<MicroserviceHost> logger)
@@ -58,42 +58,42 @@ namespace Minor.Miffy.MicroServices.Host
             Context = connection;
             Listeners = listeners;
             CommandListeners = commandListeners;
-            _logger = logger;
+            Logger = logger;
         }
 
         /// <summary>
         /// Start listening for events
         /// </summary>
-        public void Start()
+        public virtual void Start()
         {
             foreach (MicroserviceListener callback in Listeners)
             {
-                _logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
+                Logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
 
                 IMessageReceiver receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
                 receiver.StartReceivingMessages();
                 receiver.StartHandlingMessages(callback.Callback);
-                _messageReceivers.Add(receiver);
+                MessageReceivers.Add(receiver);
             }
 
             foreach (MicroserviceCommandListener callback in CommandListeners)
             {
-                _logger.LogInformation($"Registering command queue {callback.Queue}");
+                Logger.LogInformation($"Registering command queue {callback.Queue}");
 
                 ICommandReceiver receiver = Context.CreateCommandReceiver(callback.Queue);
                 receiver.DeclareCommandQueue();
                 receiver.StartReceivingCommands(callback.Callback);
-                _commandReceivers.Add(receiver);
+                CommandReceivers.Add(receiver);
             }
         }
 
         /// <summary>
         /// Dispose of the context
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _messageReceivers.ForEach(e => e.Dispose());
-            _commandReceivers.ForEach(e => e.Dispose());
+            MessageReceivers.ForEach(e => e.Dispose());
+            CommandReceivers.ForEach(e => e.Dispose());
             Context.Dispose();
         }
     }

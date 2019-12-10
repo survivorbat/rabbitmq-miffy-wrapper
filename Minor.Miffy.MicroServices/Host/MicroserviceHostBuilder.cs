@@ -18,76 +18,76 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// The parent type of all domain events
         /// </summary>
-        private static readonly Type DomainEventType = typeof(DomainEvent);
+        protected static readonly Type DomainEventType = typeof(DomainEvent);
 
         /// <summary>
         /// The parent type of all domain commands
         /// </summary>
-        private static readonly Type DomainCommandType = typeof(DomainCommand);
+        protected static readonly Type DomainCommandType = typeof(DomainCommand);
 
         /// <summary>
         /// Type of a string
         /// </summary>
-        private static readonly Type StringType = typeof(string);
+        protected static readonly Type StringType = typeof(string);
 
         /// <summary>
         /// Bus context that houses configuration for the message bus
         /// </summary>
-        private IBusContext<IConnection> _context;
+        protected IBusContext<IConnection> Context { get; set; }
 
         /// <summary>
         /// Loggerfactory to create logging instances
         /// </summary>
-        private ILoggerFactory _loggerFactory;
+        protected ILoggerFactory LoggerFactory { get; set; }
 
         /// <summary>
         /// Logger to log everything in here
         /// </summary>
-        private ILogger<MicroserviceHostBuilder> _logger;
+        protected ILogger<MicroserviceHostBuilder> Logger { get; set; }
 
         /// <summary>
         /// Service collection to collect all services in
         /// </summary>
-        private readonly IServiceCollection _serviceCollection = new ServiceCollection();
+        protected readonly IServiceCollection ServiceCollection = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
         /// </summary>
-        public List<MicroserviceListener> EventListeners { get; } = new List<MicroserviceListener>();
+        protected readonly List<MicroserviceListener> EventListeners = new List<MicroserviceListener>();
 
         /// <summary>
         /// Registered command listeners
         /// </summary>
-        public List<MicroserviceCommandListener> CommandListeners { get; } = new List<MicroserviceCommandListener>();
+        protected readonly List<MicroserviceCommandListener> CommandListeners = new List<MicroserviceCommandListener>();
 
         /// <summary>
         /// Initialize a new builder with a null logger factory
         /// </summary>
         public MicroserviceHostBuilder()
         {
-            _loggerFactory = new NullLoggerFactory();
-            _serviceCollection.AddSingleton(_loggerFactory);
-            _logger = _loggerFactory.CreateLogger<MicroserviceHostBuilder>();
+            LoggerFactory = new NullLoggerFactory();
+            ServiceCollection.AddSingleton(LoggerFactory);
+            Logger = LoggerFactory.CreateLogger<MicroserviceHostBuilder>();
         }
 
         /// <summary>
         /// Configures the connection to the message broker
         /// </summary>
-        public MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
+        public virtual MicroserviceHostBuilder WithBusContext(IBusContext<IConnection> context)
         {
-            _logger.LogDebug("Adding Bus Context");
-            _context = context;
-            _serviceCollection.AddSingleton(context);
+            Logger.LogDebug("Adding Bus Context");
+            Context = context;
+            ServiceCollection.AddSingleton(context);
             return this;
         }
 
         /// <summary>
         /// Scans the assemblies for EventListeners and adds them to the MicroserviceHost
         /// </summary>
-        public MicroserviceHostBuilder UseConventions()
+        public virtual MicroserviceHostBuilder UseConventions()
         {
             Assembly callingAssembly = Assembly.GetCallingAssembly();
-            _logger.LogDebug($"Using conventions, applying types from assembly: {callingAssembly.GetName()}");
+            Logger.LogDebug($"Using conventions, applying types from assembly: {callingAssembly.GetName()}");
 
             foreach (TypeInfo type in callingAssembly.DefinedTypes)
             {
@@ -100,11 +100,11 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Manually adds EventListeners or CommandListeners to the MicroserviceHost
         /// </summary>
-        public MicroserviceHostBuilder AddEventListener<T>()
+        public virtual MicroserviceHostBuilder AddEventListener<T>()
         {
             TypeInfo type = typeof(T).GetTypeInfo();
 
-            _logger.LogDebug($"Adding event listeners for type {type.FullName}");
+            Logger.LogDebug($"Adding event listeners for type {type.FullName}");
 
             RegisterListener(type);
             return this;
@@ -113,10 +113,10 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Instantiate an instance of a type with populated services
         /// </summary>
-        private object InstantiatePopulatedType(TypeInfo type)
+        protected virtual object InstantiatePopulatedType(TypeInfo type)
         {
-            ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
-            _logger.LogTrace($"Instantiating {type.Name} with provided services.");
+            ServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
+            Logger.LogTrace($"Instantiating {type.Name} with provided services.");
 
             try
             {
@@ -125,7 +125,7 @@ namespace Minor.Miffy.MicroServices.Host
             }
             catch (InvalidOperationException e)
             {
-                _logger.LogCritical($"Type {type.Name} could not be properly instantiated " +
+                Logger.LogCritical($"Type {type.Name} could not be properly instantiated " +
                                     "with provided services. Did you register all your dependencies? " +
                                     $"Listener will NOT be called! Exception: {e.Message}");
                 throw;
@@ -135,7 +135,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Retrieve all the publicly declared instance methods from a type
         /// </summary>
-        private IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type)
+        protected virtual IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Where(e => !e.IsSpecialName);
@@ -145,46 +145,46 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Register a listener for a specific event with topic expressions
         /// </summary>
-        private void RegisterEventListener(TypeInfo type, MethodInfo method, string queueName)
+        protected virtual void RegisterEventListener(TypeInfo type, MethodInfo method, string queueName)
         {
             if (!IsMethodSuitableEvent(method, false))
             {
                 throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
             }
 
-            _logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
+            Logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
 
             string[] topicPatterns = method.GetCustomAttributes<TopicAttribute>()
                 .Select(e => e.TopicPattern)
                 .ToArray();
 
-            _logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
+            Logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
 
-            _logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
+            Logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
             EventListeners.Add(new MicroserviceListener
             {
                 TopicExpressions = topicPatterns,
                 Queue = queueName,
                 Callback = message =>
                 {
-                    _logger.LogDebug($"Attempting to instantiate type {type.Name} in queue {queueName}");
+                    Logger.LogDebug($"Attempting to instantiate type {type.Name} in queue {queueName}");
                     object instance = InstantiatePopulatedType(type);
 
-                    _logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
+                    Logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
 
                     if (parameterType == StringType)
                     {
-                        _logger.LogTrace($"Parameter type is a string, invoking method for message {message.CorrelationId} with body {text}");
+                        Logger.LogTrace($"Parameter type is a string, invoking method for message {message.CorrelationId} with body {text}");
                         method.Invoke(instance, new object[] {text});
                         return;
                     }
 
-                    _logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
+                    Logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
-                    _logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                    Logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                     method.Invoke(instance, new[] {jsonObject});
                 }
             });
@@ -193,7 +193,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Register a command listener
         /// </summary>
-        private void RegisterCommandListener(TypeInfo type, MethodInfo method, string queueName)
+        protected virtual void RegisterCommandListener(TypeInfo type, MethodInfo method, string queueName)
         {
             if (!IsMethodSuitableEvent(method, true))
             {
@@ -203,28 +203,28 @@ namespace Minor.Miffy.MicroServices.Host
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
             Type returnType = method.ReturnType;
 
-            _logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
+            Logger.LogDebug($"Adding MicroserviceCommandListener with queue {queueName}, type {type.Name} and method {method.Name}");
             CommandListeners.Add(new MicroserviceCommandListener
             {
                 Queue = queueName,
                 Callback = message =>
                 {
-                    _logger.LogTrace($"Attempting to instantiate type {type.Name} in queue {queueName}");
+                    Logger.LogTrace($"Attempting to instantiate type {type.Name} in queue {queueName}");
                     object instance = InstantiatePopulatedType(type);
 
-                    _logger.LogTrace($"Retrieving string command data from message with id {message.CorrelationId}");
+                    Logger.LogTrace($"Retrieving string command data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
 
-                    _logger.LogTrace($"Deserialized command object from message with id {message.CorrelationId} and body {text}");
+                    Logger.LogTrace($"Deserialized command object from message with id {message.CorrelationId} and body {text}");
                     object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
-                    _logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                    Logger.LogTrace($"Invoking method {method.Name} with command message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
                     object returnCommand = method.Invoke(instance, new[] {jsonObject});
 
-                    _logger.LogTrace("Serializing result command");
+                    Logger.LogTrace("Serializing result command");
                     string jsonReturn = JsonConvert.SerializeObject(returnCommand);
 
-                    _logger.LogTrace($"Returning new CommandMessage with timestamp {message?.Timestamp}, id {message.CorrelationId}, EventType {returnType.Name} and body {jsonReturn}");
+                    Logger.LogTrace($"Returning new CommandMessage with timestamp {message?.Timestamp}, id {message.CorrelationId}, EventType {returnType.Name} and body {jsonReturn}");
                     return new CommandMessage
                     {
                         Timestamp = message.Timestamp,
@@ -239,9 +239,9 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Register possible event listeners
         /// </summary>
-        private void RegisterListener(TypeInfo type)
+        protected virtual void RegisterListener(TypeInfo type)
         {
-            _logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
+            Logger.LogTrace($"Retrieving relevant methods from type {type.Name}");
 
             foreach (MethodInfo methodInfo in GetRelevantMethods(type))
             {
@@ -258,7 +258,7 @@ namespace Minor.Miffy.MicroServices.Host
                 }
                 else
                 {
-                    _logger.LogTrace($"Method {methodInfo.Name} does not contain listener attributes.");
+                    Logger.LogTrace($"Method {methodInfo.Name} does not contain listener attributes.");
                 }
             }
         }
@@ -266,9 +266,9 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Check if method has a suitable signature to be used as a command or event listener
         /// </summary>
-        private bool IsMethodSuitableEvent(MethodInfo method, bool isCommandListener)
+        protected virtual bool IsMethodSuitableEvent(MethodInfo method, bool isCommandListener)
         {
-            _logger.LogTrace($"Evaluating whether {method.Name} has 1 parameter");
+            Logger.LogTrace($"Evaluating whether {method.Name} has 1 parameter");
             ParameterInfo[] parameters = method.GetParameters();
 
             if (parameters.Length != 1)
@@ -279,14 +279,14 @@ namespace Minor.Miffy.MicroServices.Host
             ParameterInfo parameter = parameters.First();
             Type parameterType = parameter.ParameterType;
 
-            _logger.LogTrace($"Evaluating whether method {method.Name}'s parameter {parameter.Name} is " +
+            Logger.LogTrace($"Evaluating whether method {method.Name}'s parameter {parameter.Name} is " +
                              "a string or is derived from DomainEvent or CommandEvent");
 
             if ((!isCommandListener && parameterType.IsAssignableFrom(DomainEventType)
                  || isCommandListener && parameterType.IsAssignableFrom(DomainCommandType))
                 && parameterType != StringType)
             {
-                _logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +
+                Logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +
                                     $"type {parameterType.Name} which is not a proper type for a " +
                                     $"{(isCommandListener ? "Command" : "Event")}Listener");
 
@@ -304,21 +304,21 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Configures logging functionality for the MicroserviceHost
         /// </summary>
-        public MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
+        public virtual MicroserviceHostBuilder SetLoggerFactory(ILoggerFactory loggerFactory)
         {
-            _loggerFactory = loggerFactory;
-            _serviceCollection.AddSingleton(loggerFactory);
-            _logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
+            LoggerFactory = loggerFactory;
+            ServiceCollection.AddSingleton(loggerFactory);
+            Logger = loggerFactory.CreateLogger<MicroserviceHostBuilder>();
             return this;
         }
 
         /// <summary>
         /// Configures Dependency Injection for the MicroserviceHost
         /// </summary>
-        public MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
+        public virtual MicroserviceHostBuilder RegisterDependencies(Action<IServiceCollection> servicesConfiguration)
         {
-            _logger.LogDebug("Registering dependencies");
-            servicesConfiguration.Invoke(_serviceCollection);
+            Logger.LogDebug("Registering dependencies");
+            servicesConfiguration.Invoke(ServiceCollection);
             return this;
         }
 
@@ -326,22 +326,22 @@ namespace Minor.Miffy.MicroServices.Host
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public MicroserviceHost CreateHost()
+        public virtual MicroserviceHost CreateHost()
         {
-            _logger.LogDebug($"Instantiating microservicehost with {EventListeners.Count} event listeners and {CommandListeners.Count} command listeners");
+            Logger.LogDebug($"Instantiating microservicehost with {EventListeners.Count} event listeners and {CommandListeners.Count} command listeners");
             return new MicroserviceHost(
-                _context,
+                Context,
                 EventListeners,
                 CommandListeners,
-                _loggerFactory.CreateLogger<MicroserviceHost>());
+                LoggerFactory.CreateLogger<MicroserviceHost>());
         }
 
         /// <summary>
         /// Dispose of the logger factoryu
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _loggerFactory?.Dispose();
+            LoggerFactory?.Dispose();
         }
     }
 }
