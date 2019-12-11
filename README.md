@@ -5,8 +5,7 @@
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
 These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
-
-<link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/MaartenH"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee :)"><span style="margin-left:15px;font-size:28px !important;">Buy me a coffee :)</span></a>
+<a href="https://www.buymeacoffee.com/MaartenH" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 
 **MaartenH.Minor.Miffy.Abstractions**:  
 Contains all the interfaces and base classes of the framework.
