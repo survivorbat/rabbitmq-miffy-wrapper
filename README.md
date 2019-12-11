@@ -1,4 +1,4 @@
-# RabbitMQ Miffy Wrapper
+# RabbitMQ .NET Core Miffy Wrapper
 
 ![GitHub](https://img.shields.io/github/license/survivorbat/rabbitmq-miffy-wrapper)
 
@@ -7,20 +7,20 @@ These packages allow you to easily set up event listeners and command listeners 
 
 <a href="https://www.buymeacoffee.com/MaartenH" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-red.png" height="50" widt="216" alt="Buy Me A Coffee" ></a>
 
-**MaartenH.Minor.Miffy.Abstractions**:  
+**MaartenH.Minor.Miffy.Abstractions**:
 Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Abstractions)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.Abstractions)
 
-**MaartenH.Minor.Miffy.MicroServices**:  
+**MaartenH.Minor.Miffy.MicroServices**:
 The package containing the classes used to set up a microservice host.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Microservices)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.MicroServices)
 
-**MaartenH.Minor.Miffy.RabbitMQBus**  
+**MaartenH.Minor.Miffy.RabbitMQBus**
 Implementation classes to use RabbitMQ with the framework
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.RabbitMQBus)
@@ -56,8 +56,8 @@ First, you need to open a connection using an implementation of the IBusContext<
 ```c#
 var contextBuilder = new RabbitMqContextBuilder()
                     .WithExchange("ExampleExchange")
-                    .WithConnectionString("amqp://guest:guest@localhost");  
-            
+                    .WithConnectionString("amqp://guest:guest@localhost");
+
 using IBusContext<IConnection> context = contextBuilder.CreateContext();
 ```
 
@@ -72,7 +72,7 @@ To start listening for events you can either use a microservice host or implemen
 This tutorial will only include the former option. First you'll need a DomainEvent class, like so:
 
 ```c#
-public class ExampleEvent : DomainEvent 
+public class ExampleEvent : DomainEvent
 {
     public ExampleEvent() : base("ExampleTopic") {}
     public string ExampleData { get; set; }
@@ -82,11 +82,11 @@ public class ExampleEvent : DomainEvent
 Then, you're going to need a callback function that handles such an event.
 
 ```c#
-public class ExampleEventListener 
+public class ExampleEventListener
 {
     [EventListener("UniqueQueueName")]
     [Topic("ExampleTopic")]
-    public void Handles(ExampleEvent exampleEvent) 
+    public void Handles(ExampleEvent exampleEvent)
     {
         DoSomethingWithData(exampleEvent.ExampleData);
     }
@@ -127,7 +127,7 @@ Now that we have a listener listening for events, we need something to publish e
 ```c#
 // Context builder code
 
-public class ExampleEvent : DomainEvent 
+public class ExampleEvent : DomainEvent
 {
     public ExampleEvent() : base("ExampleTopic") {}
     public string ExampleData { get; set; }
@@ -152,13 +152,24 @@ public class JsonEventListener
 {
     [EventListener("UniqueQueueName")]
     [Topic("ExampleTopic")]
-    public void Handles(string rawJson) 
+    public void Handles(string rawJson)
     {
         DoSomethingWithJson(rawJsoon);
     }
 }
 ```
 
+#### Publishing raw json data
+
+In case you want to publish raw json over the bus, you can use the overloaded variant of the Publish method like so:
+
+```c#
+var publisher = new EventPublisher(context);
+string body = "{\"hello\": \"World\"}";
+publisher.Publish(timestamp: 500000, topic: "TestTopic", correlationId: Guid.NewGuid(), eventType: "TestEvent", body: body);
+```
+
+**Use this method with caution**, since deserializing raw or faulty data might throw errors and cause havoc.
 
 ### Commands
 
@@ -167,7 +178,7 @@ Sending commands over the bus is also possible, first create a bus context from 
 #### Listening for commands
 
 ```c#
-class ExampleCommand : DomainCommand 
+class ExampleCommand : DomainCommand
 {
     public ExampleCommand() : base("command.queue.somewhere") {}
     public string ExampleData { get; set; }
@@ -180,10 +191,10 @@ class ExampleCommandResult {
 
 ```c#
 // Note: The name of this queue corresponds to the DestinationQueue of the ExampleCommand
-public class ExampleEventListener 
+public class ExampleEventListener
 {
     [CommandListener("command.queue.somewhere")]
-    public ExampleCommandResult Handles(ExampleCommand command) 
+    public ExampleCommandResult Handles(ExampleCommand command)
     {
         DoSomethingwithCommand(command);
         return new ExampleCommandResult { ExampleData = "Hello World" };
@@ -215,7 +226,7 @@ The last piece of the puzzle is publishing commands. This can be done like so:
 ```c#
 // Context builder code
 
-public class ExampleCommand : DomainCommand 
+public class ExampleCommand : DomainCommand
 {
     public ExampleCommand() : base("command.queue.somewhere") {}
     public string ExampleData { get; set; }
