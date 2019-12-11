@@ -26,7 +26,7 @@ Implementation classes to use RabbitMQ with the framework
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.RabbitMQBus)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.RabbitMQBus)
 
-These packages can be found on nuget.org and in my private azure cloud.
+These packages can be found on nuget.org.
 
 ## Exceptions
 
