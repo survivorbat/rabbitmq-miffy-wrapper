@@ -181,7 +181,7 @@ class ExampleCommandResult {
 public class ExampleEventListener 
 {
     [CommandListener("command.queue.somewhere")]
-    public ExampleCommand Handles(ExampleCommand command) 
+    public ExampleCommandResult Handles(ExampleCommand command) 
     {
         DoSomethingwithCommand(command);
         return new ExampleCommandResult { ExampleData = "Hello World" };
@@ -222,7 +222,7 @@ public class ExampleCommand : DomainCommand
 var exampleCommand = new ExampleCommand { ExampleData = "Hello?" };
 
 ICommandPublisher publisher = new CommandPublisher(context)
-ExampleCommandResult result = publisher.Publish<ExampleCommandResult>(exampleCommand);
+ExampleCommandResult result = publisher.PublishAsync<ExampleCommandResult>(exampleCommand);
 
 Assert.AreEqual("Hello world!", result.ExampleData);
 ```
