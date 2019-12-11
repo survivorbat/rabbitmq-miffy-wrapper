@@ -8,10 +8,10 @@ namespace Minor.Miffy
     [Serializable]
     public class DestinationQueueException : Exception
     {
-        public string ReplyQueueName { get; }
-        public string DestinationQueueName { get; }
-        public Guid CorrelationId { get; }
-        
+        public virtual string ReplyQueueName { get; }
+        public virtual string DestinationQueueName { get; }
+        public virtual Guid CorrelationId { get; }
+
         /// <summary>
         /// Create an exception instance with a message
         /// </summary>
@@ -26,7 +26,7 @@ namespace Minor.Miffy
         /// <param name="replyQueueName">Name of the reply queue</param>
         /// <param name="destinationQueueName">Name of the destination queue</param>
         /// <param name="correlationId">Correlation ID</param>
-        public DestinationQueueException(string message, Exception innerException, string replyQueueName, 
+        public DestinationQueueException(string message, Exception innerException, string replyQueueName,
             string destinationQueueName, Guid correlationId) : base(message, innerException)
         {
             ReplyQueueName = replyQueueName;

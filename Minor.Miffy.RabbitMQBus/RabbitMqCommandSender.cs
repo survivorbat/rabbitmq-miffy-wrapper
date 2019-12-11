@@ -20,12 +20,12 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Context
         /// </summary>
-        private readonly IBusContext<IConnection> _context;
+        protected readonly IBusContext<IConnection> _context;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<RabbitMqCommandSender> _logger;
+        protected readonly ILogger<RabbitMqCommandSender> _logger;
 
         /// <summary>
         /// Create a new sender with a provider context
@@ -39,7 +39,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Send a command asynchronously
         /// </summary>
-        public Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
+        public virtual Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
             Task.Run(() =>
             {
                 _logger.LogDebug($"Sending command with id {request.CorrelationId} to queue {request.DestinationQueue}");

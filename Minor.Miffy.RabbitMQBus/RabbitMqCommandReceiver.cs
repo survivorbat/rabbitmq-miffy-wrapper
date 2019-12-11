@@ -14,22 +14,22 @@ namespace Minor.Miffy.RabbitMQBus
     /// </summary>
     public class RabbitMqCommandReceiver : ICommandReceiver
     {
-        private const string CommandErrorType = "CommandError";
+        protected const string CommandErrorType = "CommandError";
 
         /// <summary>
         /// Model used to send messages
         /// </summary>
-        private readonly IModel _model;
+        protected readonly IModel Model;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<RabbitMqCommandReceiver> _logger;
+        protected readonly ILogger<RabbitMqCommandReceiver> Logger;
 
         /// <summary>
         /// Is queue declared?
         /// </summary>
-        private bool _queueDeclared;
+        protected bool QueueDeclared { get; set; }
 
         /// <summary>
         /// Name of the queue for the commands
@@ -41,45 +41,45 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public RabbitMqCommandReceiver(IBusContext<IConnection> context, string queueName)
         {
-            _model = context.Connection.CreateModel();
+            Model = context.Connection.CreateModel();
             QueueName = queueName;
-            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqCommandReceiver>();
+            Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqCommandReceiver>();
         }
 
         /// <summary>
         /// Declare the queue with the given queue name
         /// </summary>
-        public void DeclareCommandQueue()
+        public virtual void DeclareCommandQueue()
         {
-            if (_queueDeclared)
+            if (QueueDeclared)
             {
                 throw new BusConfigurationException($"Queue {QueueName} has already been declared!");
             }
 
-            _logger.LogTrace($"Declaring command queue {QueueName}");
-            _model.QueueDeclare(QueueName, true, false, false, null);
-            _queueDeclared = true;
+            Logger.LogTrace($"Declaring command queue {QueueName}");
+            Model.QueueDeclare(QueueName, true, false, false, null);
+            QueueDeclared = true;
         }
 
         /// <summary>
         /// Start receiving commands and calling the callback
         /// </summary>
-        public void StartReceivingCommands(CommandReceivedCallback callback)
+        public virtual void StartReceivingCommands(CommandReceivedCallback callback)
         {
-            if (!_queueDeclared)
+            if (!QueueDeclared)
             {
                 throw new BusConfigurationException($"Queue {QueueName} has not been declared yet");
             }
 
-            _logger.LogTrace($"Start receiving commands on queue {QueueName}");
+            Logger.LogTrace($"Start receiving commands on queue {QueueName}");
 
-            EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
+            EventingBasicConsumer consumer = new EventingBasicConsumer(Model);
 
             consumer.Received += (model, ea) =>
             {
-                _logger.LogInformation(
+                Logger.LogInformation(
                     $"Received command on {QueueName} with reply queue {ea.BasicProperties.ReplyTo}");
-                IBasicProperties replyProps = _model.CreateBasicProperties();
+                IBasicProperties replyProps = Model.CreateBasicProperties();
                 replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
 
                 CommandMessage request = new CommandMessage
@@ -99,7 +99,7 @@ namespace Minor.Miffy.RabbitMQBus
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"Error occured while handling command, command id {ea.BasicProperties.CorrelationId} " +
+                    Logger.LogError($"Error occured while handling command, command id {ea.BasicProperties.CorrelationId} " +
                                      $"with exception {e.Message}");
 
                     response = new CommandError
@@ -111,24 +111,27 @@ namespace Minor.Miffy.RabbitMQBus
 
                 string responseMessage = JsonConvert.SerializeObject(response);
 
-                _logger.LogTrace($"Publishing command response with id {ea.BasicProperties.CorrelationId} " +
+                Logger.LogTrace($"Publishing command response with id {ea.BasicProperties.CorrelationId} " +
                                  $"reply queue {ea.BasicProperties.ReplyTo} and body {responseMessage}");
 
-                _model.BasicPublish(
+                Model.BasicPublish(
                     "",
                     ea.BasicProperties.ReplyTo,
                     replyProps,
                     Encoding.Unicode.GetBytes(responseMessage));
 
-                _model.BasicAck(ea.DeliveryTag, false);
+                Model.BasicAck(ea.DeliveryTag, false);
             };
 
-            _model.BasicConsume(QueueName, false, "", false, false, null, consumer);
+            Model.BasicConsume(QueueName, false, "", false, false, null, consumer);
         }
 
         /// <summary>
         /// Dispose of the created command
         /// </summary>
-        public void Dispose() => _model.Dispose();
+        public virtual void Dispose()
+        {
+            Model.Dispose();
+        }
     }
 }

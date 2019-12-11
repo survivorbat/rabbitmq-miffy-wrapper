@@ -13,6 +13,9 @@ namespace Minor.Miffy.MicroServices.Events
     {
         public string TopicPattern { get; }
 
-        public TopicAttribute(string topicPattern) => TopicPattern = topicPattern;
+        public TopicAttribute(string topicPattern)
+        {
+            TopicPattern = topicPattern;
+        }
     }
 }

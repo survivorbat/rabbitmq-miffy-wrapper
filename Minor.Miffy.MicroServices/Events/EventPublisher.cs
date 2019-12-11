@@ -12,33 +12,33 @@ namespace Minor.Miffy.MicroServices.Events
         /// <summary>
         /// Sender to send a message through the bus
         /// </summary>
-        private readonly IMessageSender _sender;
+        protected readonly IMessageSender Sender;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<EventPublisher> _logger;
+        protected readonly ILogger<EventPublisher> Logger;
 
         /// <summary>
         /// Create a publisher and initialize a sender
         /// </summary>
         public EventPublisher(IBusContext<IConnection> context, ILoggerFactory loggerFactory = null)
         {
-            _sender = context.CreateMessageSender();
+            Sender = context.CreateMessageSender();
             loggerFactory ??= new NullLoggerFactory();
-            _logger = loggerFactory.CreateLogger<EventPublisher>();
+            Logger = loggerFactory.CreateLogger<EventPublisher>();
         }
 
         /// <summary>
         /// Publish a domain event
         /// </summary>
-        public void Publish(DomainEvent domainEvent)
+        public virtual void Publish(DomainEvent domainEvent)
         {
-            _logger.LogTrace($"Publishing domain event with type {domainEvent.Type} and ID {domainEvent.Id}");
+            Logger.LogTrace($"Publishing domain event with type {domainEvent.Type} and ID {domainEvent.Id}");
 
             string json = JsonConvert.SerializeObject(domainEvent);
 
-            _logger.LogDebug($"Publishing domain event {domainEvent.Id} with body: {json}");
+            Logger.LogDebug($"Publishing domain event {domainEvent.Id} with body: {json}");
 
             EventMessage message = new EventMessage
             {
@@ -49,7 +49,7 @@ namespace Minor.Miffy.MicroServices.Events
                 Body = Encoding.Unicode.GetBytes(json)
             };
 
-            _sender.SendMessage(message);
+            Sender.SendMessage(message);
         }
 
         /// <summary>
@@ -58,9 +58,9 @@ namespace Minor.Miffy.MicroServices.Events
         /// In case you want to publish a 'normal' event you're strongly encouraged to use the
         /// DomainEvent variant.
         /// </summary>
-        public void Publish(long timeStamp, string topic, Guid correlationId, string eventType, string body)
+        public virtual void Publish(long timeStamp, string topic, Guid correlationId, string eventType, string body)
         {
-            _logger.LogTrace($"Publishing domain event with type {eventType} and ID {correlationId.ToString()} and body {body}");
+            Logger.LogTrace($"Publishing domain event with type {eventType} and ID {correlationId.ToString()} and body {body}");
 
             EventMessage message = new EventMessage
             {
@@ -71,7 +71,7 @@ namespace Minor.Miffy.MicroServices.Events
                 Body = Encoding.Unicode.GetBytes(body)
             };
 
-            _sender.SendMessage(message);
+            Sender.SendMessage(message);
         }
     }
 }

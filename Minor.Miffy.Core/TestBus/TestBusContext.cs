@@ -23,13 +23,13 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        internal virtual Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>> DataQueues { get; } = 
+        internal Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>> DataQueues { get; } =
             new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
-        
+
         /// <summary>
         /// The dictionary that keeps track of running commands
         /// </summary>
-        internal virtual Dictionary<string, TestBusQueueWrapper<CommandMessage>> CommandQueues { get; } = 
+        internal Dictionary<string, TestBusQueueWrapper<CommandMessage>> CommandQueues { get; } =
             new Dictionary<string, TestBusQueueWrapper<CommandMessage>>();
 
         /// <summary>
@@ -42,22 +42,33 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Return a test message sender to use for testing purposes
         /// </summary>
-        public IMessageSender CreateMessageSender() => new TestMessageSender(this);
+        public IMessageSender CreateMessageSender()
+        {
+            return new TestMessageSender(this);
+        }
 
         /// <summary>
         /// Return a test message receiver to use for testing purposes
         /// </summary>
-        public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions) => 
-            new TestMessageReceiver(this, queueName, topicExpressions);
+        public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions)
+        {
+            return new TestMessageReceiver(this, queueName, topicExpressions);
+        }
 
         /// <summary>
         /// Return a test command sender
         /// </summary>
-        public ICommandSender CreateCommandSender() => new TestCommandSender(this);
-        
+        public ICommandSender CreateCommandSender()
+        {
+            return new TestCommandSender(this);
+        }
+
         /// <summary>
         /// Return a test command sender
         /// </summary>
-        public ICommandReceiver CreateCommandReceiver(string queueName) => new TestCommandReceiver(this, queueName);
+        public ICommandReceiver CreateCommandReceiver(string queueName)
+        {
+            return new TestCommandReceiver(this, queueName);
+        }
     }
 }

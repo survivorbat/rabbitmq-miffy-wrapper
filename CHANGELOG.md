@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.3.1
+
+- Make a bunch of context methods virtual
+
 ## 1.3.0
 
 - Change accessibility in host and hostbuilder to increase extensibility

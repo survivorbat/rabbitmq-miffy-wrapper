@@ -12,19 +12,19 @@ namespace Minor.Miffy.MicroServices.Commands
         /// The Timestamp is set to the creation time of the domain event.
         /// </summary>
         [JsonProperty]
-        public long Timestamp { get; private set; }
+        public long Timestamp { get; protected set; }
 
         /// <summary>
         /// The ID uniquely identifies the domain event.
         /// </summary>
         [JsonProperty]
-        public Guid Id { get; private set; }
+        public Guid Id { get; protected set; }
 
         /// <summary>
         /// Queue to send message to
         /// </summary>
         [JsonProperty]
-        public string DestinationQueue { get; private set; }
+        public string DestinationQueue { get; protected set; }
 
         /// <summary>
         /// Creates a domain event by setting the topic and generating a timestamp.

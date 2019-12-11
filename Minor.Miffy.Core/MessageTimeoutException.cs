@@ -10,7 +10,7 @@ namespace Minor.Miffy
         /// <summary>
         /// The timeout given for the response
         /// </summary>
-        public int TimeOut { get;  }
+        public virtual int TimeOut { get;  }
 
         /// <summary>
         /// Create a new timeout exception with a given message and a timeout

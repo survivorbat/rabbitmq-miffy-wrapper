@@ -13,36 +13,36 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Connection to the broker
         /// </summary>
-        private readonly IConnection _connection;
+        protected readonly IConnection Connection;
 
         /// <summary>
         /// Name of the xchange being used
         /// </summary>
-        private readonly string _exchangeName;
+        protected readonly string ExchangeName;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<RabbitMqMessagePublisher> _logger;
+        protected readonly ILogger<RabbitMqMessagePublisher> Logger;
 
         /// <summary>
         /// Initialize a message publisher with a bus context
         /// </summary>
         public RabbitMqMessagePublisher(IBusContext<IConnection> context)
         {
-            _connection = context.Connection;
-            _exchangeName = context.ExchangeName;
-            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessagePublisher>();
+            Connection = context.Connection;
+            ExchangeName = context.ExchangeName;
+            Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessagePublisher>();
         }
 
         /// <summary>
         /// Publish a message to the broker
         /// </summary>
-        public void SendMessage(EventMessage message)
+        public virtual void SendMessage(EventMessage message)
         {
-            using IModel channel = _connection.CreateModel();
+            using IModel channel = Connection.CreateModel();
 
-            _logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
+            Logger.LogInformation($"Publishing message with id {message.CorrelationId}" +
                                    $", topic {message.Topic} and type {message.EventType}");
 
             IBasicProperties properties = channel.CreateBasicProperties();
@@ -50,7 +50,7 @@ namespace Minor.Miffy.RabbitMQBus
             properties.Timestamp = new AmqpTimestamp(message.Timestamp);
             properties.CorrelationId = message.CorrelationId.ToString();
 
-            channel.BasicPublish(_exchangeName, message.Topic, properties, message.Body);
+            channel.BasicPublish(ExchangeName, message.Topic, properties, message.Body);
         }
     }
 }

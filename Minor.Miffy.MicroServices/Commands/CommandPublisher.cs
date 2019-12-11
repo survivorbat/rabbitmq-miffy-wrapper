@@ -14,12 +14,12 @@ namespace Minor.Miffy.MicroServices.Commands
         /// <summary>
         /// Sender to send a message through the bus
         /// </summary>
-        private readonly ICommandSender _sender;
+        protected readonly ICommandSender _sender;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<EventPublisher> _logger;
+        protected readonly ILogger<EventPublisher> _logger;
 
         /// <summary>
         /// Create a publisher and initialize a sender
@@ -34,7 +34,7 @@ namespace Minor.Miffy.MicroServices.Commands
         /// <summary>
         /// Publish a domain command with a specific return result
         /// </summary>
-        public async Task<TReturn> PublishAsync<TReturn>(DomainCommand domainCommand)
+        public virtual async Task<TReturn> PublishAsync<TReturn>(DomainCommand domainCommand)
         {
             _logger.LogTrace(
                 $"Publishing domain command with type {domainCommand.GetType().Name} and ID {domainCommand.Id}");

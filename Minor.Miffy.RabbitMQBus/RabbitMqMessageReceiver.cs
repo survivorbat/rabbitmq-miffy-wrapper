@@ -17,41 +17,41 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Dispose of both the model and the context
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _model.Dispose();
+            Model.Dispose();
         }
 
         /// <summary>
         /// Model used to listen to broker
         /// </summary>
-        private readonly IModel _model;
+        protected readonly IModel Model;
 
         /// <summary>
         /// Context that is connected to the broker
         /// </summary>
-        private readonly IBusContext<IConnection> _context;
+        protected readonly IBusContext<IConnection> Context;
 
         /// <summary>
         /// Logger to log received messages
         /// </summary>
-        private readonly ILogger<RabbitMqMessageReceiver> _logger;
+        protected readonly ILogger<RabbitMqMessageReceiver> Logger;
 
         /// <summary>
         /// Whether the current message receiver is listening to the broker
         /// </summary>
-        private bool _isListening;
+        protected bool IsListening { get; set; }
 
         /// <summary>
         /// Initialize a message receiver with a context, queue name and topic filters
         /// </summary>
         public RabbitMqMessageReceiver(IBusContext<IConnection> context, string queueName, IEnumerable<string> topicFilters)
         {
-            _context = context;
-            _model = _context.Connection.CreateModel();
+            Context = context;
+            Model = Context.Connection.CreateModel();
             QueueName = queueName;
             TopicFilters = topicFilters;
-            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessageReceiver>();
+            Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessageReceiver>();
         }
 
         /// <summary>
@@ -67,37 +67,37 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Create a queue and bind it to the exchange and the topic expression
         /// </summary>
-        public void StartReceivingMessages()
+        public virtual void StartReceivingMessages()
         {
-            if (_isListening)
+            if (IsListening)
             {
                 throw new BusConfigurationException("Receiver is already listening to events!");
             }
 
-            _logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
-            _model.QueueDeclare(QueueName, true, false, false);
+            Logger.LogDebug($"Declaring queue {QueueName} with {TopicFilters.Count()} topic expressions");
+            Model.QueueDeclare(QueueName, true, false, false);
             foreach (string topicExpression in TopicFilters)
             {
-                _model.QueueBind(QueueName, _context.ExchangeName, topicExpression);
+                Model.QueueBind(QueueName, Context.ExchangeName, topicExpression);
             }
 
-            _isListening = true;
+            IsListening = true;
         }
 
         /// <summary>
         /// Start consuming messages from the queue
         /// </summary>
-        public void StartHandlingMessages(EventMessageReceivedCallback callback)
+        public virtual void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
-            if (!_isListening)
+            if (!IsListening)
             {
                 throw new BusConfigurationException("Receiver is not listening to events");
             }
 
-            EventingBasicConsumer consumer = new EventingBasicConsumer(_model);
+            EventingBasicConsumer consumer = new EventingBasicConsumer(Model);
             consumer.Received += (model, args) =>
             {
-                _logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
+                Logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
                                        $"of type {args.BasicProperties.Type} " +
                                        $"with topic {args.RoutingKey}");
 
@@ -113,8 +113,8 @@ namespace Minor.Miffy.RabbitMQBus
                 callback(eventMessage);
             };
 
-            _logger.LogDebug($"Start consuming queue {QueueName}");
-            _model.BasicConsume(QueueName, true, "", false, false, null, consumer);
+            Logger.LogDebug($"Start consuming queue {QueueName}");
+            Model.BasicConsume(QueueName, true, "", false, false, null, consumer);
         }
     }
 }

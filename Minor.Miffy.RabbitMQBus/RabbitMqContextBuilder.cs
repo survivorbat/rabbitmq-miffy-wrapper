@@ -10,32 +10,32 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<RabbitMqContextBuilder> _logger;
+        protected readonly ILogger<RabbitMqContextBuilder> Logger;
 
         /// <summary>
         /// Connection string
         /// </summary>
-        public Uri ConnectionString { get; private set; }
+        public Uri ConnectionString { get; protected set; }
 
         /// <summary>
         /// Exchange name
         /// </summary>
-        public string ExchangeName { get; private set; }
+        public string ExchangeName { get; protected set; }
 
         /// <summary>
         /// Initialize a builder with a logger
         /// </summary>
         public RabbitMqContextBuilder()
         {
-            _logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqContextBuilder>();
+            Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqContextBuilder>();
         }
 
         /// <summary>
         /// Set up an exchange name
         /// </summary>
-        public RabbitMqContextBuilder WithExchange(string exchangeName)
+        public virtual RabbitMqContextBuilder WithExchange(string exchangeName)
         {
-            _logger.LogTrace($"Setting exchange name as {exchangeName}");
+            Logger.LogTrace($"Setting exchange name as {exchangeName}");
             ExchangeName = exchangeName;
             return this;
         }
@@ -45,9 +45,9 @@ namespace Minor.Miffy.RabbitMQBus
         ///
         /// Not logging the url since it might leak secrets
         /// </summary>
-        public RabbitMqContextBuilder WithConnectionString(string url)
+        public virtual RabbitMqContextBuilder WithConnectionString(string url)
         {
-            _logger.LogTrace($"Setting connection string");
+            Logger.LogTrace($"Setting connection string");
             ConnectionString = new Uri(url);
             return this;
         }
@@ -55,14 +55,14 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Initialize the connection to the broker using environment variables
         /// </summary>
-        public RabbitMqContextBuilder ReadFromEnvironmentVariables()
+        public virtual RabbitMqContextBuilder ReadFromEnvironmentVariables()
         {
             string url = Environment.GetEnvironmentVariable(EnvVarNames.BrokerConnectionString) ??
                            throw new BusConfigurationException($"{EnvVarNames.BrokerConnectionString} env variable not set");
             ExchangeName = Environment.GetEnvironmentVariable(EnvVarNames.BrokerExchangeName) ??
                            throw new BusConfigurationException($"{EnvVarNames.BrokerExchangeName} env variable not set");
 
-            _logger.LogDebug($"Setting exchange name as {ExchangeName} and setting connection string");
+            Logger.LogDebug($"Setting exchange name as {ExchangeName} and setting connection string");
 
             ConnectionString = new Uri(url);
             return this;
@@ -74,7 +74,7 @@ namespace Minor.Miffy.RabbitMQBus
         ///  - a declared Topic-Exchange (based on ExchangeName)
         /// </summary>
         /// <param name="connectionFactory">Use a custom connection factory</param>
-        public IBusContext<IConnection> CreateContext(IConnectionFactory connectionFactory)
+        public virtual IBusContext<IConnection> CreateContext(IConnectionFactory connectionFactory)
         {
             connectionFactory.Uri = ConnectionString;
 
@@ -82,7 +82,7 @@ namespace Minor.Miffy.RabbitMQBus
 
             using (var channel = connection.CreateModel())
             {
-                _logger.LogDebug($"Declaring exchange {ExchangeName}");
+                Logger.LogDebug($"Declaring exchange {ExchangeName}");
                 channel.ExchangeDeclare(ExchangeName, ExchangeType.Topic);
             }
 
@@ -94,7 +94,7 @@ namespace Minor.Miffy.RabbitMQBus
         ///  - an opened connection (based on the URI)
         ///  - a declared Topic-Exchange (based on ExchangeName)
         /// </summary>
-        public IBusContext<IConnection> CreateContext()
+        public virtual IBusContext<IConnection> CreateContext()
         {
             return CreateContext(new ConnectionFactory());
         }

@@ -9,18 +9,18 @@ namespace Minor.Miffy
     public class EventMessage
     {
         [JsonProperty]
-        public string Topic { get; set; }
-        
+        public virtual string Topic { get; set; }
+
         [JsonProperty]
-        public Guid CorrelationId { get; set; }
-        
+        public virtual Guid CorrelationId { get; set; }
+
         [JsonProperty]
-        public long Timestamp { get; set; }
-        
+        public virtual long Timestamp { get; set; }
+
         [JsonProperty]
-        public string EventType { get; set; }
-        
+        public virtual string EventType { get; set; }
+
         [JsonProperty]
-        public byte[] Body { get; set; }
+        public virtual byte[] Body { get; set; }
     }
 }
