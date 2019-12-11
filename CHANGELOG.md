@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.4.0
+
+- Add 'Pause' and 'Resume' methods to MessageReceivers
+
 ## 1.3.1
 
 - Make a bunch of context methods virtual
