@@ -23,6 +23,11 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
+        /// Is the listener currently paused?
+        /// </summary>
+        public bool IsPaused { get; protected set; }
+
+        /// <summary>
         /// Model used to listen to broker
         /// </summary>
         protected readonly IModel Model;
@@ -115,6 +120,32 @@ namespace Minor.Miffy.RabbitMQBus
 
             Logger.LogDebug($"Start consuming queue {QueueName}");
             Model.BasicConsume(QueueName, true, "", false, false, null, consumer);
+        }
+
+        /// <summary>
+        /// Pause the receiver
+        /// </summary>
+        public void Pause()
+        {
+            if (IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to pause the MessageReceiver, but it already paused.");
+            }
+
+            IsPaused = true;
+        }
+
+        /// <summary>
+        /// Resume the receiver
+        /// </summary>
+        public void Resume()
+        {
+            if (!IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to resume the MessageReceiver, but it was not paused.");
+            }
+
+            IsPaused = false;
         }
     }
 }

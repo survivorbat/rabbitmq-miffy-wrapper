@@ -13,6 +13,11 @@ namespace Minor.Miffy.TestBus
         public TestBusContext Context { get; protected set; }
 
         /// <summary>
+        /// Indicate whether the receiver is paused or not
+        /// </summary>
+        public bool IsPaused { get; private set; }
+
+        /// <summary>
         /// dDetermine if the receiver is listening
         /// </summary>
         protected bool IsListening { get; set; }
@@ -85,6 +90,12 @@ namespace Minor.Miffy.TestBus
                 Thread thread = new Thread(() => {
                     while (true)
                     {
+                        if (IsPaused)
+                        {
+                            Thread.Sleep(1000);
+                            continue;
+                        }
+
                         TestBusKey key = new TestBusKey(QueueName, topic);
 
                         _logger.LogTrace($"Waiting for message on queue {QueueName} with topic {topic}");
@@ -101,6 +112,32 @@ namespace Minor.Miffy.TestBus
                 thread.IsBackground = true;
                 thread.Start();
             }
+        }
+
+        /// <summary>
+        /// Pause the receiver
+        /// </summary>
+        public void Pause()
+        {
+            if (IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it already paused.");
+            }
+
+            IsPaused = true;
+        }
+
+        /// <summary>
+        /// Resume the receiver
+        /// </summary>
+        public void Resume()
+        {
+            if (!IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to resume the TestMessageReceiver, but it was not paused.");
+            }
+
+            IsPaused = false;
         }
     }
 }
