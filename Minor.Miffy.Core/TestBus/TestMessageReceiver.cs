@@ -10,17 +10,17 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The test context being used
         /// </summary>
-        public TestBusContext Context { get; set; }
+        public TestBusContext Context { get; protected set; }
 
         /// <summary>
         /// dDetermine if the receiver is listening
         /// </summary>
-        private bool _isListening;
+        protected bool IsListening { get; set; }
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<TestMessageReceiver> _logger;
+        protected readonly ILogger<TestMessageReceiver> _logger;
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions
@@ -37,7 +37,7 @@ namespace Minor.Miffy.TestBus
         /// Empty dispose since we don't have anything to dispose of
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public void Dispose()
+        public virtual void Dispose()
         {
             // Nothing to dispose of
         }
@@ -46,7 +46,7 @@ namespace Minor.Miffy.TestBus
         /// Name of the queue
         /// </summary>
         public string QueueName { get; }
-        
+
         /// <summary>
         /// Topic filters to filter the listener on
         /// </summary>
@@ -55,9 +55,9 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Create a new queue wrapper object in the dictionary of the bus
         /// </summary>
-        public void StartReceivingMessages()
+        public virtual void StartReceivingMessages()
         {
-            if (_isListening)
+            if (IsListening)
             {
                 throw new BusConfigurationException("Receiver is already listening to events!");
             }
@@ -69,19 +69,19 @@ namespace Minor.Miffy.TestBus
                 Context.DataQueues[key] = new TestBusQueueWrapper<EventMessage>();
             }
 
-            _isListening = true;
+            IsListening = true;
         }
 
         /// <summary>
         /// Create a new thread with an endless loop that waits for new
         /// messages in a specific queue
         /// </summary>
-        public void StartHandlingMessages(EventMessageReceivedCallback callback)
+        public virtual void StartHandlingMessages(EventMessageReceivedCallback callback)
         {
             foreach (string topic in TopicFilters)
             {
                 _logger.LogDebug($"Creating thread for queue {QueueName} with topic {topic}");
-                
+
                 Thread thread = new Thread(() => {
                     while (true)
                     {
@@ -91,13 +91,13 @@ namespace Minor.Miffy.TestBus
 
                         Context.DataQueues[key].AutoResetEvent.WaitOne();
                         Context.DataQueues[key].Queue.TryDequeue(out EventMessage result);
-                        
+
                         _logger.LogDebug($"Message received on queue {QueueName} with topic {topic}");
 
                         callback(result);
                     }
                 });
-                
+
                 thread.IsBackground = true;
                 thread.Start();
             }

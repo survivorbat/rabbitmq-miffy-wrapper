@@ -8,30 +8,35 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Context
         /// </summary>
-        private readonly TestBusContext _context;
+        protected readonly TestBusContext Context;
 
         /// <summary>
         /// Instantiate a command sender with a context
         /// </summary>
-        public TestCommandSender(TestBusContext context) => _context = context;
+        public TestCommandSender(TestBusContext context)
+        {
+            Context = context;
+        }
 
         /// <summary>
         /// Send a command asynchronously
         /// </summary>
-        public Task<CommandMessage> SendCommandAsync(CommandMessage request) =>
-            Task.Run(() =>
+        public virtual Task<CommandMessage> SendCommandAsync(CommandMessage request)
+        {
+            return Task.Run(() =>
             {
                 string randomReplyQueueName = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
                 request.ReplyQueue = randomReplyQueueName;
 
-                _context.CommandQueues[randomReplyQueueName] = new TestBusQueueWrapper<CommandMessage>();
+                Context.CommandQueues[randomReplyQueueName] = new TestBusQueueWrapper<CommandMessage>();
 
-                _context.CommandQueues[request.DestinationQueue].Queue.Enqueue(request);
-                _context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
+                Context.CommandQueues[request.DestinationQueue].Queue.Enqueue(request);
+                Context.CommandQueues[request.DestinationQueue].AutoResetEvent.Set();
 
-                _context.CommandQueues[randomReplyQueueName].AutoResetEvent.WaitOne();
-                _context.CommandQueues[randomReplyQueueName].Queue.TryDequeue(out CommandMessage output);
+                Context.CommandQueues[randomReplyQueueName].AutoResetEvent.WaitOne();
+                Context.CommandQueues[randomReplyQueueName].Queue.TryDequeue(out CommandMessage output);
                 return output;
             });
+        }
     }
 }

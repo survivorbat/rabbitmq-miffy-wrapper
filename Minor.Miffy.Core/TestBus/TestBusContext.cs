@@ -15,7 +15,7 @@ namespace Minor.Miffy.TestBus
         /// Unimplemented since we don't use a connection
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public void Dispose()
+        public virtual void Dispose()
         {
             // Nothing to dispose of
         }
@@ -23,26 +23,26 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The dictionary that will keep track of our data
         /// </summary>
-        internal Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>> DataQueues { get; } =
+        internal virtual Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>> DataQueues { get; } =
             new Dictionary<TestBusKey, TestBusQueueWrapper<EventMessage>>();
 
         /// <summary>
         /// The dictionary that keeps track of running commands
         /// </summary>
-        internal Dictionary<string, TestBusQueueWrapper<CommandMessage>> CommandQueues { get; } =
+        internal virtual Dictionary<string, TestBusQueueWrapper<CommandMessage>> CommandQueues { get; } =
             new Dictionary<string, TestBusQueueWrapper<CommandMessage>>();
 
         /// <summary>
         /// Properties that do not matter for the queue but are
         /// here to comply with the interface
         /// </summary>
-        public IConnection Connection => throw new NotImplementedException();
-        public string ExchangeName => throw new NotImplementedException();
+        public virtual IConnection Connection => throw new NotImplementedException();
+        public virtual string ExchangeName => throw new NotImplementedException();
 
         /// <summary>
         /// Return a test message sender to use for testing purposes
         /// </summary>
-        public IMessageSender CreateMessageSender()
+        public virtual IMessageSender CreateMessageSender()
         {
             return new TestMessageSender(this);
         }
@@ -50,7 +50,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Return a test message receiver to use for testing purposes
         /// </summary>
-        public IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions)
+        public virtual IMessageReceiver CreateMessageReceiver(string queueName, IEnumerable<string> topicExpressions)
         {
             return new TestMessageReceiver(this, queueName, topicExpressions);
         }
@@ -58,7 +58,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Return a test command sender
         /// </summary>
-        public ICommandSender CreateCommandSender()
+        public virtual ICommandSender CreateCommandSender()
         {
             return new TestCommandSender(this);
         }
@@ -66,7 +66,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Return a test command sender
         /// </summary>
-        public ICommandReceiver CreateCommandReceiver(string queueName)
+        public virtual ICommandReceiver CreateCommandReceiver(string queueName)
         {
             return new TestCommandReceiver(this, queueName);
         }

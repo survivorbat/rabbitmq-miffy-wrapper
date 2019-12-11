@@ -9,12 +9,12 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Testbus context
         /// </summary>
-        private readonly TestBusContext _context;
+        protected readonly TestBusContext _context;
 
         /// <summary>
         /// Logger
         /// </summary>
-        private readonly ILogger<TestMessageSender> _logger;
+        protected readonly ILogger<TestMessageSender> _logger;
 
         /// <summary>
         /// Testbuscontext to send the message to
@@ -28,14 +28,14 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Send a message to the in-memory bus
         /// </summary>
-        public void SendMessage(EventMessage message)
+        public virtual void SendMessage(EventMessage message)
         {
             IEnumerable<TestBusKey> matchingTopics = _context.DataQueues.Keys
                 .Where(key => key.TopicPattern.IsMatch(message.Topic))
                 .ToList();
-            
+
             _logger.LogDebug($"Message {message.CorrelationId} received with matching topics {string.Join(", ", matchingTopics)}");
-            
+
             foreach (TestBusKey key in matchingTopics)
             {
                 _context.DataQueues[key].Queue.Enqueue(message);
