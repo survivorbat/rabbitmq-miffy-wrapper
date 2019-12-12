@@ -141,6 +141,20 @@ publisher.Publish(exampleEvent);
 
 Publishers can be injected using the IEventPublisher interface and accept any event that inherits from DomainEvent.
 
+Please note that DomainEvents can also contain a Process Id since v1.5.0 to follow a certain process through a system.
+This property can be set using an overloaded constructor like so:
+
+```c#
+public class ExampleEvent : DomainEvent
+{
+    public ExampleEvent(Guid processId) : base("Exampletopic", processId) {}
+    public string ExampleData { get; set; }
+}
+
+Guid guid = /* Create a guid */;
+ExampleEvent exampleEvent = new ExampleEvent(guid);
+```
+
 #### Listening for raw json data
 
 In case you don't want to listen to specific events or want to
@@ -154,7 +168,7 @@ public class JsonEventListener
     [Topic("ExampleTopic")]
     public void Handles(string rawJson)
     {
-        DoSomethingWithJson(rawJsoon);
+        DoSomethingWithJson(rawJson);
     }
 }
 ```
@@ -238,6 +252,20 @@ ICommandPublisher publisher = new CommandPublisher(context)
 ExampleCommandResult result = publisher.PublishAsync<ExampleCommandResult>(exampleCommand);
 
 Assert.AreEqual("Hello world!", result.ExampleData);
+```
+
+Please note that, just like events,  DomainCommands can also contain a Process Id since v1.5.0 to follow a certain process through a system.
+This property can be set using an overloaded constructor like so:
+
+```c#
+public class ExampleCommand : DomainCommand
+{
+    public ExampleCommand(Guid processId) : base("command.queue.somewhere", processId) {}
+    public string ExampleData { get; set; }
+}
+
+Guid guid = /* Create a guid */;
+ExampleCommand exampleCommand = new ExampleCommand(guid);
 ```
 
 And that's about it! Have fun rabbiting :)
