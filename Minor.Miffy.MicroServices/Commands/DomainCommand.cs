@@ -21,6 +21,12 @@ namespace Minor.Miffy.MicroServices.Commands
         public Guid Id { get; protected set; }
 
         /// <summary>
+        /// Id of the process
+        /// </summary>
+        [JsonProperty]
+        public Guid ProcessId { get; protected set; }
+
+        /// <summary>
         /// Queue to send message to
         /// </summary>
         [JsonProperty]
@@ -34,6 +40,14 @@ namespace Minor.Miffy.MicroServices.Commands
             Timestamp = DateTime.Now.Ticks;
             Id = Guid.NewGuid();
             DestinationQueue = destinationQueue;
+        }
+
+        /// <summary>
+        /// Create a domain command with a process id
+        /// </summary>
+        protected DomainCommand(string destinationQueue, Guid processId) : this(destinationQueue)
+        {
+            ProcessId = processId;
         }
     }
 }

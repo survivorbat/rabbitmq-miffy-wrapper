@@ -23,6 +23,24 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Events
         }
 
         [TestMethod]
+        [DataRow("test.topic", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC")]
+        [DataRow("topic.test", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC")]
+        public void ContructorProperlyInitializesGuid(string topic, string guidString)
+        {
+            // Arrange
+            Guid guid = Guid.Parse(guidString);
+
+            // Act
+            DomainEvent @event = new TestEvent(topic, guid);
+
+            // Assert
+            Assert.IsNotNull(@event.Id);
+            Assert.IsNotNull(@event.Timestamp);
+            Assert.AreEqual(guid, @event.ProcessId);
+            Assert.AreEqual(topic, @event.Topic);
+        }
+
+        [TestMethod]
         [DataRow("Blackjack", "Jan is toegevoegd")]
         [DataRow("TestEvent", "Event happened")]
         [DataRow("Serializing", "All the things")]

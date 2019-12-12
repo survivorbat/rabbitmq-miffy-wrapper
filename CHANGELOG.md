@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.5.0
+
+- Add ProcessId property to DomainEvents and DomainCommands
+
 ## 1.4.1
 
 - Add logging to pausing and resuming

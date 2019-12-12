@@ -1,3 +1,4 @@
+using System;
 using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Unit.Events
@@ -11,7 +12,9 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Events
         /// Proxy the topic to the base class
         /// </summary>
         public TestEvent(string topic) : base(topic) { }
-        
+
+        public TestEvent(string topic, Guid guid) : base(topic, guid) {}
+
         /// <summary>
         /// A dummy datafield to allow serialization tests
         /// </summary>

@@ -1,3 +1,4 @@
+using System;
 using Minor.Miffy.MicroServices.Commands;
 
 namespace Minor.Miffy.MicroServices.Test.Unit.Commands
@@ -11,7 +12,12 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Commands
         /// Proxy the topic to the base class
         /// </summary>
         public TestCommand(string queue) : base(queue) { }
-        
+
+        /// <summary>
+        /// Proxy the queue and guild to the base class
+        /// </summary>
+        public TestCommand(string queue, Guid guid) : base(queue, guid) { }
+
         /// <summary>
         /// A dummy datafield to allow serialization tests
         /// </summary>
