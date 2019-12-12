@@ -174,7 +174,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartHandlingMessages(e => {});
 
             // Assert
-            modelMock.Verify(e => e.BasicConsume(queueName, true, "", false, false, null, It.IsAny<IBasicConsumer>()));
+            modelMock.Verify(e => e.BasicConsume(queueName, true, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
         }
 
         [TestMethod]
@@ -194,7 +194,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Retrieve consumer from callback
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
             modelMock.Setup(
-                    e => e.BasicConsume("test.queue", true, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                    e => e.BasicConsume("test.queue", true, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string, bool, string, bool, bool, IDictionary<string, object>, IBasicConsumer>(
                     (a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
@@ -212,7 +212,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             // Act
             Thread.Sleep(WaitTime);
-            consumer.HandleBasicDeliver("some-tag", 0, false, exchangeName, topic, properties, new byte[0]);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), 0, false, exchangeName, topic, properties, new byte[0]);
 
             // Assert
             Assert.AreEqual(topic, eventMessage.Topic);
@@ -324,6 +324,47 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Attempting to resume the MessageReceiver, but it is not even receiving messages.", exception.Message);
+        }
+
+        [TestMethod]
+        public void PauseCallsBasicCancelOnModel()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqMessageReceiver(contextMock.Object, "queue", new string[0]);
+            receiver.StartReceivingMessages();
+
+            // Act
+            receiver.Pause();
+
+            // Assert
+            modelMock.Verify(e => e.BasicCancel(It.IsAny<string>()));
+        }
+
+        [TestMethod]
+        public void ResumeCallsBasicConsumeOnModel()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqMessageReceiver(contextMock.Object, "queue", new string[0]);
+            receiver.StartReceivingMessages();
+            receiver.Pause();
+
+            // Act
+            receiver.Resume();
+
+            // Assert
+            modelMock.Verify(e => e.BasicConsume("queue", true, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
         }
     }
 }

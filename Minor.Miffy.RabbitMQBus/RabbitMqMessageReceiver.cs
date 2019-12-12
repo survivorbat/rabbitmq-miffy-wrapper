@@ -48,6 +48,11 @@ namespace Minor.Miffy.RabbitMQBus
         protected bool IsListening { get; set; }
 
         /// <summary>
+        /// A randomly generated consumer ta
+        /// </summary>
+        protected string ConsumerTag { get; set; }
+
+        /// <summary>
         /// Initialize a message receiver with a context, queue name and topic filters
         /// </summary>
         public RabbitMqMessageReceiver(IBusContext<IConnection> context, string queueName, IEnumerable<string> topicFilters)
@@ -58,6 +63,7 @@ namespace Minor.Miffy.RabbitMQBus
             TopicFilters = topicFilters;
             Consumer = new EventingBasicConsumer(Model);
             Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessageReceiver>();
+            ConsumerTag = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -124,7 +130,7 @@ namespace Minor.Miffy.RabbitMQBus
             };
 
             Logger.LogDebug($"Start consuming queue {QueueName}");
-            Model.BasicConsume(QueueName, true, "", false, false, null, Consumer);
+            Model.BasicConsume(QueueName, true, ConsumerTag, false, false, null, Consumer);
         }
 
         /// <summary>
@@ -141,7 +147,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Attempting to pause the MessageReceiver, but it was already paused.");
             }
 
-            Model.BasicCancel(Consumer.ConsumerTag);
+            Model.BasicCancel(ConsumerTag);
 
             IsPaused = true;
         }
@@ -160,7 +166,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Attempting to resume the MessageReceiver, but it was not paused.");
             }
 
-            Model.BasicConsume(QueueName, true, Consumer.ConsumerTag, false, false, null, Consumer);
+            Model.BasicConsume(QueueName, true, ConsumerTag, false, false, null, Consumer);
 
             IsPaused = false;
         }
