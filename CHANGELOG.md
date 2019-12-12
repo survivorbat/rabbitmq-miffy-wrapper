@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.4.1
+
+- Add logging to pausing and resuming
+
 ## 1.4.0
 
 - Add 'Pause' and 'Resume' methods to MessageReceivers
@@ -22,7 +26,7 @@
 
 ## 1.0.1
 
-- Loosen the accessibility of the fields in the host and the host builder 
+- Loosen the accessibility of the fields in the host and the host builder
 
 ## 1.0.0
 
