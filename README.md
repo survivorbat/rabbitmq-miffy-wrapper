@@ -5,8 +5,6 @@
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
 These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
-<a href="https://www.buymeacoffee.com/MaartenH" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-red.png" height="50" widt="216" alt="Buy Me A Coffee" ></a>
-
 **MaartenH.Minor.Miffy.Abstractions**:
 Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
@@ -274,3 +272,5 @@ And that's about it! Have fun rabbiting :)
 - Queue names **MUST** be unique
 - Exceptions thrown in Command callbacks **MUST** implement Serializable or have a _[Serializable]_ attribute
 - Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized
+
+<a href="https://www.buymeacoffee.com/MaartenH" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-red.png" height="50" widt="216" alt="Buy Me A Coffee" ></a>
