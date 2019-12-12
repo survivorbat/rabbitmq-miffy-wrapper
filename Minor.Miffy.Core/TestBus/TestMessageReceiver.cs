@@ -131,13 +131,17 @@ namespace Minor.Miffy.TestBus
         {
             if (!IsListening)
             {
+                Logger.LogCritical($"Attempting to pause the MessageReceiver, but it is not even receiving messages yet with queue {QueueName}");
                 throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it is not even receiving messages.");
             }
 
             if (IsPaused)
             {
+                Logger.LogCritical($"Attempting to pause the MessageReceiver, but it is already paused with queue {QueueName}");
                 throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it was already paused.");
             }
+
+            Logger.LogInformation($"Pausing consumption of queue {QueueName}");
 
             IsPaused = true;
         }
@@ -149,13 +153,17 @@ namespace Minor.Miffy.TestBus
         {
             if (!IsListening)
             {
+                Logger.LogCritical($"Attempting to resume the MessageReceiver, but it is not even receiving messages yet with queue {QueueName}");
                 throw new BusConfigurationException("Attempting to resume the TestMessageReceiver, but it is not even receiving messages.");
             }
 
             if (!IsPaused)
             {
+                Logger.LogCritical($"Attempting to resume the MessageReceiver, but it is not paused with queue {QueueName}");
                 throw new BusConfigurationException("Attempting to resume the TestMessageReceiver, but it was not paused.");
             }
+
+            Logger.LogInformation($"Resuming consumption of queue {QueueName}");
 
             IsPaused = false;
         }
