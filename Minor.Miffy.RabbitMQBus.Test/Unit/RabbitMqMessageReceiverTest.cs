@@ -193,8 +193,10 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             // Retrieve consumer from callback
             var receiver = new RabbitMqMessageReceiver(contextMock.Object, "test.queue", new string[0]);
-            modelMock.Setup(e => e.BasicConsume("test.queue", true, "", false, false, null, It.IsAny<IBasicConsumer>()))
-                .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
+            modelMock.Setup(
+                    e => e.BasicConsume("test.queue", true, "", false, false, null, It.IsAny<IBasicConsumer>()))
+                .Callback<string, bool, string, bool, bool, IDictionary<string, object>, IBasicConsumer>(
+                    (a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             EventMessage eventMessage = null;
 
@@ -210,7 +212,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
 
             // Act
             Thread.Sleep(WaitTime);
-            consumer.HandleBasicDeliver("", 0, false, exchangeName, topic, properties, new byte[0]);
+            consumer.HandleBasicDeliver("some-tag", 0, false, exchangeName, topic, properties, new byte[0]);
 
             // Assert
             Assert.AreEqual(topic, eventMessage.Topic);

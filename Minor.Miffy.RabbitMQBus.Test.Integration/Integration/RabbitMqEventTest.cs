@@ -48,7 +48,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             Thread.Sleep(WaitTime);
 
             // Assert
-            Assert.IsTrue(messageReceived);
+            Assert.AreEqual(true, messageReceived);
         }
 
         [TestMethod]
@@ -97,9 +97,10 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
         }
 
         [TestMethod]
-        [DataRow("TestQueueWithAName")]
-        [DataRow("typo.queue")]
-        public void PausePausesReceivingMessages(string queueName)
+        [DataRow(103920)]
+        [DataRow(6938)]
+        [DataRow(639530)]
+        public void PausePausesReceivingMessages(long timestamp)
         {
             // Arrange
             using IBusContext<IConnection> context = new RabbitMqContextBuilder()
@@ -109,14 +110,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
 
             bool messageReceived = false;
 
-            using var receiver = context.CreateMessageReceiver(queueName, new []{"test"});
+            using var receiver = context.CreateMessageReceiver("topic.queue.test", new []{"test"});
             receiver.StartReceivingMessages();
             receiver.StartHandlingMessages(e => messageReceived = true);
 
             var eventMessage = new EventMessage
             {
                 Body = Encoding.Unicode.GetBytes("TestMessage"),
-                Timestamp = 10,
+                Timestamp = timestamp,
                 CorrelationId = Guid.NewGuid(),
                 Topic = "test",
                 EventType = "TestEvent"
@@ -131,13 +132,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             Thread.Sleep(WaitTime);
 
             // Assert
-            Assert.IsFalse(messageReceived);
+            Assert.AreEqual(false, messageReceived);
         }
 
         [TestMethod]
-        [DataRow("TestQueueThatWorks")]
-        [DataRow("some.random.queue")]
-        public void ResumeResumesReceivingMessagesAfterItWasPaused(string queueName)
+        [DataRow(103920)]
+        [DataRow(6938)]
+        [DataRow(639530)]
+        public void ResumeResumesReceivingMessagesAfterItWasPaused(long timestamp)
         {
             // Arrange
             using IBusContext<IConnection> context = new RabbitMqContextBuilder()
@@ -147,14 +149,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
 
             bool messageReceived = false;
 
-            using var receiver = context.CreateMessageReceiver(queueName, new []{"test"});
+            using var receiver = context.CreateMessageReceiver("topic.queue.test", new []{"test"});
             receiver.StartReceivingMessages();
             receiver.StartHandlingMessages(e => messageReceived = true);
 
             var eventMessage = new EventMessage
             {
                 Body = Encoding.Unicode.GetBytes("TestMessage"),
-                Timestamp = 10,
+                Timestamp = timestamp,
                 CorrelationId = Guid.NewGuid(),
                 Topic = "test",
                 EventType = "TestEvent"
@@ -163,21 +165,15 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             receiver.Pause();
 
             // Act
-            void Resume() => receiver.Resume();
-
             var sender = context.CreateMessageSender();
             sender.SendMessage(eventMessage);
+
+            receiver.Resume();
 
             // Assert
             Thread.Sleep(WaitTime);
 
-            Assert.IsFalse(messageReceived);
-
-            Resume();
-
-            Thread.Sleep(WaitTime);
-
-            Assert.IsTrue(messageReceived);
+            Assert.AreEqual(true, messageReceived);
         }
 
         [TestCleanup]

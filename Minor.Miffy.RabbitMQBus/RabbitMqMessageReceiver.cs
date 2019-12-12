@@ -71,11 +71,6 @@ namespace Minor.Miffy.RabbitMQBus
         public IEnumerable<string> TopicFilters { get; }
 
         /// <summary>
-        /// The event handler that keeps track of our callback.
-        /// </summary>
-        protected EventHandler<BasicDeliverEventArgs> ConsumerCallback;
-
-        /// <summary>
         /// The consumer used by the class
         /// </summary>
         protected readonly EventingBasicConsumer Consumer;
@@ -110,7 +105,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Receiver is not listening to events");
             }
 
-            ConsumerCallback = (model, args) =>
+            Consumer.Received += (model, args) =>
             {
                 Logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
                                        $"of type {args.BasicProperties.Type} " +
@@ -127,8 +122,6 @@ namespace Minor.Miffy.RabbitMQBus
 
                 callback(eventMessage);
             };
-
-            Consumer.Received += ConsumerCallback;
 
             Logger.LogDebug($"Start consuming queue {QueueName}");
             Model.BasicConsume(QueueName, true, "", false, false, null, Consumer);
@@ -148,7 +141,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Attempting to pause the MessageReceiver, but it was already paused.");
             }
 
-            Consumer.Received -= ConsumerCallback;
+            Model.BasicCancel(Consumer.ConsumerTag);
 
             IsPaused = true;
         }
@@ -167,7 +160,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Attempting to resume the MessageReceiver, but it was not paused.");
             }
 
-            Consumer.Received -= ConsumerCallback;
+            Model.BasicConsume(QueueName, true, Consumer.ConsumerTag, false, false, null, Consumer);
 
             IsPaused = false;
         }
