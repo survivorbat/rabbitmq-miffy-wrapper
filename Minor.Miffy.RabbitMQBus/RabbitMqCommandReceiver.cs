@@ -47,6 +47,11 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
+        /// Indicate whether the receiver is currently paused
+        /// </summary>
+        public bool IsPaused { get; protected set; }
+
+        /// <summary>
         /// Declare the queue with the given queue name
         /// </summary>
         public virtual void DeclareCommandQueue()
@@ -124,6 +129,22 @@ namespace Minor.Miffy.RabbitMQBus
             };
 
             Model.BasicConsume(QueueName, false, "", false, false, null, consumer);
+        }
+
+        /// <summary>
+        /// Pause the receiver
+        /// </summary>
+        public void Pause()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Resume the receiver
+        /// </summary>
+        public void Resume()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

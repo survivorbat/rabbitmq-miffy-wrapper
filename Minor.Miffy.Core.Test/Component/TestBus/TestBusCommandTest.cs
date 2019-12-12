@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics.Tracing;
 using System.Text;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.TestBus;
 
@@ -8,6 +10,8 @@ namespace Minor.Miffy.Test.Component.TestBus
     [TestClass]
     public class TestBusCommandTest
     {
+        private const int WaitTime = 1500;
+
         [TestMethod]
         [DataRow("test.queue", "World")]
         [DataRow("command.queue", "Test")]
@@ -25,12 +29,12 @@ namespace Minor.Miffy.Test.Component.TestBus
                 DestinationQueue = destQueue,
                 CorrelationId = Guid.NewGuid()
             };
-            
+
             // Act
             receiver.StartReceivingCommands(e => new CommandMessage {Body = Encoding.Unicode.GetBytes(expected)});
 
             var result = sender.SendCommandAsync(command);
-            
+
             // Assert
             Assert.AreEqual(expected, Encoding.Unicode.GetString(result.Result.Body));
         }
@@ -56,7 +60,7 @@ namespace Minor.Miffy.Test.Component.TestBus
                 CorrelationId = Guid.NewGuid(),
                 Body = Encoding.Unicode.GetBytes(startMessage)
             };
-            
+
             // Act
             receiver.StartReceivingCommands(e =>
             {
@@ -65,9 +69,86 @@ namespace Minor.Miffy.Test.Component.TestBus
             });
 
             var result = sender.SendCommandAsync(command);
-            
+
             // Assert
             Assert.AreEqual(startMessage + appendMessage, Encoding.Unicode.GetString(result.Result.Body));
+        }
+
+        [TestMethod]
+        [DataRow("TestQueue")]
+        [DataRow("MVM.Queue")]
+        [DataRow("NewQueueWithItems")]
+        public void PausingEventListenerPausesDeliveryInQueue(string queueName)
+        {
+            var context = new TestBusContext();
+            var sender = context.CreateCommandSender();
+            var receiver = context.CreateCommandReceiver(queueName);
+            receiver.DeclareCommandQueue();
+
+            var command = new CommandMessage
+            {
+                DestinationQueue = queueName,
+                CorrelationId = Guid.NewGuid(),
+                Body = Encoding.Unicode.GetBytes("Hello World")
+            };
+
+            bool messageReceived = false;
+
+            receiver.StartReceivingCommands(e =>
+            {
+                messageReceived = true;
+                return new CommandMessage();
+            });
+
+            // Act
+            receiver.Pause();
+
+            sender.SendCommandAsync(command);
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(false, messageReceived);
+        }
+
+        [TestMethod]
+        [DataRow("TestQueue")]
+        [DataRow("MVM.Queue")]
+        public void ResumingEventListenerReActivatesDeliveryInQueue(string queueName)
+        {
+            var context = new TestBusContext();
+            var sender = context.CreateCommandSender();
+            var receiver = context.CreateCommandReceiver(queueName);
+            receiver.DeclareCommandQueue();
+
+            var command = new CommandMessage
+            {
+                DestinationQueue = queueName,
+                CorrelationId = Guid.NewGuid(),
+                Body = Encoding.Unicode.GetBytes("Hello World")
+            };
+
+            bool messageReceived = false;
+
+            receiver.StartReceivingCommands(e =>
+            {
+                messageReceived = true;
+                return new CommandMessage();
+            });
+
+            receiver.Pause();
+
+            // Act
+            sender.SendCommandAsync(command);
+
+            Thread.Sleep(WaitTime);
+
+            receiver.Resume();
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(true, messageReceived);
         }
     }
 }

@@ -20,10 +20,10 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var contextMock = new Mock<IBusContext<IConnection>>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
             var context = contextMock.Object;
-            
+
             // Act
             var host = new MicroserviceHost(context, null, null, logger.Object);
-            
+
             // Assert
             Assert.AreSame(context, host.Context);
         }
@@ -39,11 +39,11 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             // Act
             host.Dispose();
-            
+
             // Assert
             contextMock.Verify(e => e.Dispose(), Times.Once);
         }
-        
+
         [TestMethod]
         public void DisposeIsCalledOnAllEventListeners()
         {
@@ -55,7 +55,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             // Act
             host.Dispose();
-            
+
             // Assert
             contextMock.Verify(e => e.Dispose(), Times.Once);
         }
@@ -73,18 +73,18 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             contextMock.Setup(e => e.CreateMessageReceiver(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
                 .Returns(receiverMock.Object);
-            
+
             var listeners = Enumerable.Range(0, listenerAmount).Select(e => new MicroserviceListener());
-            
+
             var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
 
             // Act
             host.Start();
-            
+
             // Assert
             contextMock.Verify(e => e.CreateMessageReceiver(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Exactly(listenerAmount));
         }
-        
+
         [TestMethod]
         [DataRow("foo", "bar,bez")]
         [DataRow("bar", "foo,foo#")]
@@ -96,21 +96,21 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
             string[] topicNames = topics.Split(',');
-            
+
             contextMock.Setup(e => e.CreateMessageReceiver(queueName, topicNames))
                 .Returns(receiverMock.Object);
-            
+
             var listeners = new[] {new MicroserviceListener {Queue = queueName, TopicExpressions = topicNames} };
-            
+
             var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
 
             // Act
             host.Start();
-            
+
             // Assert
             contextMock.Verify(e => e.CreateMessageReceiver(queueName, topicNames));
         }
-        
+
         [TestMethod]
         public void StartListeningIsCalledOnReceiver()
         {
@@ -124,14 +124,14 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
                 .Returns(receiverMock.Object);
-            
+
             var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
-            
+
             var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
 
             // Act
             host.Start();
-            
+
             // Assert
             receiverMock.Verify(e => e.StartReceivingMessages());
         }
