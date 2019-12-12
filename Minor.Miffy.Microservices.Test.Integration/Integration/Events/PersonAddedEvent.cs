@@ -7,11 +7,16 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.Events
     {
         public PersonAddedEvent() : base("PeopleApp.Persons.New")
         {
-            
+
         }
-        
+
         public Person Person { get; set; }
-        
+
+        public override string ToString()
+        {
+            return $"Person with name {Person.FirstName} {Person.LastName}, Email {Person.Email} and Phone {Person.PhoneNumber}";
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PersonAddedEvent addedEvent && Equals(addedEvent);

@@ -7,11 +7,15 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.Events
     {
         public CatAddedEvent() : base("PeopleApp.Cats.New")
         {
-            
         }
 
         public Cat Cat { get; set; }
-        
+
+        public override string ToString()
+        {
+            return $"Cat with the name {Cat.Name}";
+        }
+
         public override bool Equals(object obj)
         {
             return obj is CatAddedEvent addedEvent && Equals(addedEvent);

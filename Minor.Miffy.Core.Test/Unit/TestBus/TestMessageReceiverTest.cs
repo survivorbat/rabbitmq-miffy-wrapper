@@ -96,6 +96,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
             var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
+            receiver.StartReceivingMessages();
 
             // Act
             receiver.Pause();
@@ -110,6 +111,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
             var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
+            receiver.StartReceivingMessages();
 
             receiver.Pause();
 
@@ -126,11 +128,10 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
             var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
-
-            receiver.Pause();
+            receiver.StartReceivingMessages();
 
             // Act
-            void Act() => receiver.Pause();
+            void Act() => receiver.Resume();
 
             // Assert
             BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
@@ -143,6 +144,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Arrange
             Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
             var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
+            receiver.StartReceivingMessages();
 
             receiver.Pause();
 
@@ -151,7 +153,37 @@ namespace Minor.Miffy.Test.Unit.TestBus
 
             // Assert
             BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
-            Assert.AreEqual("Attempting to pause the TestMessageReceiver, but it already paused.", exception.Message);
+            Assert.AreEqual("Attempting to pause the TestMessageReceiver, but it was already paused.", exception.Message);
+        }
+
+        [TestMethod]
+        public void PauseThrowsExceptionWhenNotListening()
+        {
+            // Arrange
+            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
+            var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
+
+            // Act
+            void Act() => receiver.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to pause the TestMessageReceiver, but it is not even receiving messages.", exception.Message);
+        }
+
+        [TestMethod]
+        public void ResumeThrowsExceptionWhenNotListening()
+        {
+            // Arrange
+            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
+            var receiver = new TestMessageReceiver(context.Object, "queue", new string[0]);
+
+            // Act
+            void Act() => receiver.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to resume the TestMessageReceiver, but it is not even receiving messages.", exception.Message);
         }
     }
 }

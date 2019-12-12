@@ -25,7 +25,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Logger
         /// </summary>
-        protected readonly ILogger<TestMessageReceiver> _logger;
+        protected readonly ILogger<TestMessageReceiver> Logger;
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions
@@ -35,7 +35,7 @@ namespace Minor.Miffy.TestBus
             Context = context;
             QueueName = queueName;
             TopicFilters = topicExpressions;
-            _logger = MiffyLoggerFactory.CreateInstance<TestMessageReceiver>();
+            Logger = MiffyLoggerFactory.CreateInstance<TestMessageReceiver>();
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Minor.Miffy.TestBus
 
             foreach (string topic in TopicFilters)
             {
-                _logger.LogDebug($"Creating queue {QueueName} with topic {topic}");
+                Logger.LogDebug($"Creating queue {QueueName} with topic {topic}");
                 TestBusKey key = new TestBusKey(QueueName, topic);
                 Context.DataQueues[key] = new TestBusQueueWrapper<EventMessage>();
             }
@@ -85,11 +85,12 @@ namespace Minor.Miffy.TestBus
         {
             foreach (string topic in TopicFilters)
             {
-                _logger.LogDebug($"Creating thread for queue {QueueName} with topic {topic}");
+                Logger.LogDebug($"Creating thread for queue {QueueName} with topic {topic}");
 
                 Thread thread = new Thread(() => {
                     while (true)
                     {
+                        // If the receiver is paused, keep it waiting
                         if (IsPaused)
                         {
                             Thread.Sleep(1000);
@@ -98,12 +99,21 @@ namespace Minor.Miffy.TestBus
 
                         TestBusKey key = new TestBusKey(QueueName, topic);
 
-                        _logger.LogTrace($"Waiting for message on queue {QueueName} with topic {topic}");
+                        Logger.LogTrace($"Waiting for message on queue {QueueName} with topic {topic}");
 
+                        // Wait for messages
                         Context.DataQueues[key].AutoResetEvent.WaitOne();
+
+                        // If the thread was paused while a message came in, reset the resetevent and continue
+                        if (IsPaused)
+                        {
+                            Context.DataQueues[key].AutoResetEvent.Set();
+                            continue;
+                        }
+
                         Context.DataQueues[key].Queue.TryDequeue(out EventMessage result);
 
-                        _logger.LogDebug($"Message received on queue {QueueName} with topic {topic}");
+                        Logger.LogDebug($"Message received on queue {QueueName} with topic {topic}");
 
                         callback(result);
                     }
@@ -119,9 +129,14 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void Pause()
         {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it is not even receiving messages.");
+            }
+
             if (IsPaused)
             {
-                throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it already paused.");
+                throw new BusConfigurationException("Attempting to pause the TestMessageReceiver, but it was already paused.");
             }
 
             IsPaused = true;
@@ -132,6 +147,11 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void Resume()
         {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempting to resume the TestMessageReceiver, but it is not even receiving messages.");
+            }
+
             if (!IsPaused)
             {
                 throw new BusConfigurationException("Attempting to resume the TestMessageReceiver, but it was not paused.");
