@@ -4,8 +4,6 @@ namespace Minor.Miffy
 {
     public interface ICommandReceiver : IDisposable
     {
-        string QueueName { get; }
-
         void DeclareCommandQueue();
         void StartReceivingCommands(CommandReceivedCallback callback);
     }

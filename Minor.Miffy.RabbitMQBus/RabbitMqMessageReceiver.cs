@@ -23,6 +23,11 @@ namespace Minor.Miffy.RabbitMQBus
         }
 
         /// <summary>
+        /// Is the listener currently paused?
+        /// </summary>
+        public bool IsPaused { get; protected set; }
+
+        /// <summary>
         /// Model used to listen to broker
         /// </summary>
         protected readonly IModel Model;
@@ -51,6 +56,7 @@ namespace Minor.Miffy.RabbitMQBus
             Model = Context.Connection.CreateModel();
             QueueName = queueName;
             TopicFilters = topicFilters;
+            Consumer = new EventingBasicConsumer(Model);
             Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqMessageReceiver>();
         }
 
@@ -63,6 +69,16 @@ namespace Minor.Miffy.RabbitMQBus
         /// Topics that the queue is listening for
         /// </summary>
         public IEnumerable<string> TopicFilters { get; }
+
+        /// <summary>
+        /// The event handler that keeps track of our callback.
+        /// </summary>
+        protected EventHandler<BasicDeliverEventArgs> ConsumerCallback;
+
+        /// <summary>
+        /// The consumer used by the class
+        /// </summary>
+        protected readonly EventingBasicConsumer Consumer;
 
         /// <summary>
         /// Create a queue and bind it to the exchange and the topic expression
@@ -94,8 +110,7 @@ namespace Minor.Miffy.RabbitMQBus
                 throw new BusConfigurationException("Receiver is not listening to events");
             }
 
-            EventingBasicConsumer consumer = new EventingBasicConsumer(Model);
-            consumer.Received += (model, args) =>
+            ConsumerCallback = (model, args) =>
             {
                 Logger.LogInformation($"Received event with id {args.BasicProperties.CorrelationId} " +
                                        $"of type {args.BasicProperties.Type} " +
@@ -113,8 +128,48 @@ namespace Minor.Miffy.RabbitMQBus
                 callback(eventMessage);
             };
 
+            Consumer.Received += ConsumerCallback;
+
             Logger.LogDebug($"Start consuming queue {QueueName}");
-            Model.BasicConsume(QueueName, true, "", false, false, null, consumer);
+            Model.BasicConsume(QueueName, true, "", false, false, null, Consumer);
+        }
+
+        /// <summary>
+        /// Pause the receiver
+        /// </summary>
+        public void Pause()
+        {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempting to pause the MessageReceiver, but it is not even receiving messages.");
+            }
+            if (IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to pause the MessageReceiver, but it was already paused.");
+            }
+
+            Consumer.Received -= ConsumerCallback;
+
+            IsPaused = true;
+        }
+
+        /// <summary>
+        /// Resume the receiver
+        /// </summary>
+        public void Resume()
+        {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempting to resume the MessageReceiver, but it is not even receiving messages.");
+            }
+            if (!IsPaused)
+            {
+                throw new BusConfigurationException("Attempting to resume the MessageReceiver, but it was not paused.");
+            }
+
+            Consumer.Received -= ConsumerCallback;
+
+            IsPaused = false;
         }
     }
 }

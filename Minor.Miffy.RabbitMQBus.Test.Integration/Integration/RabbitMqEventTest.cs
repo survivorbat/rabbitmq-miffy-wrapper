@@ -20,14 +20,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
         [DataRow("test.queue.event", "Femke")]
         public void CallbackIsCalledOnReceivedEvent(string queue, string message)
         {
-            // arrange
+            // Arrange
             using var context = new RabbitMqContextBuilder()
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .WithExchange("HelloExchange")
                 .CreateContext();
 
             bool messageReceived = false;
-            
+
             using var receiver = context.CreateMessageReceiver(queue, new []{"#"});
             receiver.StartReceivingMessages();
             receiver.StartHandlingMessages(e => messageReceived = true);
@@ -40,15 +40,17 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
                 Topic = "irrelevant",
                 EventType = "TestEvent"
             };
-            
+
+            // Act
             var sender = context.CreateMessageSender();
             sender.SendMessage(eventMessage);
-            
+
             Thread.Sleep(WaitTime);
-            
+
+            // Assert
             Assert.IsTrue(messageReceived);
         }
-        
+
         [TestMethod]
         [DataRow("topic.pattern", "topic.pattern", true)]
         [DataRow("topic.*.pattern", "topic.test.pattern", true)]
@@ -63,14 +65,14 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
         [DataRow("test.*.*.bar", "bar.test.baz.foo", false)]
         public void CallbackIsCalledOnReceivedEventWithSpecificTopic(string topicPattern, string topic, bool expected)
         {
-            // arrange
+            // Arrange
             using IBusContext<IConnection> context = new RabbitMqContextBuilder()
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .WithExchange("HelloExchange")
                 .CreateContext();
 
             bool messageReceived = false;
-            
+
             using var receiver = context.CreateMessageReceiver("topic.queue.test", new []{topicPattern});
             receiver.StartReceivingMessages();
             receiver.StartHandlingMessages(e => messageReceived = true);
@@ -83,13 +85,99 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
                 Topic = topic,
                 EventType = "TestEvent"
             };
-            
+
+            // Act
             var sender = context.CreateMessageSender();
             sender.SendMessage(eventMessage);
-            
+
             Thread.Sleep(WaitTime);
 
+            // Assert
             Assert.AreEqual(messageReceived, expected);
+        }
+
+        [TestMethod]
+        [DataRow("TestQueueWithAName")]
+        [DataRow("typo.queue")]
+        public void PausePausesReceivingMessages(string queueName)
+        {
+            // Arrange
+            using IBusContext<IConnection> context = new RabbitMqContextBuilder()
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .WithExchange("HelloExchange")
+                .CreateContext();
+
+            bool messageReceived = false;
+
+            using var receiver = context.CreateMessageReceiver(queueName, new []{"test"});
+            receiver.StartReceivingMessages();
+            receiver.StartHandlingMessages(e => messageReceived = true);
+
+            var eventMessage = new EventMessage
+            {
+                Body = Encoding.Unicode.GetBytes("TestMessage"),
+                Timestamp = 10,
+                CorrelationId = Guid.NewGuid(),
+                Topic = "test",
+                EventType = "TestEvent"
+            };
+
+            // Act
+            receiver.Pause();
+
+            var sender = context.CreateMessageSender();
+            sender.SendMessage(eventMessage);
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.IsFalse(messageReceived);
+        }
+
+        [TestMethod]
+        [DataRow("TestQueueThatWorks")]
+        [DataRow("some.random.queue")]
+        public void ResumeResumesReceivingMessagesAfterItWasPaused(string queueName)
+        {
+            // Arrange
+            using IBusContext<IConnection> context = new RabbitMqContextBuilder()
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .WithExchange("HelloExchange")
+                .CreateContext();
+
+            bool messageReceived = false;
+
+            using var receiver = context.CreateMessageReceiver(queueName, new []{"test"});
+            receiver.StartReceivingMessages();
+            receiver.StartHandlingMessages(e => messageReceived = true);
+
+            var eventMessage = new EventMessage
+            {
+                Body = Encoding.Unicode.GetBytes("TestMessage"),
+                Timestamp = 10,
+                CorrelationId = Guid.NewGuid(),
+                Topic = "test",
+                EventType = "TestEvent"
+            };
+
+            receiver.Pause();
+
+            // Act
+            void Resume() => receiver.Resume();
+
+            var sender = context.CreateMessageSender();
+            sender.SendMessage(eventMessage);
+
+            // Assert
+            Thread.Sleep(WaitTime);
+
+            Assert.IsFalse(messageReceived);
+
+            Resume();
+
+            Thread.Sleep(WaitTime);
+
+            Assert.IsTrue(messageReceived);
         }
 
         [TestCleanup]
