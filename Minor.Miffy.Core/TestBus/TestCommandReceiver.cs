@@ -36,6 +36,9 @@ namespace Minor.Miffy.TestBus
             Logger = MiffyLoggerFactory.CreateInstance<TestCommandReceiver>();
         }
 
+        /// <summary>
+        /// Indicate if the receiver is currently paused
+        /// </summary>
         public bool IsPaused { get; protected set; }
 
         /// <summary>
