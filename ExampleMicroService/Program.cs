@@ -93,7 +93,7 @@ namespace ExampleMicroService
             /**
              * Lastly, instantiate a host and ensure it starts
              */
-            using MicroserviceHost host = builder.CreateHost();
+            using IMicroserviceHost host = builder.CreateHost();
             host.Start();
 
             /**

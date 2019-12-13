@@ -5,6 +5,7 @@
 - Turn most protected fields into properties
 - Add ability to pause command receivers
 - Add Pause() and Resume() methods to microservice host
+- Add interface for MicroserviceHost called IMicroserviceHost
 
 ## 1.5.0
 

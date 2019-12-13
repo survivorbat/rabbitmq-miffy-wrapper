@@ -10,22 +10,22 @@ namespace Minor.Miffy.MicroServices.Host
     /// <summary>
     /// Listens to incoming events and dispatches them to the appropriate handler
     /// </summary>
-    public class MicroserviceHost : IDisposable
+    public class MicroserviceHost : IMicroserviceHost
     {
         /// <summary>
         /// Connection context
         /// </summary>
-        public readonly IBusContext<IConnection> Context;
+        public IBusContext<IConnection> Context { get; }
 
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
-        public readonly IEnumerable<MicroserviceListener> Listeners;
+        public IEnumerable<MicroserviceListener> Listeners { get; }
 
         /// <summary>
         /// A list of queues that are used to receive commands
         /// </summary>
-        public readonly IEnumerable<MicroserviceCommandListener> CommandListeners;
+        public IEnumerable<MicroserviceCommandListener> CommandListeners { get; }
 
         /// <summary>
         /// List of message receivers
@@ -85,6 +85,24 @@ namespace Minor.Miffy.MicroServices.Host
                 receiver.StartReceivingCommands(callback.Callback);
                 CommandReceivers.Add(receiver);
             }
+        }
+
+        /// <summary>
+        /// Pause normal operations
+        /// </summary>
+        public void Pause()
+        {
+            MessageReceivers.ForEach(e => e.Pause());
+            CommandReceivers.ForEach(e => e.Pause());
+        }
+
+        /// <summary>
+        /// Resume normal operations
+        /// </summary>
+        public void Resume()
+        {
+            MessageReceivers.ForEach(e => e.Resume());
+            CommandReceivers.ForEach(e => e.Resume());
         }
 
         /// <summary>

@@ -45,22 +45,6 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
-        public void DisposeIsCalledOnAllEventListeners()
-        {
-            // Arrange
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var logger = new Mock<ILogger<MicroserviceHost>>();
-            var context = contextMock.Object;
-            var host = new MicroserviceHost(context, null, null, logger.Object);
-
-            // Act
-            host.Dispose();
-
-            // Assert
-            contextMock.Verify(e => e.Dispose(), Times.Once);
-        }
-
-        [TestMethod]
         [DataRow(1)]
         [DataRow(4)]
         [DataRow(20)]

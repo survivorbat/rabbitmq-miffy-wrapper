@@ -326,7 +326,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// Creates the MicroserviceHost, based on the configurations
         /// </summary>
         /// <returns></returns>
-        public virtual MicroserviceHost CreateHost()
+        public virtual IMicroserviceHost CreateHost()
         {
             Logger.LogDebug($"Instantiating microservicehost with {EventListeners.Count} event listeners and {CommandListeners.Count} command listeners");
             return new MicroserviceHost(
