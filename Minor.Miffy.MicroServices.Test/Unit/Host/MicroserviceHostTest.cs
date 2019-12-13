@@ -148,6 +148,75 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
+        public void PausingHostSetsIsPausedToTrue()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            host.Start();
+
+            // Act
+            host.Pause();
+
+            // Assert
+            Assert.AreEqual(true, host.IsPaused);
+        }
+
+        [TestMethod]
+        public void ResumingHostSetsIsPausedToFalse()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            host.Start();
+            host.Pause();
+
+            // Act
+            host.Resume();
+
+            // Assert
+            Assert.AreEqual(false, host.IsPaused);
+        }
+
+        [TestMethod]
+        public void IsPausedIsDefaultSetToFalse()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            // Act
+            var host = new MicroserviceHost(contextMock.Object, new List<MicroserviceListener>(), new List<MicroserviceCommandListener>(), logger.Object);
+
+            // Assert
+            Assert.AreEqual(false, host.IsPaused);
+        }
+
+        [TestMethod]
         public void ResumeIsCalledOnReceiver()
         {
             // Arrange
@@ -172,7 +241,142 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             host.Resume();
 
             // Assert
-            receiverMock.Verify(e => e.Pause());
+            receiverMock.Verify(e => e.Resume());
+        }
+
+        [TestMethod]
+        public void PausingWhileAlreadyPausedThrowsException()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            host.Start();
+            host.Pause();
+
+            // Act
+            void Act() => host.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempted to pause the MicroserviceHost, but it was already paused.", exception.Message);
+        }
+
+        [TestMethod]
+        public void ResumingWhileNotPausedThrowsException()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            host.Start();
+
+            // Act
+            void Act() => host.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempted to resume the MicroserviceHost, but it wasn't paused.", exception.Message);
+        }
+
+        [TestMethod]
+        public void PausingWhileNotStartedThrowsException()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            // Act
+            void Act() => host.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempted to pause the MicroserviceHost, but host has not been started.", exception.Message);
+        }
+
+        [TestMethod]
+        public void ResumingWhileNotStartedThrowsException()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            // Act
+            void Act() => host.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempted to resume the MicroserviceHost, but host has not been started.", exception.Message);
+        }
+
+        [TestMethod]
+        public void StartingTheHostASecondTimeThrowsException()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            host.Start();
+
+            // Act
+            void Act() => host.Start();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempted to start the MicroserviceHost, but it has already started.", exception.Message);
         }
     }
 }

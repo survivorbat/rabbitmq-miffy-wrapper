@@ -48,17 +48,17 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Service collection to collect all services in
         /// </summary>
-        protected readonly IServiceCollection ServiceCollection = new ServiceCollection();
+        protected IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
         /// </summary>
-        protected readonly List<MicroserviceListener> EventListeners = new List<MicroserviceListener>();
+        protected List<MicroserviceListener> EventListeners { get; } = new List<MicroserviceListener>();
 
         /// <summary>
         /// Registered command listeners
         /// </summary>
-        protected readonly List<MicroserviceCommandListener> CommandListeners = new List<MicroserviceCommandListener>();
+        protected List<MicroserviceCommandListener> CommandListeners { get; } = new List<MicroserviceCommandListener>();
 
         /// <summary>
         /// Initialize a new builder with a null logger factory

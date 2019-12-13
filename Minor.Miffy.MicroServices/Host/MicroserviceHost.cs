@@ -20,12 +20,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Indicate whether the host is paused or not
         /// </summary>
-        public bool IsPaused { get; }
+        public bool IsPaused { get; protected set; }
 
         /// <summary>
         /// Indicatee whether the host is listening or not
         /// </summary>
-        public bool IsListening { get; }
+        public bool IsListening { get; protected set; }
 
         /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
@@ -40,12 +40,12 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// List of message receivers
         /// </summary>
-        protected readonly List<IMessageReceiver> MessageReceivers = new List<IMessageReceiver>();
+        protected List<IMessageReceiver> MessageReceivers { get; } = new List<IMessageReceiver>();
 
         /// <summary>
         /// List of command receivers
         /// </summary>
-        protected readonly List<ICommandReceiver> CommandReceivers = new List<ICommandReceiver>();
+        protected List<ICommandReceiver> CommandReceivers { get; }= new List<ICommandReceiver>();
 
         /// <summary>
         /// A logger factory to log the start
@@ -76,6 +76,13 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public virtual void Start()
         {
+            if (IsListening)
+            {
+                throw new BusConfigurationException("Attempted to start the MicroserviceHost, but it has already started.");
+            }
+
+            IsListening = true;
+
             foreach (MicroserviceListener callback in Listeners)
             {
                 Logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
@@ -102,6 +109,17 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public void Pause()
         {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempted to pause the MicroserviceHost, but host has not been started.");
+            }
+
+            if (IsPaused)
+            {
+                throw new BusConfigurationException("Attempted to pause the MicroserviceHost, but it was already paused.");
+            }
+
+            IsPaused = true;
             MessageReceivers.ForEach(e => e.Pause());
             CommandReceivers.ForEach(e => e.Pause());
         }
@@ -111,6 +129,17 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public void Resume()
         {
+            if (!IsListening)
+            {
+                throw new BusConfigurationException("Attempted to resume the MicroserviceHost, but host has not been started.");
+            }
+
+            if (!IsPaused)
+            {
+                throw new BusConfigurationException("Attempted to resume the MicroserviceHost, but it wasn't paused.");
+            }
+
+            IsPaused = false;
             MessageReceivers.ForEach(e => e.Resume());
             CommandReceivers.ForEach(e => e.Resume());
         }

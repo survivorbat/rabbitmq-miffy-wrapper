@@ -17,7 +17,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
     public class MicroserviceHostTest
     {
         private const int WaitTime = 5000;
-            
+
         [TestMethod]
         [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
@@ -30,17 +30,17 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
-            
+
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<PersonEventListener>()
                 .CreateHost();
-            
+
             host.Start();
-            
+
             var publisher = new EventPublisher(busContext);
 
-            var personEvent = new PersonAddedEvent { Person = new Person 
+            var personEvent = new PersonAddedEvent { Person = new Person
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -48,15 +48,98 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                     PhoneNumber = phone
                 }
             };
-            
+
             // Act
             publisher.Publish(personEvent);
             Thread.Sleep(WaitTime);
-            
+
             // Assert
             Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
         }
-        
+
+        [TestMethod]
+        [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060344556")]
+        [DataRow("Cristian", "de Hamer", "c.hamer@info.com", "0603445562")]
+        public void ReceivingMessagesIsPaused(string firstName, string lastName, string email, string phone)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+
+            using var host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<PersonEventListener>()
+                .CreateHost();
+
+            host.Start();
+
+            var publisher = new EventPublisher(busContext);
+
+            var personEvent = new PersonAddedEvent { Person = new Person
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    PhoneNumber = phone
+                }
+            };
+
+            // Act
+            host.Pause();
+
+            publisher.Publish(personEvent);
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreNotEqual(personEvent, PersonEventListener.ResultEvent);
+        }
+
+        [TestMethod]
+        [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
+        public void ReceivingMessagesIsResumed(string firstName, string lastName, string email, string phone)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+
+            using var host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<PersonEventListener>()
+                .CreateHost();
+
+            host.Start();
+
+            var publisher = new EventPublisher(busContext);
+
+            var personEvent = new PersonAddedEvent { Person = new Person
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    PhoneNumber = phone
+                }
+            };
+
+            // Act
+            host.Pause();
+
+            publisher.Publish(personEvent);
+            Thread.Sleep(WaitTime);
+
+            host.Resume();
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
+        }
+
         [TestMethod]
         [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
@@ -69,18 +152,18 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
-            
+
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<WildCardPersonEventListener>()
                 .AddEventListener<WildCardPersonEventListener2>()
                 .CreateHost();
-            
+
             host.Start();
-            
+
             var publisher = new EventPublisher(busContext);
 
-            var personEvent = new PersonAddedEvent { Person = new Person 
+            var personEvent = new PersonAddedEvent { Person = new Person
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -88,16 +171,16 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                     PhoneNumber = phone
                 }
             };
-            
+
             // Act
             publisher.Publish(personEvent);
             Thread.Sleep(WaitTime);
-            
+
             // Assert
             Assert.AreEqual(personEvent, WildCardPersonEventListener.ResultEvent);
             Assert.AreEqual(personEvent, WildCardPersonEventListener2.ResultEvent);
         }
-        
+
         [TestMethod]
         [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
@@ -110,18 +193,18 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
-            
+
             using var builder = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<FanInEventListener>();
-            
+
             using var host = builder.CreateHost();
-            
+
             host.Start();
-            
+
             var publisher = new EventPublisher(busContext);
 
-            var personEvent = new PersonAddedEvent { Person = new Person 
+            var personEvent = new PersonAddedEvent { Person = new Person
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -129,15 +212,15 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                     PhoneNumber = phone
                 }
             };
-            
+
             // Act
             publisher.Publish(personEvent);
             Thread.Sleep(WaitTime);
-            
+
             // Assert
             Assert.AreEqual(personEvent, FanInEventListener.ResultEvent);
         }
-        
+
         [TestMethod]
         [DataRow("Aspra")]
         [DataRow("Luna")]
@@ -150,28 +233,28 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
-            
+
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<PersonEventListener>()
                 .AddEventListener<CatEventListener>()
                 .CreateHost();
-            
+
             host.Start();
-            
+
             var publisher = new EventPublisher(busContext);
 
             var catEvent = new CatAddedEvent { Cat = new Cat {Name = name}};
-            
+
             // Act
             publisher.Publish(catEvent);
             Thread.Sleep(WaitTime);
-            
+
             // Assert
             Assert.IsNull(PersonEventListener.ResultEvent);
             Assert.AreEqual(catEvent, CatEventListener.ResultEvent);
         }
-        
+
         [TestMethod]
         [DataRow("Bram")]
         [DataRow("Aspra", "Chris", "Kat")]
@@ -186,29 +269,29 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
                 .CreateContext();
-            
+
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<SpamEventListener>()
                 .CreateHost();
-            
+
             host.Start();
-            
+
             var publisher = new EventPublisher(busContext);
 
             var catEvents = names.Select(e => new CatAddedEvent {Cat = new Cat {Name = e}}).ToList();
-            
+
             // Act
             foreach (var @event in catEvents)
             {
                 publisher.Publish(@event);
             }
-            
+
             Thread.Sleep(WaitTime);
 
             CollectionAssert.AreEquivalent(catEvents, SpamEventListener.ResultEvents);
         }
-        
+
         [TestMethod]
         [DataRow("TestException")]
         [DataRow("NullPointerException")]
@@ -225,7 +308,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithBusContext(busContext)
                 .AddEventListener<ErrorEventListener>()
                 .CreateHost();
-            
+
             host.Start();
 
             var command = new DummyCommand(message);
@@ -233,7 +316,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
 
             // Act
             Task<DummyCommand> Act() => publisher.PublishAsync<DummyCommand>(command);
-            
+
             // Arrange
             var exception = Assert.ThrowsExceptionAsync<DestinationQueueException>(Act);
             Assert.AreEqual("Received error command from queue Test.Command.Listener", exception.Result.Message);
@@ -249,6 +332,9 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
             PersonEventListener.ResultEvent = null;
             FanInEventListener.ResultEvent = null;
             RabbitMqCleanUp.DeleteExchange("TestExchange", "amqp://guest:guest@localhost");
+            RabbitMqCleanUp.DeleteQueue("PeopleApp.Cats.New", "amqp://guest:guest@localhost");
+            RabbitMqCleanUp.DeleteQueue("Test.Command.Listener", "amqp://guest:guest@localhost");
+            RabbitMqCleanUp.DeleteQueue("PeopleApp.Persons.New", "amqp://guest:guest@localhost");
         }
     }
 }
