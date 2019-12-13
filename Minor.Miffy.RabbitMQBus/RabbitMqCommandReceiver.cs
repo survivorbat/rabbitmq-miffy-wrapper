@@ -138,7 +138,7 @@ namespace Minor.Miffy.RabbitMQBus
                 Model.BasicAck(ea.DeliveryTag, false);
             };
 
-            Model.BasicConsume(QueueName, false, "", false, false, null, Consumer);
+            Model.BasicConsume(QueueName, false, ConsumerTag, false, false, null, Consumer);
         }
 
         /// <summary>

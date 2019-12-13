@@ -90,7 +90,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             // Assert
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Method Handle does not have a proper " +
-                            "commandlistener signature in type WrongParameterEventListener", exception.Message);
+                            "eventlistener signature in type WrongParameterEventListener", exception.Message);
 
         }
 
@@ -107,7 +107,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             // Assert
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Method Handle does not have a proper " +
-                            "commandlistener signature in type WrongParameterAmountEventListener", exception.Message);
+                            "eventlistener signature in type WrongParameterAmountEventListener", exception.Message);
         }
 
         [TestMethod]
@@ -123,7 +123,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             // Assert
             var exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Method Handle does not have a proper " +
-                            "commandlistener signature in type EventWithReturnTypeEventListener", exception.Message);
+                            "eventlistener signature in type EventWithReturnTypeEventListener", exception.Message);
         }
 
         [TestMethod]

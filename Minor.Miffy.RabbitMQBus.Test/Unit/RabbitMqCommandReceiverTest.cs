@@ -157,7 +157,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => new CommandMessage());
 
             // Assert
-            modelMock.Verify(e => e.BasicConsume(queueName, false, "", false, false, null, It.IsAny<IBasicConsumer>()));
+            modelMock.Verify(e => e.BasicConsume(queueName, false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
         }
 
         [TestMethod]
@@ -184,7 +184,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             IBasicConsumer consumer = null;
 
             // Retrieve consumer from callback
-            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             Guid guid = Guid.NewGuid();
@@ -199,7 +199,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => result = e);
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, byteBody);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), 0, false, "test.exchange", "test.queue", properties, byteBody);
 
             // Assert
             Assert.AreEqual(byteBody, result.Body);
@@ -228,7 +228,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             IBasicConsumer consumer = null;
 
             // Retrieve consumer from callback
-            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             // Retrieve basic publish data
@@ -246,7 +246,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => throw new Exception(message));
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "test.exchange", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), 0, false, "test.exchange", "test.queue", properties, new byte[0]);
 
             // Assert
             var stringBody = Encoding.Unicode.GetString(resultBody);
@@ -273,7 +273,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             IBasicConsumer consumer = null;
 
             // Retrieve consumer from callback
-            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             var properties = new BasicProperties
@@ -288,7 +288,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => responseMessage);
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), 0, false, "", "test.queue", properties, new byte[0]);
 
             // Assert
             var jsonResponse = JsonConvert.SerializeObject(responseMessage);
@@ -321,7 +321,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             IBasicConsumer consumer = null;
 
             // Retrieve consumer from callback
-            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             var properties = new BasicProperties
@@ -343,7 +343,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
                 .Callback<string, string, bool, IBasicProperties, byte[]>((a, b, c, d, body) => expectedBody = body);
 
             // Act
-            consumer.HandleBasicDeliver("", 0, false, "", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), 0, false, "", "test.queue", properties, new byte[0]);
 
             // Assert
             var stringBody = Encoding.Unicode.GetString(expectedBody);
@@ -374,7 +374,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             IBasicConsumer consumer = null;
 
             // Retrieve consumer from callback
-            modelMock.Setup(e => e.BasicConsume("test.queue", false, "", false, false, null, It.IsAny<IBasicConsumer>()))
+            modelMock.Setup(e => e.BasicConsume("test.queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()))
                 .Callback<string,bool,string,bool,bool, IDictionary<string,object>, IBasicConsumer>((a, b, c, d, e, f, givenConsumer) => consumer = givenConsumer);
 
             var properties = new BasicProperties { CorrelationId = Guid.NewGuid().ToString() };
@@ -383,7 +383,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.StartReceivingCommands(e => new CommandMessage());
 
             // Act
-            consumer.HandleBasicDeliver("", deliveryTag, false, "test.exchange", "test.queue", properties, new byte[0]);
+            consumer.HandleBasicDeliver(It.IsAny<string>(), deliveryTag, false, "test.exchange", "test.queue", properties, new byte[0]);
 
             // Assert
             modelMock.Verify(e => e.BasicAck(deliveryTag, false));
