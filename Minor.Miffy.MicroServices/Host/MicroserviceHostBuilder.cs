@@ -282,8 +282,8 @@ namespace Minor.Miffy.MicroServices.Host
             Logger.LogTrace($"Evaluating whether method {method.Name}'s parameter {parameter.Name} is " +
                              "a string or is derived from DomainEvent or CommandEvent");
 
-            if ((!isCommandListener && parameterType.IsAssignableFrom(DomainEventType)
-                 || isCommandListener && parameterType.IsAssignableFrom(DomainCommandType))
+            if ((!isCommandListener && !parameterType.IsSubclassOf(DomainEventType)
+                 || isCommandListener && parameterType.IsSubclassOf(DomainCommandType))
                 && parameterType != StringType)
             {
                 Logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +

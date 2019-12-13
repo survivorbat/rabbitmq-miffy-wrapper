@@ -475,5 +475,45 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             Assert.AreEqual("Attempting to resume the CommandReceiver, but it is not even receiving messages.", exception.Message);
         }
 
+        [TestMethod]
+        public void PauseCallsBasicCancelOnModel()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+            receiver.DeclareCommandQueue();
+
+            // Act
+            receiver.Pause();
+
+            // Assert
+            modelMock.Verify(e => e.BasicCancel(It.IsAny<string>()));
+        }
+
+        [TestMethod]
+        public void ResumeCallsBasicConsumeOnModel()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+            receiver.DeclareCommandQueue();
+            receiver.Pause();
+
+            // Act
+            receiver.Resume();
+
+            // Assert
+            modelMock.Verify(e => e.BasicConsume("queue", true, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
+        }
     }
 }
