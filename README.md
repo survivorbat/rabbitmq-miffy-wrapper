@@ -5,20 +5,20 @@
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
 These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
-**MaartenH.Minor.Miffy.Abstractions**:
+**MaartenH.Minor.Miffy.Abstractions**  
 Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Abstractions)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.Abstractions)
 
-**MaartenH.Minor.Miffy.MicroServices**:
+**MaartenH.Minor.Miffy.MicroServices**  
 The package containing the classes used to set up a microservice host.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Microservices)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.MicroServices)
 
-**MaartenH.Minor.Miffy.RabbitMQBus**
+**MaartenH.Minor.Miffy.RabbitMQBus**  
 Implementation classes to use RabbitMQ with the framework
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.RabbitMQBus)
@@ -26,26 +26,9 @@ Implementation classes to use RabbitMQ with the framework
 
 These packages can be found on nuget.org.
 
-## Exceptions
-
-### DestinationQueueException
-
-This exception indicates that an exception occured at the CommandListener on
-the receiving end and that the CommandPublisher is unable to complete its command.
-
-### BusConfigurationException
-
-This exception indicates that something is wrong with the configuration of
-your listener of sender.
-
-### MessageTimeoutException
-
-This exception indicates that no response was received within the (currently hard-coded) limit
-within a CommandPublisher.
-
 ## Example configuration
 
-To allow you for a quick start, here are a few examples on how to use this library.
+To allow you a quick start, here are a few examples on how to use this library.
 
 ### Events
 
@@ -67,7 +50,7 @@ var context = new TestBusContext();
 #### Listening for events
 
 To start listening for events you can either use a microservice host or implement your own listener.
-This tutorial will only include the former option. First you'll need a DomainEvent class, like so:
+This tutorial will only include the former option. You're going to need a DomainEvent class.
 
 ```c#
 public class ExampleEvent : DomainEvent
@@ -247,7 +230,7 @@ public class ExampleCommand : DomainCommand
 var exampleCommand = new ExampleCommand { ExampleData = "Hello?" };
 
 ICommandPublisher publisher = new CommandPublisher(context)
-ExampleCommandResult result = publisher.PublishAsync<ExampleCommandResult>(exampleCommand);
+ExampleCommandResult result = publisher.PublishAsync<ExampleCommandResult>(exampleCommand).Result;
 
 Assert.AreEqual("Hello world!", result.ExampleData);
 ```
