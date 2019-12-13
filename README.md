@@ -213,6 +213,10 @@ host.Start();
 ```
 
 And voila, now it's listening for incoming ExampleCommands and sends back data to the reply queue.
+Please note that the Start() command is non-blocking, so in case you wish to
+keep it running you'll need something to occupy the main thread.
+
+Since v1.6.0 it's also possible to .Pause() and .Resume() this host instance.
 
 #### Sending commands
 
