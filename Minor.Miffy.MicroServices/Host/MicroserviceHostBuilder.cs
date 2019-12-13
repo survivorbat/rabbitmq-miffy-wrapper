@@ -283,7 +283,7 @@ namespace Minor.Miffy.MicroServices.Host
                              "a string or is derived from DomainEvent or CommandEvent");
 
             if ((!isCommandListener && !parameterType.IsSubclassOf(DomainEventType)
-                 || isCommandListener && parameterType.IsSubclassOf(DomainCommandType))
+                 || isCommandListener && !parameterType.IsSubclassOf(DomainCommandType))
                 && parameterType != StringType)
             {
                 Logger.LogCritical($"Parameter {parameter.Name} of method {method.Name} has " +
