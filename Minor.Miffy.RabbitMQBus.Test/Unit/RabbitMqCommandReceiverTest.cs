@@ -513,7 +513,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             receiver.Resume();
 
             // Assert
-            modelMock.Verify(e => e.BasicConsume("queue", true, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
+            modelMock.Verify(e => e.BasicConsume("queue", false, It.IsAny<string>(), false, false, null, It.IsAny<IBasicConsumer>()));
         }
     }
 }
