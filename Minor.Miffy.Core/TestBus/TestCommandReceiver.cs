@@ -96,6 +96,12 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void Pause()
         {
+            if (!QueueDeclared)
+            {
+                Logger.LogCritical($"Attempting to pause the MessageReceiver, but it is not even receiving messages yet with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to pause the TestCommandReceiver, but it is not even receiving messages.");
+            }
+
             if (IsPaused)
             {
                 Logger.LogCritical($"Attempting to pause the CommandReceiver, but it is already paused with queue {QueueName}");
@@ -112,6 +118,12 @@ namespace Minor.Miffy.TestBus
         /// </summary>
         public void Resume()
         {
+            if (!QueueDeclared)
+            {
+                Logger.LogCritical($"Attempting to resume the CommandReceiver, but it is not even receiving messages yet with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to resume the TestCommandReceiver, but it is not even receiving messages.");
+            }
+
             if (!IsPaused)
             {
                 Logger.LogCritical($"Attempting to resume the CommandReceiver, but it is not paused with queue {QueueName}");

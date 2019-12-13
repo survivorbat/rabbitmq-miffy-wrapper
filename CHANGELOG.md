@@ -1,5 +1,11 @@
 # Changelog Miffy Framework
 
+## 1.6.0
+
+- Turn most protected fields into properties
+- Add ability to pause command receivers
+- Add Pause() and Resume() methods to microservice host
+
 ## 1.5.0
 
 - Add ProcessId property to DomainEvents and DomainCommands

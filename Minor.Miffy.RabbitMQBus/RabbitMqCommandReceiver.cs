@@ -27,6 +27,16 @@ namespace Minor.Miffy.RabbitMQBus
         protected readonly ILogger<RabbitMqCommandReceiver> Logger;
 
         /// <summary>
+        /// Consumer
+        /// </summary>
+        protected EventingBasicConsumer Consumer { get; }
+
+        /// <summary>
+        /// A randomly generated consumer ta
+        /// </summary>
+        protected string ConsumerTag { get; }
+
+        /// <summary>
         /// Is queue declared?
         /// </summary>
         protected bool QueueDeclared { get; set; }
@@ -43,7 +53,9 @@ namespace Minor.Miffy.RabbitMQBus
         {
             Model = context.Connection.CreateModel();
             QueueName = queueName;
+            Consumer = new EventingBasicConsumer(Model);
             Logger = RabbitMqLoggerFactory.CreateInstance<RabbitMqCommandReceiver>();
+            ConsumerTag = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -78,9 +90,7 @@ namespace Minor.Miffy.RabbitMQBus
 
             Logger.LogTrace($"Start receiving commands on queue {QueueName}");
 
-            EventingBasicConsumer consumer = new EventingBasicConsumer(Model);
-
-            consumer.Received += (model, ea) =>
+            Consumer.Received += (model, ea) =>
             {
                 Logger.LogInformation(
                     $"Received command on {QueueName} with reply queue {ea.BasicProperties.ReplyTo}");
@@ -128,7 +138,7 @@ namespace Minor.Miffy.RabbitMQBus
                 Model.BasicAck(ea.DeliveryTag, false);
             };
 
-            Model.BasicConsume(QueueName, false, "", false, false, null, consumer);
+            Model.BasicConsume(QueueName, false, "", false, false, null, Consumer);
         }
 
         /// <summary>
@@ -136,7 +146,22 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void Pause()
         {
-            throw new NotImplementedException();
+            if (!QueueDeclared)
+            {
+                Logger.LogCritical($"Attempting to pause the CommandReceiver, but it is not even receiving messages yet with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to pause the CommandReceiver, but it is not even receiving messages.");
+            }
+            if (IsPaused)
+            {
+                Logger.LogCritical($"Attempting to pause the CommandReceiver, but it is already paused with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to pause the CommandReceiver, but it was already paused.");
+            }
+
+            Logger.LogInformation($"Pausing consumption of queue {QueueName}");
+
+            Model.BasicCancel(ConsumerTag);
+
+            IsPaused = true;
         }
 
         /// <summary>
@@ -144,7 +169,22 @@ namespace Minor.Miffy.RabbitMQBus
         /// </summary>
         public void Resume()
         {
-            throw new NotImplementedException();
+            if (!QueueDeclared)
+            {
+                Logger.LogCritical($"Attempting to resume the CommandReceiver, but it is not even receiving messages yet with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to resume the CommandReceiver, but it is not even receiving messages.");
+            }
+            if (!IsPaused)
+            {
+                Logger.LogCritical($"Attempting to resume the CommandReceiver, but it is not paused with queue {QueueName}");
+                throw new BusConfigurationException("Attempting to resume the CommandReceiver, but it was not paused.");
+            }
+
+            Logger.LogInformation($"Resuming consumption of queue {QueueName}");
+
+            Model.BasicConsume(QueueName, true, ConsumerTag, false, false, null, Consumer);
+
+            IsPaused = false;
         }
 
         /// <summary>

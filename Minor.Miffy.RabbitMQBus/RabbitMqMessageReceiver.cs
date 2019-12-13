@@ -30,17 +30,17 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// Model used to listen to broker
         /// </summary>
-        protected readonly IModel Model;
+        protected IModel Model { get; }
 
         /// <summary>
         /// Context that is connected to the broker
         /// </summary>
-        protected readonly IBusContext<IConnection> Context;
+        protected IBusContext<IConnection> Context { get; }
 
         /// <summary>
         /// Logger to log received messages
         /// </summary>
-        protected readonly ILogger<RabbitMqMessageReceiver> Logger;
+        protected ILogger<RabbitMqMessageReceiver> Logger { get; }
 
         /// <summary>
         /// Whether the current message receiver is listening to the broker
@@ -50,7 +50,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// A randomly generated consumer ta
         /// </summary>
-        protected string ConsumerTag { get; set; }
+        protected string ConsumerTag { get; }
 
         /// <summary>
         /// Initialize a message receiver with a context, queue name and topic filters
@@ -79,7 +79,7 @@ namespace Minor.Miffy.RabbitMQBus
         /// <summary>
         /// The consumer used by the class
         /// </summary>
-        protected readonly EventingBasicConsumer Consumer;
+        protected EventingBasicConsumer Consumer { get; }
 
         /// <summary>
         /// Create a queue and bind it to the exchange and the topic expression

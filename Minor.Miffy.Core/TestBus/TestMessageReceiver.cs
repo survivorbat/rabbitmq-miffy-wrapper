@@ -10,7 +10,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// The test context being used
         /// </summary>
-        public TestBusContext Context { get; protected set; }
+        public TestBusContext Context { get; }
 
         /// <summary>
         /// Indicate whether the receiver is paused or not
@@ -25,7 +25,7 @@ namespace Minor.Miffy.TestBus
         /// <summary>
         /// Logger
         /// </summary>
-        protected readonly ILogger<TestMessageReceiver> Logger;
+        protected ILogger<TestMessageReceiver> Logger { get; }
 
         /// <summary>
         /// Create a new test receiver with a test context, queue name and expressions

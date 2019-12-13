@@ -149,7 +149,7 @@ namespace Minor.Miffy.MicroServices.Host
         {
             if (!IsMethodSuitableEvent(method, false))
             {
-                throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");
+                throw new BusConfigurationException($"Method {method.Name} does not have a proper eventlistener signature in type {type.Name}");
             }
 
             Logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
