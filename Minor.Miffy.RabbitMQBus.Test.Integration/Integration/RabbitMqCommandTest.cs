@@ -1,14 +1,18 @@
 using System;
 using System.Text;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.RabbitMQBus.Test.Integration.Integration.Models;
 using Newtonsoft.Json;
+using RabbitMQ.Client;
 
 namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
 {
     [TestClass]
     public class RabbitMqCommandReceiverTest
     {
+        private const int WaitTime = 2000;
+
         [TestMethod]
         [DataRow("test.queue", "Jan")]
         [DataRow("add.hello", "Bart")]
@@ -58,7 +62,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             var stringResult = Encoding.Unicode.GetString(result.Result.Body);
             Assert.AreEqual($"Hallo {message}", stringResult);
         }
-        
+
         [TestMethod]
         [DataRow("test.queue", "Jan", "Peters")]
         [DataRow("add.hello", "Bart", "van de Weg")]
@@ -84,7 +88,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
                 FirstName = firstName,
                 LastName = lastName
             };
-            
+
             var command = new CommandMessage
             {
                 DestinationQueue = destQueue,
@@ -100,7 +104,7 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
                 Person person = JsonConvert.DeserializeObject<Person>(Encoding.Unicode.GetString(commandMessage.Body));
                 person.FullName = $"{person.FirstName} {person.LastName}";
                 string jsonResponse = JsonConvert.SerializeObject(person);
-                
+
                 return new CommandMessage
                 {
                     CorrelationId = commandMessage.CorrelationId,
@@ -117,9 +121,98 @@ namespace Minor.Miffy.RabbitMQBus.Test.Integration.Integration
             Assert.AreEqual($"{firstName} {lastName}", personResult.FullName);
         }
 
+        [TestMethod]
+        [DataRow(103920)]
+        [DataRow(6938)]
+        [DataRow(639530)]
+        public void PausePausesReceivingMessages(long timestamp)
+        {
+            // Arrange
+            using IBusContext<IConnection> context = new RabbitMqContextBuilder()
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .WithExchange("HelloExchange")
+                .CreateContext();
+
+            bool messageReceived = false;
+
+            using var receiver = context.CreateCommandReceiver("topic.queue.test");
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e =>
+            {
+                messageReceived = true;
+                return null;
+            });
+
+            var eventMessage = new CommandMessage
+            {
+                Body = Encoding.Unicode.GetBytes("TestMessage"),
+                Timestamp = timestamp,
+                CorrelationId = Guid.NewGuid(),
+                DestinationQueue = "topic.queue.test",
+                EventType = "TestEvent"
+            };
+
+            // Act
+            receiver.Pause();
+
+            var sender = context.CreateCommandSender();
+            sender.SendCommandAsync(eventMessage);
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(false, messageReceived);
+        }
+
+        [TestMethod]
+        [DataRow(103920)]
+        [DataRow(6938)]
+        [DataRow(639530)]
+        public void ResumeResumesReceivingMessagesAfterItWasPaused(long timestamp)
+        {
+            // Arrange
+            using IBusContext<IConnection> context = new RabbitMqContextBuilder()
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .WithExchange("HelloExchange")
+                .CreateContext();
+
+            bool messageReceived = false;
+
+            using var receiver = context.CreateCommandReceiver("topic.queue.test");
+            receiver.DeclareCommandQueue();
+            receiver.StartReceivingCommands(e =>
+            {
+                messageReceived = true;
+                return null;
+            });
+
+            var eventMessage = new CommandMessage
+            {
+                Body = Encoding.Unicode.GetBytes("TestMessage"),
+                Timestamp = timestamp,
+                CorrelationId = Guid.NewGuid(),
+                DestinationQueue = "topic.queue.test",
+                EventType = "TestEvent"
+            };
+
+            receiver.Pause();
+
+            // Act
+            var sender = context.CreateCommandSender();
+            sender.SendCommandAsync(eventMessage);
+
+            receiver.Resume();
+
+            // Assert
+            Thread.Sleep(WaitTime);
+
+            Assert.AreEqual(true, messageReceived);
+        }
+
         [TestCleanup]
         public void TestCleanup()
         {
+            RabbitMqCleanUp.DeleteQueue("topic.queue.test", "amqp://guest:guest@localhost");
             RabbitMqCleanUp.DeleteExchange("TestExchange", "amqp://guest:guest@localhost");
         }
     }
