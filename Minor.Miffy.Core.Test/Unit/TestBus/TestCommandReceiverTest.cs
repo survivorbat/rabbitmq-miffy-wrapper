@@ -28,7 +28,7 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void ReceiverIsStandardNotPaused()
         {
             // Arrange
-            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
+            Mock<TestBusContext> context = new Mock<TestBusContext>();
 
             // Act
             var receiver = new TestCommandReceiver(context.Object, "queue");
@@ -41,8 +41,9 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void PausePausesReceiver()
         {
             // Arrange
-            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var receiver = new TestCommandReceiver(context.Object, "queue");
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+            receiver.DeclareCommandQueue();
 
             // Act
             receiver.Pause();
@@ -55,8 +56,9 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void ResumeResumesReceiver()
         {
             // Arrange
-            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var receiver = new TestCommandReceiver(context.Object, "queue");
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+            receiver.DeclareCommandQueue();
 
             receiver.Pause();
 
@@ -71,8 +73,9 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void ResumeThrowsExceptionIfNotPaused()
         {
             // Arrange
-            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var receiver = new TestCommandReceiver(context.Object, "queue");
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+            receiver.DeclareCommandQueue();
 
             // Act
             void Act() => receiver.Resume();
@@ -86,8 +89,9 @@ namespace Minor.Miffy.Test.Unit.TestBus
         public void PauseThrowsExceptionIfAlreadyPaused()
         {
             // Arrange
-            Mock<TestBusContext> context = new Mock<TestBusContext>(MockBehavior.Strict);
-            var receiver = new TestCommandReceiver(context.Object, "queue");
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+            receiver.DeclareCommandQueue();
 
             receiver.Pause();
 
@@ -99,5 +103,34 @@ namespace Minor.Miffy.Test.Unit.TestBus
             Assert.AreEqual("Attempting to pause the TestCommandReceiver, but it was already paused.", exception.Message);
         }
 
+        [TestMethod]
+        public void PauseThrowsExceptionWhenQueueNotDeclared()
+        {
+            // Arrange
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+
+            // Act
+            void Act() => receiver.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to pause the TestCommandReceiver, but it is not even receiving messages.", exception.Message);
+        }
+
+        [TestMethod]
+        public void ResumeThrowsExceptionWhenQueueNotDeclared()
+        {
+            // Arrange
+            var context = new TestBusContext();
+            var receiver = new TestCommandReceiver(context, "queue");
+
+            // Act
+            void Act() => receiver.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to resume the TestCommandReceiver, but it is not even receiving messages.", exception.Message);
+        }
     }
 }

@@ -388,5 +388,92 @@ namespace Minor.Miffy.RabbitMQBus.Test.Unit
             // Assert
             modelMock.Verify(e => e.BasicAck(deliveryTag, false));
         }
+
+        [TestMethod]
+        public void ResumeThrowsExceptionIfNotPaused()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+
+            receiver.DeclareCommandQueue();
+
+            // Act
+            void Act() => receiver.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to resume the CommandReceiver, but it was not paused.", exception.Message);
+
+        }
+
+        [TestMethod]
+        public void PauseThrowsExceptionIfAlreadyPaused()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+
+            receiver.DeclareCommandQueue();
+            receiver.Pause();
+
+            // Act
+            void Act() => receiver.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to pause the CommandReceiver, but it was already paused.", exception.Message);
+        }
+
+        [TestMethod]
+        public void PauseThrowsExceptionWhenNotListening()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+
+            // Act
+            void Act() => receiver.Pause();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to pause the CommandReceiver, but it is not even receiving messages.", exception.Message);
+        }
+
+        [TestMethod]
+        public void ResumeThrowsExceptionWhenNotListening()
+        {
+            // Arrange
+            var connectionMock = new Mock<IConnection>();
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var modelMock = new Mock<IModel>();
+
+            contextMock.SetupGet(e => e.Connection).Returns(connectionMock.Object);
+            connectionMock.Setup(e => e.CreateModel()).Returns(modelMock.Object);
+            var receiver = new RabbitMqCommandReceiver(contextMock.Object, "queue");
+
+            // Act
+            void Act() => receiver.Resume();
+
+            // Assert
+            BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
+            Assert.AreEqual("Attempting to resume the CommandReceiver, but it is not even receiving messages.", exception.Message);
+        }
+
     }
 }
