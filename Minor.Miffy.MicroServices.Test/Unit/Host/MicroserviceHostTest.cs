@@ -119,5 +119,60 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             // Assert
             receiverMock.Verify(e => e.StartReceivingMessages());
         }
+
+        [TestMethod]
+        public void PauseIsCalledOnReceiver()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            host.Start();
+
+            // Act
+            host.Pause();
+
+            // Assert
+            receiverMock.Verify(e => e.Pause());
+        }
+
+        [TestMethod]
+        public void ResumeIsCalledOnReceiver()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+
+            host.Start();
+            host.Pause();
+
+            // Act
+            host.Resume();
+
+            // Assert
+            receiverMock.Verify(e => e.Pause());
+        }
     }
 }

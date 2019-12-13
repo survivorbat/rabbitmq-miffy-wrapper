@@ -8,6 +8,8 @@ namespace Minor.Miffy.MicroServices.Host
 {
     public interface IMicroserviceHost : IDisposable
     {
+        public bool IsPaused { get; }
+        public bool IsListening { get; }
         public IEnumerable<MicroserviceListener> Listeners { get; }
         public IEnumerable<MicroserviceCommandListener> CommandListeners { get; }
         public IBusContext<IConnection> Context { get; }

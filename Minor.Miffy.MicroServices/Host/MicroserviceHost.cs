@@ -18,6 +18,16 @@ namespace Minor.Miffy.MicroServices.Host
         public IBusContext<IConnection> Context { get; }
 
         /// <summary>
+        /// Indicate whether the host is paused or not
+        /// </summary>
+        public bool IsPaused { get; }
+
+        /// <summary>
+        /// Indicatee whether the host is listening or not
+        /// </summary>
+        public bool IsListening { get; }
+
+        /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
         public IEnumerable<MicroserviceListener> Listeners { get; }
