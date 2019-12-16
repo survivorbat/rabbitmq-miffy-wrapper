@@ -182,7 +182,7 @@ namespace Minor.Miffy.RabbitMQBus
 
             Logger.LogInformation($"Resuming consumption of queue {QueueName}");
 
-            Model.BasicConsume(QueueName, true, ConsumerTag, false, false, null, Consumer);
+            Model.BasicConsume(QueueName, false, ConsumerTag, false, false, null, Consumer);
 
             IsPaused = false;
         }
