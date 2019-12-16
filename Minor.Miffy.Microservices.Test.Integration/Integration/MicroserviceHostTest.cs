@@ -62,6 +62,45 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
         [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060344556")]
         [DataRow("Cristian", "de Hamer", "c.hamer@info.com", "0603445562")]
+        public void EventListenerReceivesMessageAsync(string firstName, string lastName, string email, string phone)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+
+            using var host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<PersonEventListener>()
+                .CreateHost();
+
+            host.Start();
+
+            var publisher = new EventPublisher(busContext);
+
+            var personEvent = new PersonAddedEvent { Person = new Person
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    PhoneNumber = phone
+                }
+            };
+
+            // Act
+            publisher.PublishAsync(personEvent);
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
+        }
+
+        [TestMethod]
+        [DataRow("Mark", "van Brugge", "m.brugge@infosupport.net", "0603463096")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060323305")]
+        [DataRow("Haspran", "Hermadosi", "h.h@iosi.com", "060344556")]
+        [DataRow("Cristian", "de Hamer", "c.hamer@info.com", "0603445562")]
         public void ReceivingMessagesIsPaused(string firstName, string lastName, string email, string phone)
         {
             // Arrange

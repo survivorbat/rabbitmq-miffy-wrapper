@@ -1,5 +1,13 @@
 # Changelog Miffy Framework
 
+## 1.7.0
+
+- Add PublishAsync method to EventPublisher and IEventPublisher
+
+## 1.6.1
+
+- Add overloaded Publish command to ICommandPublisher interface
+
 ## 1.6.0
 
 - Turn most protected fields into properties

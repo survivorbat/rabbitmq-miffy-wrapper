@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 
 namespace Minor.Miffy.MicroServices.Events
 {
@@ -6,5 +7,8 @@ namespace Minor.Miffy.MicroServices.Events
     {
         void Publish(DomainEvent domainEvent);
         void Publish(long timeStamp, string topic, Guid correlationId, string eventType, string body);
+
+        Task PublishAsync(DomainEvent domainEvent);
+        Task PublishAsync(long timeStamp, string topic, Guid correlationId, string eventType, string body);
     }
 }

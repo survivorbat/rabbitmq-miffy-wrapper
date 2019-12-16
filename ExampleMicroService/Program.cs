@@ -109,13 +109,13 @@ namespace ExampleMicroService
                 {
                     Polis = new Polis { Klantnaam = name }
                 };
-                publisher.Publish(toegevoegdEvent);
+                publisher.PublishAsync(toegevoegdEvent);
             }
 
             /**
              * Now let's wait 1 second for all the events to arrive and be processed
              */
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
 
             /**
              * Now let's fire a command and retrieve a list of polissen
