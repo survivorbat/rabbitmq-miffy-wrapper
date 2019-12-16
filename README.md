@@ -5,20 +5,20 @@
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
 These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
-**MaartenH.Minor.Miffy.Abstractions**  
+**MaartenH.Minor.Miffy.Abstractions**
 Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Abstractions)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.Abstractions)
 
-**MaartenH.Minor.Miffy.MicroServices**  
+**MaartenH.Minor.Miffy.MicroServices**
 The package containing the classes used to set up a microservice host.
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.Microservices)
 ![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.MicroServices)
 
-**MaartenH.Minor.Miffy.RabbitMQBus**  
+**MaartenH.Minor.Miffy.RabbitMQBus**
 Implementation classes to use RabbitMQ with the framework
 
 ![Nuget](https://img.shields.io/nuget/v/MaartenH.Minor.Miffy.RabbitMQBus)
@@ -117,7 +117,7 @@ public class ExampleEvent : DomainEvent
 var exampleEvent = new ExampleEvent() { ExampleData = "Hello World" };
 
 var publisher = new EventPublisher(context);
-publisher.Publish(exampleEvent);
+publisher.PublishAsync(exampleEvent);
 ```
 
 Publishers can be injected using the IEventPublisher interface and accept any event that inherits from DomainEvent.
@@ -161,7 +161,7 @@ In case you want to publish raw json over the bus, you can use the overloaded va
 ```c#
 var publisher = new EventPublisher(context);
 string body = "{\"hello\": \"World\"}";
-publisher.Publish(timestamp: 500000, topic: "TestTopic", correlationId: Guid.NewGuid(), eventType: "TestEvent", body: body);
+publisher.PublishAsync(timestamp: 500000, topic: "TestTopic", correlationId: Guid.NewGuid(), eventType: "TestEvent", body: body);
 ```
 
 **Use this method with caution**, since deserializing raw or faulty data might throw errors and cause havoc.

@@ -48,7 +48,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Service collection to collect all services in
         /// </summary>
-        protected IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+        public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
