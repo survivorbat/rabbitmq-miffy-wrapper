@@ -6,7 +6,7 @@
     <Title>MaartenH.Minor.Miffy.RabbitMQBus</Title>
     <Authors>Maarten van der Heijden</Authors>
     <PackageId>MaartenH.Minor.Miffy.RabbitMQBus</PackageId>
-    <PackageVersion>1.6.0</PackageVersion>
+    <PackageVersion>1.6.1</PackageVersion>
     <PackageTags>Miffy RabbitMQ Events Commands Bus</PackageTags>
     <ProjectGuid>9A19103F-16F7-4668-BE54-9A1E7A4F7561</ProjectGuid>
     <Description>The RabbitMQ implementation package of the Miffy Framework</Description>
