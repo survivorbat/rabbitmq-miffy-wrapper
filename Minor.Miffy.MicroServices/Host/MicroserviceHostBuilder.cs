@@ -182,10 +182,20 @@ namespace Minor.Miffy.MicroServices.Host
                     }
 
                     Logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
-                    object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
-                    Logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
-                    method.Invoke(instance, new[] {jsonObject});
+                    try
+                    {
+                        object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
+
+                        Logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                        method.Invoke(instance, new[] {jsonObject});
+                    }
+                    catch (JsonReaderException readerException)
+                    {
+                        Logger.LogCritical($"JsonReader occured while deserializing message with type {message.EventType} and topic {message.Topic}," +
+                                           $" consider changing the parameter type of method {method.Name} of type {type.Name} to string. {readerException.Message}");
+                        throw;
+                    }
                 }
             });
         }

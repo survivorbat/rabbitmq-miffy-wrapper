@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.8.0
+
+- Add extra error handlers to prevent silent errors on invalid json
+
 ## 1.7.0
 
 - Add PublishAsync method to EventPublisher and IEventPublisher

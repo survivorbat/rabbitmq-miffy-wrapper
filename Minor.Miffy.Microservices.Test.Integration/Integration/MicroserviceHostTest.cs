@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -55,6 +56,35 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
 
             // Assert
             Assert.AreEqual(personEvent, PersonEventListener.ResultEvent);
+        }
+
+        [TestMethod]
+        [DataRow("{}{}{}")]
+        [DataRow("{223223}")]
+        [DataRow("{|]")]
+        public void EventListenerDoesCallListenerOnInvalidJson(string body)
+        {
+            // Arrange
+            using var busContext = new RabbitMqContextBuilder()
+                .WithExchange("TestExchange")
+                .WithConnectionString("amqp://guest:guest@localhost")
+                .CreateContext();
+
+            using var host = new MicroserviceHostBuilder()
+                .WithBusContext(busContext)
+                .AddEventListener<PersonEventListener>()
+                .CreateHost();
+
+            host.Start();
+
+            EventPublisher publisher = new EventPublisher(busContext);
+
+            // Act
+            publisher.Publish(242424, "PeopleApp.Persons.New", Guid.NewGuid(), "PersonEvent", body);
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.IsNull(PersonEventListener.ResultEvent);
         }
 
         [TestMethod]

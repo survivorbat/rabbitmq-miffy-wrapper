@@ -255,9 +255,15 @@ ExampleCommand exampleCommand = new ExampleCommand(guid);
 
 And that's about it! Have fun rabbiting :)
 
+## Invalid events
+
+Any incoming events or commands that can not be properly deserialized or other cause issues will be logged as critical.
+In case you encounter such an error, please consider changing your listener's parameter to _string_ as described in the
+**Listening for raw json data** section of this README.
+
 ## Notes
 - Queue names **MUST** be unique
-- Exceptions thrown in Command callbacks **MUST** implement Serializable or have a _[Serializable]_ attribute
+- Exceptions thrown in Command receivers **MUST** implement Serializable or have a _[Serializable]_ attribute
 - Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized
 
 <a href="https://www.buymeacoffee.com/MaartenH" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-red.png" height="50" widt="216" alt="Buy Me A Coffee" ></a>

@@ -1,3 +1,4 @@
+using System;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.Microservices.Test.Integration.Integration.Events;
 
@@ -17,7 +18,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// Static variable to keep track of the event
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; set; }
-        
+
         /// <summary>
         /// Listener for the event
         /// </summary>
