@@ -54,14 +54,6 @@ namespace Minor.Miffy.MicroServices.Events
         }
 
         /// <summary>
-        /// Publish a new domain event asynchronously
-        /// </summary>
-        public Task PublishAsync(DomainEvent domainEvent)
-        {
-            return Task.Run(() => Publish(domainEvent));
-        }
-
-        /// <summary>
         /// Publish a raw message to the bus with explicit values
         ///
         /// In case you want to publish a 'normal' event you're strongly encouraged to use the
@@ -86,9 +78,17 @@ namespace Minor.Miffy.MicroServices.Events
         /// <summary>
         /// Publish a new domain event asynchronously
         /// </summary>
-        public Task PublishAsync(long timeStamp, string topic, Guid correlationId, string eventType, string body)
+        public async Task PublishAsync(DomainEvent domainEvent)
         {
-            return Task.Run(() => Publish(timeStamp, topic, correlationId, eventType, body));
+            await Task.Run(() => Publish(domainEvent));
+        }
+
+        /// <summary>
+        /// Publish a new domain event asynchronously
+        /// </summary>
+        public async Task PublishAsync(long timeStamp, string topic, Guid correlationId, string eventType, string body)
+        {
+            await Task.Run(() => Publish(timeStamp, topic, correlationId, eventType, body));
         }
     }
 }
