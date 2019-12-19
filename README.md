@@ -262,6 +262,7 @@ In case you encounter such an error, please consider changing your listener's pa
 **Listening for raw json data** section of this README.
 
 ## Notes
+- We encourage you to utilize a loggerfactory for logging, since bugs can easily be found by reading the logs.
 - Queue names **MUST** be unique
 - Exceptions thrown in Command receivers **MUST** implement Serializable or have a _[Serializable]_ attribute
 - Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized

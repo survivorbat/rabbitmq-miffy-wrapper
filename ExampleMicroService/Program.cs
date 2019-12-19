@@ -76,6 +76,9 @@ namespace ExampleMicroService
              * next we register any dependencies we might need, like a DBContext
              * that is injected into our CommandListeners and EventListeners
              *
+             * Since most of the inner workings of this framework are asynchronous, we
+             * strongly urge you to set up a loggerfactory to quickly find any errors going over the bus.
+             *
              * Then, throw our context into the builder and lastly, ensure that
              * all our event/command listeners are registered by calling UseConventions().
              *
@@ -131,6 +134,13 @@ namespace ExampleMicroService
             {
                 Console.WriteLine($"Found polis for {polis.Klantnaam} with ID {polis.Id}");
             }
+
+            /**
+             * Now let's see what happens if we send a mangled json event
+             *
+             * This should log a critical error in the console and tell you how you might be able to diagnose the problem.
+             */
+            publisher.Publish(0, "MVM.Polisbeheer.PolisToegevoegd", Guid.Empty, "PolisToegevoegdEvent", "{[somerandomjson}]");
 
             /**
              * Lastly, let's see how the queue deals with exceptions on the other side

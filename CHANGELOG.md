@@ -1,8 +1,12 @@
 # Changelog Miffy Framework
 
+## 1.8.1
+
+- Update eventlistener exception message and add example service info
+
 ## 1.8.0
 
-- Add extra error handlers to prevent silent errors on invalid json
+- Add extra error handlers to eventhandlers prevent silent errors on invalid json
 
 ## 1.7.0
 

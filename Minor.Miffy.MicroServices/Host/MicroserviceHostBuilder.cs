@@ -192,8 +192,8 @@ namespace Minor.Miffy.MicroServices.Host
                     }
                     catch (JsonReaderException readerException)
                     {
-                        Logger.LogCritical($"JsonReader occured while deserializing message with type {message.EventType} and topic {message.Topic}," +
-                                           $" consider changing the parameter type of method {method.Name} of type {type.Name} to string. {readerException.Message}");
+                        Logger.LogCritical($"JsonReaderException occured while deserializing message with type {message.EventType} and topic {message.Topic}," +
+                                           $" consider changing the parameter type of method {method.Name} of type {type.Name} to string. Data: {text}, exception: {readerException.Message}");
                         throw;
                     }
                 }
