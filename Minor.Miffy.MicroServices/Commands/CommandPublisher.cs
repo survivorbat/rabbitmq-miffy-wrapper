@@ -3,7 +3,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Minor.Miffy.MicroServices.Events;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
@@ -19,7 +18,7 @@ namespace Minor.Miffy.MicroServices.Commands
         /// <summary>
         /// Logger
         /// </summary>
-        protected readonly ILogger<EventPublisher> _logger;
+        protected readonly ILogger<CommandPublisher> _logger;
 
         /// <summary>
         /// Create a publisher and initialize a sender
@@ -28,7 +27,7 @@ namespace Minor.Miffy.MicroServices.Commands
         {
             _sender = context.CreateCommandSender();
             loggerFactory ??= new NullLoggerFactory();
-            _logger = loggerFactory.CreateLogger<EventPublisher>();
+            _logger = loggerFactory.CreateLogger<CommandPublisher>();
         }
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace Minor.Miffy.MicroServices.Commands
 
             var json = JsonConvert.SerializeObject(domainCommand);
 
-            _logger.LogDebug($"Publishing domain event {domainCommand.Id} with body: {json}");
+            _logger.LogDebug($"Publishing domain command {domainCommand.Id} with body: {json}");
 
             var message = new CommandMessage
             {

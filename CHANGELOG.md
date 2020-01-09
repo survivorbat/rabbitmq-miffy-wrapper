@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.8.2
+
+- Fix two log statements in the CommandPublisher
+
 ## 1.8.1
 
 - Update eventlistener exception message and add example service info
