@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.9.0
+
+- Add overloaded RegisterDependencies method with tests
+
 ## 1.8.2
 
 - Fix two log statements in the CommandPublisher

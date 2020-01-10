@@ -48,7 +48,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Service collection to collect all services in
         /// </summary>
-        public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+        public IServiceCollection ServiceCollection { get; protected set; } = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
@@ -329,6 +329,16 @@ namespace Minor.Miffy.MicroServices.Host
         {
             Logger.LogDebug("Registering dependencies");
             servicesConfiguration.Invoke(ServiceCollection);
+            return this;
+        }
+
+        /// <summary>
+        /// Overwrites the existing service collection with a new one provided by the user
+        /// </summary>
+        public virtual MicroserviceHostBuilder RegisterDependencies(IServiceCollection serviceCollection)
+        {
+            Logger.LogDebug("Overwriting registered dependencies with provided collection");
+            ServiceCollection = serviceCollection;
             return this;
         }
 

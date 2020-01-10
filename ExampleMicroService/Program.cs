@@ -86,6 +86,7 @@ namespace ExampleMicroService
              */
             using MicroserviceHostBuilder builder = new MicroserviceHostBuilder()
                 .SetLoggerFactory(loggerFactory)
+                // This method also accepts a service collection as input
                 .RegisterDependencies(services =>
                 {
                     services.AddSingleton(databaseContext);
