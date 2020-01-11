@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 1.10.0
+
+- Remove the overwriting mechanism of RegisterDependencies and replace it with appending dependencies
+
 ## 1.9.0
 
 - Add overloaded RegisterDependencies method with tests

@@ -110,7 +110,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
-        public void RegisterDependenciesOverwritesServiceCollection()
+        public void RegisterDependenciesAddsToExistingServiceCollection()
         {
             // Arrange
             using var builder = new MicroserviceHostBuilder();
@@ -119,12 +119,13 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             serviceCollection.AddTransient<TestType1>();
 
             // Act
+            builder.RegisterDependencies(services => { services.AddTransient<TestType2>(); });
             builder.RegisterDependencies(serviceCollection);
 
             // Assert
-            Assert.AreSame(serviceCollection, builder.ServiceCollection);
             IServiceProvider serviceProvider = builder.ServiceCollection.BuildServiceProvider();
             Assert.IsNotNull(serviceProvider.GetService<TestType1>());
+            Assert.IsNotNull(serviceProvider.GetService<TestType2>());
         }
     }
 }

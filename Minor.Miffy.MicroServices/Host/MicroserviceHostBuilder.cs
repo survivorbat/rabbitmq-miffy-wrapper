@@ -333,12 +333,15 @@ namespace Minor.Miffy.MicroServices.Host
         }
 
         /// <summary>
-        /// Overwrites the existing service collection with a new one provided by the user
+        /// Adds dependencies of existing servicecollection to the dependencies list
         /// </summary>
         public virtual MicroserviceHostBuilder RegisterDependencies(IServiceCollection serviceCollection)
         {
-            Logger.LogDebug("Overwriting registered dependencies with provided collection");
-            ServiceCollection = serviceCollection;
+            Logger.LogDebug("Adding registered dependencies from provided collection");
+            foreach (ServiceDescriptor serviceDescriptor in serviceCollection)
+            {
+                ServiceCollection.Add(serviceDescriptor);
+            }
             return this;
         }
 
