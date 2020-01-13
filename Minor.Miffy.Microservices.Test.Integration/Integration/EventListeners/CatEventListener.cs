@@ -17,11 +17,11 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// Static variable to keep track of the event
         /// </summary>
         internal static CatAddedEvent ResultEvent { get; set; }
-        
+
         /// <summary>
         /// Listener for the event
         /// </summary>
-        [EventListener("PeopleApp.Cats")]
+        [EventListener]
         [Topic("PeopleApp.Cats.New")]
         public void Handles(CatAddedEvent addedEvent)
         {

@@ -26,6 +26,32 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
+        public void QueueNameIsAutomaticallySet()
+        {
+            // Act
+            using var host = new MicroserviceHostBuilder();
+
+            // Assert
+            Assert.IsNotNull(host.QueueName);
+            Assert.IsTrue(host.QueueName.StartsWith("unset_queue_name_"));
+        }
+
+        [TestMethod]
+        [DataRow("test.queue")]
+        [DataRow("VeryAwesomeQueue")]
+        public void WithQueueNameSetsQueueProperly(string queueName)
+        {
+            // Arrange
+            using var host = new MicroserviceHostBuilder();
+
+            // Act
+            host.WithQueueName(queueName);
+
+            // Assert
+            Assert.AreEqual(queueName, host.QueueName);
+        }
+
+        [TestMethod]
         public void CreateHostReturnsHostWithContext()
         {
             // Arrange

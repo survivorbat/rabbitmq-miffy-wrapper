@@ -17,7 +17,7 @@ namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
         /// Unreachable code because of missing dependency
         /// </summary>
         /// <param name="dummyEvent"></param>
-        [EventListener("TestDependency")]
+        [EventListener]
         [Topic("test.topic")]
         public void Handle(DummyEvent dummyEvent)
         {

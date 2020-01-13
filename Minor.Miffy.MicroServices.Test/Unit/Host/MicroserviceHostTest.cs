@@ -22,7 +22,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var context = contextMock.Object;
 
             // Act
-            var host = new MicroserviceHost(context, null, null, logger.Object);
+            var host = new MicroserviceHost(context, new MicroserviceListener[0], new MicroserviceCommandListener[0], "test.queue", logger.Object);
 
             // Assert
             Assert.AreSame(context, host.Context);
@@ -32,10 +32,11 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void DisposeCallsDisposeOnContext()
         {
             // Arrange
+            const string queue = "test.queue";
             var contextMock = new Mock<IBusContext<IConnection>>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
-            var context = contextMock.Object;
-            var host = new MicroserviceHost(context, null, null, logger.Object);
+
+            var host = new MicroserviceHost(contextMock.Object, new MicroserviceListener[0], new MicroserviceCommandListener[0], queue, logger.Object);
 
             // Act
             host.Dispose();
@@ -48,7 +49,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         [DataRow(1)]
         [DataRow(4)]
         [DataRow(20)]
-        public void CreateListenerIsCalledForAllGivenListeners(int listenerAmount)
+        public void CreateListenerIsCalledOnce(int listenerAmount)
         {
             // Arrange
             var contextMock = new Mock<IBusContext<IConnection>>();
@@ -60,13 +61,13 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             var listeners = Enumerable.Range(0, listenerAmount).Select(e => new MicroserviceListener());
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "test.queue", logger.Object);
 
             // Act
             host.Start();
 
             // Assert
-            contextMock.Verify(e => e.CreateMessageReceiver(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Exactly(listenerAmount));
+            contextMock.Verify(e => e.CreateMessageReceiver(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [TestMethod]
@@ -84,9 +85,9 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             contextMock.Setup(e => e.CreateMessageReceiver(queueName, topicNames))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queueName, TopicExpressions = topicNames} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topicNames} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queueName, logger.Object);
 
             // Act
             host.Start();
@@ -103,21 +104,38 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             // Act
             host.Start();
 
             // Assert
             receiverMock.Verify(e => e.StartReceivingMessages());
+        }
+
+        [TestMethod]
+        [DataRow("test.queue")]
+        [DataRow("some.queue.somewhere")]
+        public void QueueIsProperlySet(string queueName)
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+            var context = contextMock.Object;
+
+            // Act
+            var host = new MicroserviceHost(context, new MicroserviceListener[0], new MicroserviceCommandListener[0], queueName, logger.Object);
+
+            // Assert
+            Assert.AreSame(queueName, host.QueueName);
         }
 
         [TestMethod]
@@ -128,15 +146,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             host.Start();
 
@@ -155,15 +173,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
             contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
 
             host.Start();
 
@@ -182,15 +200,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
 
             host.Start();
             host.Pause();
@@ -210,7 +228,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
             // Act
-            var host = new MicroserviceHost(contextMock.Object, new List<MicroserviceListener>(), new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, new List<MicroserviceListener>(), new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
 
             // Assert
             Assert.AreEqual(false, host.IsPaused);
@@ -224,15 +242,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
             contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
 
             host.Start();
             host.Pause();
@@ -252,15 +270,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             host.Start();
             host.Pause();
@@ -281,15 +299,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
             host.Start();
 
             // Act
@@ -308,15 +326,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             // Act
             void Act() => host.Pause();
@@ -334,15 +352,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             // Act
             void Act() => host.Resume();
@@ -360,15 +378,15 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var receiverMock = new Mock<IMessageReceiver>();
             var logger = new Mock<ILogger<MicroserviceHost>>();
 
-            string queue = "testQueue";
+            const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
             contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
                 .Returns(receiverMock.Object);
 
-            var listeners = new[] {new MicroserviceListener {Queue = queue, TopicExpressions = topics} };
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
             host.Start();
 
             // Act

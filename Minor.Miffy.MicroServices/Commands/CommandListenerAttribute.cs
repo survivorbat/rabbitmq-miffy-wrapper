@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minor.Miffy.MicroServices.Events
+namespace Minor.Miffy.MicroServices.Commands
 {
     /// <summary>
     /// This attribute should decorate each event listening class.

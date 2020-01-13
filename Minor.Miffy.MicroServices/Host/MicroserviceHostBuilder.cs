@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -46,9 +47,14 @@ namespace Minor.Miffy.MicroServices.Host
         protected ILogger<MicroserviceHostBuilder> Logger { get; set; }
 
         /// <summary>
+        /// Queue that is used to listen
+        /// </summary>
+        public string QueueName { get; protected set; } = "unset_queue_name_" + Guid.NewGuid();
+
+        /// <summary>
         /// Service collection to collect all services in
         /// </summary>
-        public IServiceCollection ServiceCollection { get; protected set; } = new ServiceCollection();
+        public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
         /// <summary>
         /// Registered event listeners
@@ -78,6 +84,18 @@ namespace Minor.Miffy.MicroServices.Host
             Logger.LogDebug("Adding Bus Context");
             Context = context;
             ServiceCollection.AddSingleton(context);
+            return this;
+        }
+
+        /// <summary>
+        /// Set the name of the queue that this service will utilise
+        ///
+        /// If this value is not set, a GUID will be generated with a queue_ prefix
+        /// </summary>
+        public virtual MicroserviceHostBuilder WithQueueName(string queueName)
+        {
+            Logger.LogDebug($"Setting queuename as {queueName}");
+            QueueName = queueName;
             return this;
         }
 
@@ -145,7 +163,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Register a listener for a specific event with topic expressions
         /// </summary>
-        protected virtual void RegisterEventListener(TypeInfo type, MethodInfo method, string queueName)
+        protected virtual void RegisterEventListener(TypeInfo type, MethodInfo method)
         {
             if (!IsMethodSuitableEvent(method, false))
             {
@@ -155,20 +173,27 @@ namespace Minor.Miffy.MicroServices.Host
             Logger.LogDebug($"Evaluating parameter type {type.Name} of method {method.Name}");
             Type parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
 
-            string[] topicPatterns = method.GetCustomAttributes<TopicAttribute>()
+            TopicAttribute[] topicAttributes = method.GetCustomAttributes<TopicAttribute>()
+                .ToArray();
+
+            string[] topicPatterns = topicAttributes
                 .Select(e => e.TopicPattern)
+                .ToArray();
+
+            Regex[] topicRegularExpressions = topicAttributes
+                .Select(e => e.TopicRegularExpression)
                 .ToArray();
 
             Logger.LogDebug($"Found topic patterns {string.Join(", ", topicPatterns)} on method {method.Name} in type {type.Name}");
 
-            Logger.LogTrace($"Adding MicroserviceListener with queue {queueName}, type {type.Name} and method {method.Name}");
+            Logger.LogTrace($"Adding MicroserviceListener with type {type.Name} and method {method.Name}");
             EventListeners.Add(new MicroserviceListener
             {
                 TopicExpressions = topicPatterns,
-                Queue = queueName,
+                TopicRegularExpressions = topicRegularExpressions,
                 Callback = message =>
                 {
-                    Logger.LogDebug($"Attempting to instantiate type {type.Name} in queue {queueName}");
+                    Logger.LogDebug($"Attempting to instantiate type {type.Name}");
                     object instance = InstantiatePopulatedType(type);
 
                     Logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
@@ -255,12 +280,12 @@ namespace Minor.Miffy.MicroServices.Host
 
             foreach (MethodInfo methodInfo in GetRelevantMethods(type))
             {
-                string eventQueueName = methodInfo.GetCustomAttribute<EventListenerAttribute>()?.QueueName;
+                EventListenerAttribute eventQueueName = methodInfo.GetCustomAttribute<EventListenerAttribute>();
                 string commandQueueName = methodInfo.GetCustomAttribute<CommandListenerAttribute>()?.QueueName;
 
                 if (eventQueueName != null)
                 {
-                    RegisterEventListener(type, methodInfo, eventQueueName);
+                    RegisterEventListener(type, methodInfo);
                 }
                 else if (commandQueueName != null)
                 {
@@ -356,6 +381,7 @@ namespace Minor.Miffy.MicroServices.Host
                 Context,
                 EventListeners,
                 CommandListeners,
+                QueueName,
                 LoggerFactory.CreateLogger<MicroserviceHost>());
         }
 

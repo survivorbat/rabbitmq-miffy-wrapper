@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
@@ -28,6 +30,11 @@ namespace Minor.Miffy.MicroServices.Host
         public bool IsListening { get; protected set; }
 
         /// <summary>
+        /// Queuename that this service will listen to
+        /// </summary>
+        public string QueueName { get; protected set; }
+
+        /// <summary>
         /// A list of queues that have a list of associated topics with handlers.
         /// </summary>
         public IEnumerable<MicroserviceListener> Listeners { get; }
@@ -40,12 +47,17 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// List of message receivers
         /// </summary>
-        protected List<IMessageReceiver> MessageReceivers { get; } = new List<IMessageReceiver>();
+        protected IMessageReceiver MessageReceiver { get; set; }
+
+        /// <summary>
+        /// A list of topics used in all the listeners
+        /// </summary>
+        protected IEnumerable<string> Topics { get; }
 
         /// <summary>
         /// List of command receivers
         /// </summary>
-        protected List<ICommandReceiver> CommandReceivers { get; }= new List<ICommandReceiver>();
+        protected List<ICommandReceiver> CommandReceivers { get; } = new List<ICommandReceiver>();
 
         /// <summary>
         /// A logger factory to log the start
@@ -58,17 +70,23 @@ namespace Minor.Miffy.MicroServices.Host
         /// <param name="connection">IBusContext for the connection with the message bus</param>
         /// <param name="listeners">All the listeners</param>
         /// <param name="commandListeners">All the command listeners</param>
+        /// <param name="queueName">Name of the queue </param>
         /// <param name="logger">Logging instance</param>
         public MicroserviceHost(
             IBusContext<IConnection> connection,
             IEnumerable<MicroserviceListener> listeners,
             IEnumerable<MicroserviceCommandListener> commandListeners,
+            string queueName,
             ILogger<MicroserviceHost> logger)
         {
             Context = connection;
             Listeners = listeners;
             CommandListeners = commandListeners;
+            QueueName = queueName;
             Logger = logger;
+
+            Topics = Listeners.SelectMany(e => e.TopicExpressions)
+                    .Distinct();
         }
 
         /// <summary>
@@ -83,16 +101,6 @@ namespace Minor.Miffy.MicroServices.Host
 
             IsListening = true;
 
-            foreach (MicroserviceListener callback in Listeners)
-            {
-                Logger.LogInformation($"Registering queue {callback.Queue} with expressions {string.Join(", ", callback.TopicExpressions)}");
-
-                IMessageReceiver receiver = Context.CreateMessageReceiver(callback.Queue, callback.TopicExpressions);
-                receiver.StartReceivingMessages();
-                receiver.StartHandlingMessages(callback.Callback);
-                MessageReceivers.Add(receiver);
-            }
-
             foreach (MicroserviceCommandListener callback in CommandListeners)
             {
                 Logger.LogInformation($"Registering command queue {callback.Queue}");
@@ -102,6 +110,22 @@ namespace Minor.Miffy.MicroServices.Host
                 receiver.StartReceivingCommands(callback.Callback);
                 CommandReceivers.Add(receiver);
             }
+
+            MessageReceiver = Context.CreateMessageReceiver(QueueName, Topics);
+            MessageReceiver.StartReceivingMessages();
+            MessageReceiver.StartHandlingMessages(eventMessage =>
+            {
+                foreach (MicroserviceListener microserviceListener in Listeners)
+                {
+                    foreach (Regex expression in microserviceListener.TopicRegularExpressions)
+                    {
+                        if (expression.IsMatch(eventMessage.Topic))
+                        {
+                            microserviceListener.Callback.Invoke(eventMessage);
+                        }
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -120,7 +144,7 @@ namespace Minor.Miffy.MicroServices.Host
             }
 
             IsPaused = true;
-            MessageReceivers.ForEach(e => e.Pause());
+            MessageReceiver.Pause();
             CommandReceivers.ForEach(e => e.Pause());
         }
 
@@ -140,7 +164,7 @@ namespace Minor.Miffy.MicroServices.Host
             }
 
             IsPaused = false;
-            MessageReceivers.ForEach(e => e.Resume());
+            MessageReceiver.Resume();
             CommandReceivers.ForEach(e => e.Resume());
         }
 
@@ -149,7 +173,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public virtual void Dispose()
         {
-            MessageReceivers.ForEach(e => e.Dispose());
+            MessageReceiver?.Dispose();
             CommandReceivers.ForEach(e => e.Dispose());
             Context.Dispose();
         }

@@ -13,7 +13,7 @@ namespace Minor.Miffy.MicroServices.Test.Conventions.Component.EventListeners
         /// <summary>
         /// Put the result in a static variable so we can use it in tests
         /// </summary>
-        [EventListener(queueName: "TestQueue3")]
+        [EventListener]
         [Topic("IrrelevantTopic")]
         public void Handles(DummyEvent dummyEvent) => HandlesResult = dummyEvent;
     }

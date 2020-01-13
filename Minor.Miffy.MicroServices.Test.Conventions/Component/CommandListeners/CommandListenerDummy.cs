@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Test.Conventions.Component.Commands;
 using Minor.Miffy.MicroServices.Test.Conventions.Component.Models;

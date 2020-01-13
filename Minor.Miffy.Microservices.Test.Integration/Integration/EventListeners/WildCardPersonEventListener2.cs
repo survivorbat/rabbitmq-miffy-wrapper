@@ -17,11 +17,11 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// To keep track of this event
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; set; }
-        
+
         /// <summary>
         /// Listener for events
         /// </summary>
-        [EventListener("PeopleApp.Persons.Wild2")]
+        [EventListener]
         [Topic("PeopleApp.#")]
         public void Handles(PersonAddedEvent addedEvent)
         {

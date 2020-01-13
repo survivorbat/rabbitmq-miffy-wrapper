@@ -14,7 +14,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// <summary>
         /// Listener for all events
         /// </summary>
-        [EventListener("PeopleApp.Cats.Spam")]
+        [EventListener]
         [Topic("PeopleApp.Cats.New")]
         public void Handles(CatAddedEvent addedEvent)
         {

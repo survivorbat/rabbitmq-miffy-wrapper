@@ -6,12 +6,12 @@ namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
     {
         public void NotRelevantMethod()
         {
-            
+
         }
-        
+
         public string NotRelevantProperty { get; set; }
 
-        [EventListener("PersonApp.Cats.Test")]
+        [EventListener]
         [Topic("testPattern")]
         public void Handle(DummyEvent @event)
         {

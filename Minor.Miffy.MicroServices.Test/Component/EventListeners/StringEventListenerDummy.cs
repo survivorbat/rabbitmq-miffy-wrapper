@@ -6,7 +6,7 @@ namespace Minor.Miffy.MicroServices.Test.Component.EventListeners
     {
         internal static string ReceivedData { get; set; }
 
-        [EventListener("test.queue")]
+        [EventListener]
         [Topic("test.topic")]
         public void Handles(string data)
         {

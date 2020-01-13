@@ -259,8 +259,8 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
         {
             // Arrange
             using var busContext = new RabbitMqContextBuilder()
-                .WithExchange("TestExchange")
                 .WithConnectionString("amqp://guest:guest@localhost")
+                .WithExchange("TestExchange")
                 .CreateContext();
 
             using var builder = new MicroserviceHostBuilder()
@@ -341,6 +341,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
 
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
+                .WithQueueName("QueueName3")
                 .AddEventListener<SpamEventListener>()
                 .CreateHost();
 
@@ -375,6 +376,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
 
             using var host = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
+                .WithQueueName("QueueName2")
                 .AddEventListener<ErrorEventListener>()
                 .CreateHost();
 

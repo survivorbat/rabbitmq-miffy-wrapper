@@ -1,5 +1,12 @@
 # Changelog Miffy Framework
 
+## 2.0.0(-alpha) 🎉🎉🎉
+
+- Finally remove the unique-queue constraint and the fact that the framework created multiple queues
+- Add .WithQueueName(string queueName) to hostbuilder
+- Add default queuename to hostbuilder
+- Remove queue name from [EventListener] attribute
+
 ## 1.10.0
 
 - Remove the overwriting mechanism of RegisterDependencies and replace it with appending dependencies

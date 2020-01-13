@@ -26,6 +26,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
 
             // Act
             hostBuilder.AddEventListener<EventListenerDummy>();
+            hostBuilder.WithQueueName("test.queue");
 
             hostBuilder.CreateHost().Start();
 
@@ -44,6 +45,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             // Arrange
             var testContext = new TestBusContext();
             using var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
+                .WithQueueName("test.queue")
                 .AddEventListener<MethodEventListener>();
 
             // Act
@@ -54,7 +56,6 @@ namespace Minor.Miffy.MicroServices.Test.Component
             Assert.AreEqual(1, result.Count);
 
             var firstItem = result.FirstOrDefault();
-            Assert.AreEqual("PersonApp.Cats.Test", firstItem?.Queue);
             Assert.AreEqual("testPattern", firstItem?.TopicExpressions.FirstOrDefault());
         }
 
@@ -63,7 +64,9 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             TestBusContext testContext = new TestBusContext();
-            using MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            using MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder()
+                .WithQueueName("test.queue")
+                .WithBusContext(testContext);
 
             // Act
             hostBuilder.AddEventListener<CommandListenerDummy>();
@@ -134,6 +137,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
+                .WithQueueName("test.queue")
                 .AddEventListener<MissingDependencyEventListener>()
                 .CreateHost();
 
@@ -160,6 +164,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
+                .WithQueueName("test.queue")
                 .AddEventListener<StringEventListenerDummy>()
                 .CreateHost();
 
@@ -188,6 +193,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
+                .WithQueueName("test.queue")
                 .AddEventListener<NullCommandListener>()
                 .CreateHost();
 

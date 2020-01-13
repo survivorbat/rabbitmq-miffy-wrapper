@@ -17,11 +17,11 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// Static variable to keep the result in
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; set; }
-        
+
         /// <summary>
         /// Listener for all events
         /// </summary>
-        [EventListener("PeopleApp.Persons.FanIn")]
+        [EventListener]
         [Topic("#")]
         public void Handles(PersonAddedEvent addedEvent)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Minor.Miffy.MicroServices.Events
 {
@@ -12,10 +13,18 @@ namespace Minor.Miffy.MicroServices.Events
     public class TopicAttribute : Attribute
     {
         public string TopicPattern { get; }
+        public Regex TopicRegularExpression { get; }
 
         public TopicAttribute(string topicPattern)
         {
             TopicPattern = topicPattern;
+
+            string regexPattern = topicPattern
+                .Replace(".", @"\.")
+                .Replace("*", @"[^.]*")
+                .Replace("#", @".*");
+
+            TopicRegularExpression = new Regex($"^{regexPattern}$");
         }
     }
 }

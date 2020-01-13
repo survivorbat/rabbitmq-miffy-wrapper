@@ -2,6 +2,8 @@
 
 ![GitHub](https://img.shields.io/github/license/survivorbat/rabbitmq-miffy-wrapper)
 
+*🎉 Version 2.0.0 has just been released! 🎉*
+
 This is a wrapper library for the RabbitMQ Client in dotnetcore.
 These packages allow you to easily set up event listeners and command listeners using RabbitMQ.
 
@@ -65,7 +67,7 @@ Then, you're going to need a callback function that handles such an event.
 ```c#
 public class ExampleEventListener
 {
-    [EventListener("UniqueQueueName")]
+    [EventListener]
     [Topic("ExampleTopic")]
     public void Handles(ExampleEvent exampleEvent)
     {
@@ -80,6 +82,7 @@ Now that we have that setup, we can register the event listener in our hostbuild
 // Context builder code
 
 using var builder = new MicroserviceHostBuilder()
+				.WithQueueName("MyService.Queue")
                 .WithBusContext(context)
                 .AddEventListener<ExampleEventListener>();
 
@@ -94,12 +97,12 @@ And voila! Incoming events matching the topic will now be handled by the Handles
 You can also allow reflection to take care of registering listeners, for example:
 ```c#
 using var builder = new MicroserviceHostBuilder()
+				.WithQueueName("MyService.Queue")
                 .WithBusContext(context)
                 .UseConventions();
 ```
 
-Just make sure an event listener has a EventListener attribute with an unique queuename and one method with a topic
-and event parameter type.
+Just make sure an event listener has a EventListener attribute with one or more Topic attributes.
 
 #### Publishing events
 
@@ -145,7 +148,7 @@ type of _string_ like so:
 ```c#
 public class JsonEventListener
 {
-    [EventListener("UniqueQueueName")]
+    [EventListener]
     [Topic("ExampleTopic")]
     public void Handles(string rawJson)
     {
@@ -263,7 +266,6 @@ In case you encounter such an error, please consider changing your listener's pa
 
 ## Notes
 - We encourage you to utilize a loggerfactory for logging, since bugs can easily be found by reading the logs.
-- Queue names **MUST** be unique
 - Exceptions thrown in Command receivers **MUST** implement Serializable or have a _[Serializable]_ attribute
 - Events, exceptions and commands need to have the same classname in all involved services in order to be properly (de)serialized
 

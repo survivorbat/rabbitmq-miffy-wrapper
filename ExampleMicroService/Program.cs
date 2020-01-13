@@ -91,6 +91,7 @@ namespace ExampleMicroService
                 {
                     services.AddSingleton(databaseContext);
                 })
+                .WithQueueName("ExampleService.Queue")
                 .WithBusContext(context)
                 .UseConventions();
 

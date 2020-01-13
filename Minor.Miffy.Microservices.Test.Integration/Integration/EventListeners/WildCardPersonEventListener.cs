@@ -17,11 +17,11 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// Result of the initial call from rabbitMQ
         /// </summary>
         internal static PersonAddedEvent ResultEvent { get; set; }
-        
+
         /// <summary>
         /// Listener for the topic on the queue
         /// </summary>
-        [EventListener("PeopleApp.Persons.Wild")]
+        [EventListener]
         [Topic("PeopleApp.Persons.*")]
         public void Handles(PersonAddedEvent addedEvent)
         {

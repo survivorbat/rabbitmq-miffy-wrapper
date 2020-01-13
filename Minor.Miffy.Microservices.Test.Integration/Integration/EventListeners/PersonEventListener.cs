@@ -22,7 +22,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration.EventListeners
         /// <summary>
         /// Listener for the event
         /// </summary>
-        [EventListener("PeopleApp.Persons")]
+        [EventListener]
         [Topic("PeopleApp.Persons.New")]
         public void Handles(PersonAddedEvent addedEvent)
         {

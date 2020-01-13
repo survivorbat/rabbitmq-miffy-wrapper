@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 
 namespace Minor.Miffy.MicroServices.Test.Unit.Commands

@@ -33,7 +33,7 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// Command that handles the incoming event, in this case saving it
         /// </summary>
-        [EventListener("MVM.TestService.PolisEventListenerQueue")]
+        [EventListener]
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(PolisToegevoegdEvent evt)
         {
@@ -44,7 +44,7 @@ namespace ExampleMicroService.EventListeners
         /// <summary>
         /// A string listener that gets the json result of the item
         /// </summary>
-        [EventListener("MVM.TestService.StringListener")]
+        [EventListener]
         [Topic("MVM.Polisbeheer.PolisToegevoegd")]
         public void Handles(string evt)
         {
