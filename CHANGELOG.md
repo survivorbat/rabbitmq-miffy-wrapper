@@ -6,6 +6,7 @@
 - Add .WithQueueName(string queueName) to hostbuilder
 - Add default queuename to hostbuilder
 - Remove queue name from [EventListener] attribute
+- Move CommandListenerAttribute to Command namespace
 
 ## 1.10.0
 
