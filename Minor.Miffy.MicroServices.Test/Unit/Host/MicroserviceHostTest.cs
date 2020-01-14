@@ -176,12 +176,12 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
             var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             host.Start();
 
@@ -208,7 +208,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             host.Start();
             host.Pause();
@@ -245,12 +245,12 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             const string queue = "testQueue";
             string[] topics = {"Topic1", "Topic2"};
 
-            contextMock.Setup(e => e.CreateMessageReceiver("testQueue", topics))
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
                 .Returns(receiverMock.Object);
 
             var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
 
-            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), "testQueue", logger.Object);
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
 
             host.Start();
             host.Pause();
