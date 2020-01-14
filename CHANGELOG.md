@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 2.0.1
+
+- Add more log statements to microservice host
+
 ## 2.0.0(-alpha) 🎉🎉🎉
 
 - Finally remove the unique-queue constraint and the fact that the framework created multiple queues

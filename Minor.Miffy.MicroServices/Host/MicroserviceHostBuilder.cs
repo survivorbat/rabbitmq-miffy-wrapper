@@ -133,12 +133,25 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         protected virtual object InstantiatePopulatedType(TypeInfo type)
         {
-            ServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
-            Logger.LogTrace($"Instantiating {type.Name} with provided services.");
+            Logger.LogTrace("Building service provider...");
+            ServiceProvider serviceProvider;
 
             try
             {
+                serviceProvider = ServiceCollection.BuildServiceProvider();
+            }
+            catch (Exception exception)
+            {
+                Logger.LogCritical($"Error occured while building service provider with type {type.Name}, error: {exception.Message}");
+                throw;
+            }
+
+            try
+            {
+                Logger.LogTrace($"Instantiating {type.Name} with provided services.");
                 object instance = ActivatorUtilities.CreateInstance(serviceProvider, type);
+
+                Logger.LogTrace($"Instantiated {type.Name} with provided services, return instance.");
                 return instance;
             }
             catch (InvalidOperationException e)
@@ -155,6 +168,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         protected virtual IEnumerable<MethodInfo> GetRelevantMethods(TypeInfo type)
         {
+            Logger.LogDebug($"Retrieving methods from type {type.Name}");
             return type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Where(e => !e.IsSpecialName);
         }
@@ -165,8 +179,11 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         protected virtual void RegisterEventListener(TypeInfo type, MethodInfo method)
         {
+            Logger.LogDebug($"Checking if method {method.Name} is a suitable event listener");
+
             if (!IsMethodSuitableEvent(method, false))
             {
+                Logger.LogCritical($"Method {method.Name} does not have a proper event listener signature in type {type.Name}");
                 throw new BusConfigurationException($"Method {method.Name} does not have a proper eventlistener signature in type {type.Name}");
             }
 
@@ -199,6 +216,7 @@ namespace Minor.Miffy.MicroServices.Host
                     Logger.LogTrace($"Retrieving string data from message with id {message.CorrelationId}");
                     string text = Encoding.Unicode.GetString(message.Body);
 
+                    Logger.LogTrace("Checking if parameter type is equal to a string");
                     if (parameterType == StringType)
                     {
                         Logger.LogTrace($"Parameter type is a string, invoking method for message {message.CorrelationId} with body {text}");
@@ -206,13 +224,14 @@ namespace Minor.Miffy.MicroServices.Host
                         return;
                     }
 
-                    Logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
-
                     try
                     {
+                        Logger.LogTrace($"Deserialized object from message with id {message.CorrelationId} and body {text}");
                         object jsonObject = JsonConvert.DeserializeObject(text, parameterType);
 
-                        Logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance of type {type.Name} with data {text}");
+                        Logger.LogTrace($"Invoking method {method.Name} with message id {message.CorrelationId} and instance " +
+                                        $"of supposed type {type.Name} and actual type {jsonObject?.GetType().Name} with data {text}");
+
                         method.Invoke(instance, new[] {jsonObject});
                     }
                     catch (JsonReaderException readerException)
@@ -230,6 +249,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         protected virtual void RegisterCommandListener(TypeInfo type, MethodInfo method, string queueName)
         {
+            Logger.LogDebug($"Checking if method {method.Name} is a suitable command listener");
             if (!IsMethodSuitableEvent(method, true))
             {
                 throw new BusConfigurationException($"Method {method.Name} does not have a proper commandlistener signature in type {type.Name}");

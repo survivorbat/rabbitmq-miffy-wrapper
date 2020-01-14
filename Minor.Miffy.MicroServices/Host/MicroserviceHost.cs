@@ -173,8 +173,13 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public virtual void Dispose()
         {
+            Logger.LogDebug("Disposing of message receiver");
             MessageReceiver?.Dispose();
+
+            Logger.LogDebug("Disposing each command receiver");
             CommandReceivers.ForEach(e => e.Dispose());
+
+            Logger.LogDebug("Disposing bus context");
             Context.Dispose();
         }
     }
