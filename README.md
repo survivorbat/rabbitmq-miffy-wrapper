@@ -103,7 +103,6 @@ using var builder = new MicroserviceHostBuilder()
 ```
 
 Just make sure an event listener has a EventListener attribute with one or more Topic attributes.
-This host also contains a few C# events that you can subscribe to.
 
 #### Publishing events
 
@@ -264,6 +263,17 @@ And that's about it! Have fun rabbiting :)
 Any incoming events or commands that can not be properly deserialized or other cause issues will be logged as critical.
 In case you encounter such an error, please consider changing your listener's parameter to _string_ as described in the
 **Listening for raw json data** section of this README.
+
+## Library events
+
+This library contains a few C# events (not to be confused with RabbitMQ events) that you can subscribe to.
+These events are:
+
+### IMicroserviceHost
+- EventMessageReceived
+- HostStarted
+- HostPaused
+- HostResumed
 
 ## Notes
 - We encourage you to utilize a loggerfactory for logging, since bugs can easily be found by reading the logs.
