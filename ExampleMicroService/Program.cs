@@ -102,6 +102,14 @@ namespace ExampleMicroService
             host.Start();
 
             /**
+             * Let's add a C# event listener for fun
+             */
+            host.EventMessageReceived += (message, eventArgs) =>
+            {
+                Console.WriteLine("Received a EventMessage!");
+            };
+
+            /**
              * Now let's pretend this service is running somewhere in a cluster
              * and is receiving events, let's fire some events at it
              */

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
+using Minor.Miffy.MicroServices.Host.HostEventArgs;
 using RabbitMQ.Client;
 
 namespace Minor.Miffy.MicroServices.Host
@@ -18,6 +19,26 @@ namespace Minor.Miffy.MicroServices.Host
         /// Connection context
         /// </summary>
         public IBusContext<IConnection> Context { get; }
+
+        /// <summary>
+        /// Handler that fires every time a message comes in
+        /// </summary>
+        public event MessageReceivedEventHandler EventMessageReceived;
+
+        /// <summary>
+        /// Handler that fires once the host starts listening
+        /// </summary>
+        public event HostStartedEventHandler HostStarted;
+
+        /// <summary>
+        /// Handler that fires every time a host is paused
+        /// </summary>
+        public event HostPausedEventHandler HostPaused;
+
+        /// <summary>
+        /// Handler that fires every time a host is resumed
+        /// </summary>
+        public event HostResumedEventHandler HostResumed;
 
         /// <summary>
         /// Indicate whether the host is paused or not
@@ -99,6 +120,7 @@ namespace Minor.Miffy.MicroServices.Host
                 throw new BusConfigurationException("Attempted to start the MicroserviceHost, but it has already started.");
             }
 
+            OnHostStarted();
             IsListening = true;
 
             foreach (MicroserviceCommandListener callback in CommandListeners)
@@ -115,6 +137,7 @@ namespace Minor.Miffy.MicroServices.Host
             MessageReceiver.StartReceivingMessages();
             MessageReceiver.StartHandlingMessages(eventMessage =>
             {
+                OnMessageReceived(eventMessage);
                 foreach (MicroserviceListener microserviceListener in Listeners)
                 {
                     foreach (Regex expression in microserviceListener.TopicRegularExpressions)
@@ -146,6 +169,7 @@ namespace Minor.Miffy.MicroServices.Host
             IsPaused = true;
             MessageReceiver.Pause();
             CommandReceivers.ForEach(e => e.Pause());
+            OnHostPaused();
         }
 
         /// <summary>
@@ -166,6 +190,7 @@ namespace Minor.Miffy.MicroServices.Host
             IsPaused = false;
             MessageReceiver.Resume();
             CommandReceivers.ForEach(e => e.Resume());
+            OnHostResumed();
         }
 
         /// <summary>
@@ -181,6 +206,44 @@ namespace Minor.Miffy.MicroServices.Host
 
             Logger.LogDebug("Disposing bus context");
             Context.Dispose();
+        }
+
+        /// <summary>
+        /// Event invocator for receiving a message
+        /// </summary>
+        protected virtual void OnMessageReceived(EventMessage eventmessage)
+        {
+            EventMessageReceivedEventArgs args = new EventMessageReceivedEventArgs
+            {
+                QueueName = QueueName,
+                TopicExpressions = Topics
+            };
+
+            EventMessageReceived?.Invoke(eventmessage, args);
+        }
+
+        /// <summary>
+        /// Event invocator for when a host is paused
+        /// </summary>
+        protected virtual void OnHostPaused()
+        {
+            HostPaused?.Invoke(this, new HostPausedEventArgs());
+        }
+
+        /// <summary>
+        /// Event invocator for when a host is resumed
+        /// </summary>
+        protected virtual void OnHostResumed()
+        {
+            HostResumed?.Invoke(this, new HostResumedEventArgs());
+        }
+
+        /// <summary>
+        /// Event invocator for when a host is started
+        /// </summary>
+        protected virtual void OnHostStarted()
+        {
+            HostStarted?.Invoke(this, new HostStartedEventArgs());
         }
     }
 }

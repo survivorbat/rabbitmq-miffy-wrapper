@@ -103,6 +103,7 @@ using var builder = new MicroserviceHostBuilder()
 ```
 
 Just make sure an event listener has a EventListener attribute with one or more Topic attributes.
+This host also contains a few C# events that you can subscribe to.
 
 #### Publishing events
 

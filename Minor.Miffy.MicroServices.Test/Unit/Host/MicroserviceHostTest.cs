@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.MicroServices.Host.HostEventArgs;
 using Moq;
 using RabbitMQ.Client;
 
@@ -292,6 +293,42 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
+        public void PausingTriggersHostPausedEventWithProperValues()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            const string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
+
+            host.Start();
+
+            IMicroserviceHost resultHost = null;
+            HostPausedEventArgs eventArgs = null;
+            host.HostPaused += (microserviceHost, args) =>
+            {
+                resultHost = microserviceHost;
+                eventArgs = args;
+            };
+
+            // Act
+            host.Pause();
+
+            // Assert
+            Assert.AreEqual(host, resultHost);
+            Assert.IsNotNull(eventArgs);
+        }
+
+        [TestMethod]
         public void ResumingWhileNotPausedThrowsException()
         {
             // Arrange
@@ -371,6 +408,43 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
+        public void ResumingTriggersHostResumedEventWithProperValues()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            const string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
+
+            host.Start();
+            host.Pause();
+
+            IMicroserviceHost resultHost = null;
+            HostResumedEventArgs eventArgs = null;
+            host.HostResumed += (microserviceHost, args) =>
+            {
+                resultHost = microserviceHost;
+                eventArgs = args;
+            };
+
+            // Act
+            host.Resume();
+
+            // Assert
+            Assert.AreEqual(host, resultHost);
+            Assert.IsNotNull(eventArgs);
+        }
+
+        [TestMethod]
         public void StartingTheHostASecondTimeThrowsException()
         {
             // Arrange
@@ -395,6 +469,40 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             // Assert
             BusConfigurationException exception = Assert.ThrowsException<BusConfigurationException>(Act);
             Assert.AreEqual("Attempted to start the MicroserviceHost, but it has already started.", exception.Message);
+        }
+
+        [TestMethod]
+        public void StartingTriggersHostStartedEventWithProperValues()
+        {
+            // Arrange
+            var contextMock = new Mock<IBusContext<IConnection>>();
+            var receiverMock = new Mock<IMessageReceiver>();
+            var logger = new Mock<ILogger<MicroserviceHost>>();
+
+            const string queue = "testQueue";
+            string[] topics = {"Topic1", "Topic2"};
+
+            contextMock.Setup(e => e.CreateMessageReceiver(queue, topics))
+                .Returns(receiverMock.Object);
+
+            var listeners = new[] {new MicroserviceListener {TopicExpressions = topics} };
+
+            var host = new MicroserviceHost(contextMock.Object, listeners, new List<MicroserviceCommandListener>(), queue, logger.Object);
+
+            IMicroserviceHost resultHost = null;
+            HostStartedEventArgs eventArgs = null;
+            host.HostStarted += (microserviceHost, args) =>
+            {
+                resultHost = microserviceHost;
+                eventArgs = args;
+            };
+
+            // Act
+            host.Start();
+
+            // Assert
+            Assert.AreEqual(host, resultHost);
+            Assert.IsNotNull(eventArgs);
         }
     }
 }

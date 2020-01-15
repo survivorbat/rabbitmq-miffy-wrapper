@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minor.Miffy.MicroServices.Commands;
 using Minor.Miffy.MicroServices.Events;
 using Minor.Miffy.MicroServices.Host;
+using Minor.Miffy.MicroServices.Host.HostEventArgs;
 using Minor.Miffy.MicroServices.Test.Component.EventListeners;
 using Minor.Miffy.TestBus;
 using Newtonsoft.Json;
@@ -37,6 +38,48 @@ namespace Minor.Miffy.MicroServices.Test.Component
             Thread.Sleep(WaitTime);
 
             Assert.AreEqual(message, EventListenerDummy.HandlesResult);
+        }
+
+        [TestMethod]
+        public void EventMessageReceivedIsFiredOnIncomingMessageWithProperValues()
+        {
+            // Arrange
+            const string queueName = "test.queue";
+            const string topicExpression = "TestTopic";
+
+            var testContext = new TestBusContext();
+            using var hostBuilder = new MicroserviceHostBuilder()
+                .WithBusContext(testContext)
+                .AddEventListener<EventListenerDummy>()
+                .WithQueueName(queueName);
+
+            using var host = hostBuilder.CreateHost();
+
+            host.Start();
+
+            EventMessage receivedEventMessage = null;
+            EventMessageReceivedEventArgs receivedEventArgs = null;
+
+            host.EventMessageReceived += (eventMessage, args) =>
+            {
+                receivedEventMessage = eventMessage;
+                receivedEventArgs = args;
+            };
+
+            // Act
+            var message = new DummyEvent(topicExpression);
+            new EventPublisher(testContext).Publish(message);
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(message.Type, receivedEventMessage.EventType);
+            Assert.AreEqual(message.Id, receivedEventMessage.CorrelationId);
+            Assert.AreEqual(message.Timestamp, receivedEventMessage.Timestamp);
+
+            Assert.AreEqual(queueName, receivedEventArgs.QueueName);
+            Assert.AreEqual(1, receivedEventArgs.TopicExpressions.Count());
+            Assert.AreEqual(topicExpression, receivedEventArgs.TopicExpressions.Single());
         }
 
         [TestMethod]

@@ -1,5 +1,13 @@
 # Changelog Miffy Framework
 
+## 2.1.0
+
+- Add events to microservicehost to subscribe to:
+- Added EventMessageReceived event to host, fired whenever a event message comes in
+- Added HostStarted event to host, fired when you call Start()
+- Added HostPaused event to host, fired when you call Pause()
+- Added HostResumed event to host, fired when you call Resume()
+
 ## 2.0.1
 
 - Add more log statements to microservice host
