@@ -30,23 +30,6 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         }
 
         [TestMethod]
-        public void DisposeCallsDisposeOnContext()
-        {
-            // Arrange
-            const string queue = "test.queue";
-            var contextMock = new Mock<IBusContext<IConnection>>();
-            var logger = new Mock<ILogger<MicroserviceHost>>();
-
-            var host = new MicroserviceHost(contextMock.Object, new MicroserviceListener[0], new MicroserviceCommandListener[0], queue, logger.Object);
-
-            // Act
-            host.Dispose();
-
-            // Assert
-            contextMock.Verify(e => e.Dispose(), Times.Once);
-        }
-
-        [TestMethod]
         [DataRow(1)]
         [DataRow(4)]
         [DataRow(20)]
