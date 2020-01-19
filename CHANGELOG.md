@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 2.2.1
+
+- Remove exceptions from testbus
+
 ## 2.2.0
 
 - Remove Dispose method and IDisposable from host builder

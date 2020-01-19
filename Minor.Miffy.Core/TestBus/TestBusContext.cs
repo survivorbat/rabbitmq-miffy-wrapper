@@ -36,8 +36,8 @@ namespace Minor.Miffy.TestBus
         /// Properties that do not matter for the queue but are
         /// here to comply with the interface
         /// </summary>
-        public virtual IConnection Connection => throw new NotImplementedException();
-        public virtual string ExchangeName => throw new NotImplementedException();
+        public virtual IConnection Connection { get; set; }
+        public virtual string ExchangeName { get; set; }
 
         /// <summary>
         /// Return a test message sender to use for testing purposes

@@ -90,18 +90,5 @@ namespace Minor.Miffy.Test.Unit.TestBus
             // Assert
             Assert.ThrowsException<NotImplementedException>(Act);
         }
-
-        [TestMethod]
-        public void ExchangeNameThrowsNotImplementedException()
-        {
-            // Arrange
-            var context = new TestBusContext();
-
-            // Act
-            void Act() => _ = context.ExchangeName;
-
-            // Assert
-            Assert.ThrowsException<NotImplementedException>(Act);
-        }
     }
 }
