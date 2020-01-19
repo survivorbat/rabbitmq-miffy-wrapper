@@ -203,9 +203,6 @@ namespace Minor.Miffy.MicroServices.Host
 
             Logger.LogDebug("Disposing each command receiver");
             CommandReceivers.ForEach(e => e.Dispose());
-
-            Logger.LogDebug("Disposing bus context");
-            Context.Dispose();
         }
 
         /// <summary>

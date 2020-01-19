@@ -2,6 +2,10 @@
 
 ## 2.2.1
 
+- Remove Context dispose from host
+
+## 2.2.1
+
 - Remove exceptions from testbus
 
 ## 2.2.0
