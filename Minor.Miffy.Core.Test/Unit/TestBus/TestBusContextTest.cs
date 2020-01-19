@@ -77,18 +77,5 @@ namespace Minor.Miffy.Test.Unit.TestBus
             Assert.AreSame(queueName, receiver.QueueName);
             Assert.AreSame(topicList, receiver.TopicFilters);
         }
-
-        [TestMethod]
-        public void ConnectionThrowsNotImplementedException()
-        {
-            // Arrange
-            var context = new TestBusContext();
-
-            // Act
-            void Act() => _ = context.Connection;
-
-            // Assert
-            Assert.ThrowsException<NotImplementedException>(Act);
-        }
     }
 }
