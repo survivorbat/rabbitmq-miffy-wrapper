@@ -23,7 +23,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             hostBuilder.AddEventListener<EventListenerDummy>();
@@ -48,7 +48,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
             const string topicExpression = "TestTopic";
 
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder()
+            var hostBuilder = new MicroserviceHostBuilder()
                 .WithBusContext(testContext)
                 .AddEventListener<EventListenerDummy>()
                 .WithQueueName(queueName);
@@ -87,7 +87,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
+            var builder = new MicroserviceHostBuilder().WithBusContext(testContext)
                 .WithQueueName("test.queue")
                 .AddEventListener<MethodEventListener>();
 
@@ -107,7 +107,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             TestBusContext testContext = new TestBusContext();
-            using MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder()
+            MicroserviceHostBuilder hostBuilder = new MicroserviceHostBuilder()
                 .WithQueueName("test.queue")
                 .WithBusContext(testContext);
 
@@ -128,7 +128,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             void Act() => hostBuilder.AddEventListener<WrongParameterEventListener>();
@@ -145,7 +145,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             void Act() => hostBuilder.AddEventListener<WrongParameterAmountEventListener>();
@@ -161,7 +161,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             // Act
             void Act() => hostBuilder.AddEventListener<EventWithReturnTypeEventListener>();
@@ -177,7 +177,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             //Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
                 .WithQueueName("test.queue")
@@ -204,7 +204,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
                 .WithQueueName("test.queue")
@@ -233,7 +233,7 @@ namespace Minor.Miffy.MicroServices.Test.Component
         {
             // Arrange
             var testContext = new TestBusContext();
-            using var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
+            var hostBuilder = new MicroserviceHostBuilder().WithBusContext(testContext);
 
             using var host = hostBuilder
                 .WithQueueName("test.queue")

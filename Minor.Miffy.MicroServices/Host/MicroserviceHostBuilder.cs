@@ -14,7 +14,7 @@ using RabbitMQ.Client;
 
 namespace Minor.Miffy.MicroServices.Host
 {
-    public class MicroserviceHostBuilder : IDisposable
+    public class MicroserviceHostBuilder
     {
         /// <summary>
         /// The parent type of all domain events
@@ -39,7 +39,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Loggerfactory to create logging instances
         /// </summary>
-        protected ILoggerFactory LoggerFactory { get; set; }
+        protected ILoggerFactory LoggerFactory { get; set; } = new NullLoggerFactory();
 
         /// <summary>
         /// Logger to log everything in here
@@ -71,7 +71,6 @@ namespace Minor.Miffy.MicroServices.Host
         /// </summary>
         public MicroserviceHostBuilder()
         {
-            LoggerFactory = new NullLoggerFactory();
             ServiceCollection.AddSingleton(LoggerFactory);
             Logger = LoggerFactory.CreateLogger<MicroserviceHostBuilder>();
         }
@@ -403,14 +402,6 @@ namespace Minor.Miffy.MicroServices.Host
                 CommandListeners,
                 QueueName,
                 LoggerFactory.CreateLogger<MicroserviceHost>());
-        }
-
-        /// <summary>
-        /// Dispose of the logger factoryu
-        /// </summary>
-        public virtual void Dispose()
-        {
-            LoggerFactory?.Dispose();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void RegisterDependenciesInvokesConfigMethod()
         {
             // Arrange
-            using var host = new MicroserviceHostBuilder();
+            var host = new MicroserviceHostBuilder();
             bool hasBeenCalled = false;
 
             // Act
@@ -29,7 +29,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void QueueNameIsAutomaticallySet()
         {
             // Act
-            using var host = new MicroserviceHostBuilder();
+            var host = new MicroserviceHostBuilder();
 
             // Assert
             Assert.IsNotNull(host.QueueName);
@@ -42,7 +42,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void WithQueueNameSetsQueueProperly(string queueName)
         {
             // Arrange
-            using var host = new MicroserviceHostBuilder();
+            var host = new MicroserviceHostBuilder();
 
             // Act
             host.WithQueueName(queueName);
@@ -58,7 +58,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
             var contextMock = new Mock<IBusContext<IConnection>>();
             var context = contextMock.Object;
 
-            using var builder = new MicroserviceHostBuilder();
+            var builder = new MicroserviceHostBuilder();
             builder.WithBusContext(context);
 
             // Act
@@ -66,24 +66,6 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
 
             // Arrange
             Assert.AreSame(context, host.Context);
-        }
-
-        [TestMethod]
-        public void LoggerFactoryIsProperlyDisposed()
-        {
-            // Arrange
-            var loggerFactoryMock = new Mock<ILoggerFactory>();
-
-            var loggerFactory = loggerFactoryMock.Object;
-
-            using var builder = new MicroserviceHostBuilder();
-            builder.SetLoggerFactory(loggerFactory);
-
-            // Act
-            builder.Dispose();
-
-            // Arrange
-            loggerFactoryMock.Verify(e => e.Dispose());
         }
 
         private class TestType1 {}
@@ -95,7 +77,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void RegisterDependenciesRegistersOneExtraDependency()
         {
             // Arrange
-            using var builder = new MicroserviceHostBuilder();
+            var builder = new MicroserviceHostBuilder();
 
             // Act
             builder.RegisterDependencies(e =>
@@ -114,7 +96,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void RegisterDependenciesRegistersMultipleDependencies()
         {
             // Arrange
-            using var builder = new MicroserviceHostBuilder();
+            var builder = new MicroserviceHostBuilder();
 
             // Act
             builder.RegisterDependencies(e =>
@@ -139,7 +121,7 @@ namespace Minor.Miffy.MicroServices.Test.Unit.Host
         public void RegisterDependenciesAddsToExistingServiceCollection()
         {
             // Arrange
-            using var builder = new MicroserviceHostBuilder();
+            var builder = new MicroserviceHostBuilder();
 
             ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<TestType1>();

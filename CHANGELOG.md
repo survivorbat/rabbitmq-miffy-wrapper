@@ -1,5 +1,10 @@
 # Changelog Miffy Framework
 
+## 2.2.0
+
+- Remove Dispose method and IDisposable from host builder
+- Remove loggerfactory dispose in host builder
+
 ## 2.1.0
 
 - Add events to microservicehost to subscribe to:

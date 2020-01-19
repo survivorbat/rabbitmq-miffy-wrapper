@@ -81,7 +81,7 @@ Now that we have that setup, we can register the event listener in our hostbuild
 ```c#
 // Context builder code
 
-using var builder = new MicroserviceHostBuilder()
+var builder = new MicroserviceHostBuilder()
 				.WithQueueName("MyService.Queue")
                 .WithBusContext(context)
                 .AddEventListener<ExampleEventListener>();
@@ -96,7 +96,7 @@ And voila! Incoming events matching the topic will now be handled by the Handles
 
 You can also allow reflection to take care of registering listeners, for example:
 ```c#
-using var builder = new MicroserviceHostBuilder()
+var builder = new MicroserviceHostBuilder()
 				.WithQueueName("MyService.Queue")
                 .WithBusContext(context)
                 .UseConventions();
@@ -205,7 +205,7 @@ Now that we have that setup, we can register the command listener in our hostbui
 ```c#
 // Context builder code
 
-using var builder = new MicroserviceHostBuilder()
+var builder = new MicroserviceHostBuilder()
                 .WithBusContext(context)
                 .AddEventListener<ExampleCommandListener>();
 

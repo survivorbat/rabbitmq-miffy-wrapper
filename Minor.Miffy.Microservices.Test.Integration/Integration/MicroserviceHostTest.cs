@@ -263,7 +263,7 @@ namespace Minor.Miffy.Microservices.Test.Integration.Integration
                 .WithExchange("TestExchange")
                 .CreateContext();
 
-            using var builder = new MicroserviceHostBuilder()
+            var builder = new MicroserviceHostBuilder()
                 .WithBusContext(busContext)
                 .AddEventListener<FanInEventListener>();
 
