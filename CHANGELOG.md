@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 2.3.0
+
+- Added EventMessageHandled event to host, fired whenever a message is handled
+
 ## 2.2.1
 
 - Remove Context dispose from host

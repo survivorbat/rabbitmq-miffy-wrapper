@@ -83,6 +83,48 @@ namespace Minor.Miffy.MicroServices.Test.Component
         }
 
         [TestMethod]
+        public void EventMessageHandledIsFiredOnIncomingMessageWithProperValues()
+        {
+            // Arrange
+            const string queueName = "test.queue";
+            const string topicExpression = "TestTopic";
+
+            var testContext = new TestBusContext();
+            var hostBuilder = new MicroserviceHostBuilder()
+                .WithBusContext(testContext)
+                .AddEventListener<EventListenerDummy>()
+                .WithQueueName(queueName);
+
+            using var host = hostBuilder.CreateHost();
+
+            host.Start();
+
+            EventMessage receivedEventMessage = null;
+            EventMessageHandledEventArgs receivedEventArgs = null;
+
+            host.EventMessageHandled += (eventMessage, args) =>
+            {
+                receivedEventMessage = eventMessage;
+                receivedEventArgs = args;
+            };
+
+            // Act
+            var message = new DummyEvent(topicExpression);
+            new EventPublisher(testContext).Publish(message);
+
+            Thread.Sleep(WaitTime);
+
+            // Assert
+            Assert.AreEqual(message.Type, receivedEventMessage.EventType);
+            Assert.AreEqual(message.Id, receivedEventMessage.CorrelationId);
+            Assert.AreEqual(message.Timestamp, receivedEventMessage.Timestamp);
+
+            Assert.AreEqual(queueName, receivedEventArgs.QueueName);
+            Assert.AreEqual(1, receivedEventArgs.TopicExpressions.Count());
+            Assert.AreEqual(topicExpression, receivedEventArgs.TopicExpressions.Single());
+        }
+
+        [TestMethod]
         public void AddingListenerOnlyAddsRelevantMethod()
         {
             // Arrange

@@ -10,6 +10,7 @@ namespace Minor.Miffy.MicroServices.Host
     public interface IMicroserviceHost : IDisposable
     {
         event MessageReceivedEventHandler EventMessageReceived;
+        event MessageHandledEventHandler EventMessageHandled;
         event HostStartedEventHandler HostStarted;
         event HostPausedEventHandler HostPaused;
         event HostResumedEventHandler HostResumed;
@@ -38,6 +39,7 @@ namespace Minor.Miffy.MicroServices.Host
     }
 
     public delegate void MessageReceivedEventHandler(EventMessage eventMessage, EventMessageReceivedEventArgs args);
+    public delegate void MessageHandledEventHandler(EventMessage eventMessage, EventMessageHandledEventArgs args);
     public delegate void HostStartedEventHandler(IMicroserviceHost microserviceHost, HostStartedEventArgs args);
     public delegate void HostPausedEventHandler(IMicroserviceHost microserviceHost, HostPausedEventArgs args);
     public delegate void HostResumedEventHandler(IMicroserviceHost microserviceHost, HostResumedEventArgs args);

@@ -26,6 +26,11 @@ namespace Minor.Miffy.MicroServices.Host
         public event MessageReceivedEventHandler EventMessageReceived;
 
         /// <summary>
+        /// Handler that fires every time a message is handled
+        /// </summary>
+        public event MessageHandledEventHandler EventMessageHandled;
+
+        /// <summary>
         /// Handler that fires once the host starts listening
         /// </summary>
         public event HostStartedEventHandler HostStarted;
@@ -137,7 +142,7 @@ namespace Minor.Miffy.MicroServices.Host
             MessageReceiver.StartReceivingMessages();
             MessageReceiver.StartHandlingMessages(eventMessage =>
             {
-                OnMessageReceived(eventMessage);
+                OnEventMessageReceived(eventMessage);
                 foreach (MicroserviceListener microserviceListener in Listeners)
                 {
                     foreach (Regex expression in microserviceListener.TopicRegularExpressions)
@@ -148,6 +153,7 @@ namespace Minor.Miffy.MicroServices.Host
                         }
                     }
                 }
+                OnEventMessageHandled(eventMessage);
             });
         }
 
@@ -208,7 +214,7 @@ namespace Minor.Miffy.MicroServices.Host
         /// <summary>
         /// Event invocator for receiving a message
         /// </summary>
-        protected virtual void OnMessageReceived(EventMessage eventmessage)
+        protected virtual void OnEventMessageReceived(EventMessage eventmessage)
         {
             EventMessageReceivedEventArgs args = new EventMessageReceivedEventArgs
             {
@@ -217,6 +223,20 @@ namespace Minor.Miffy.MicroServices.Host
             };
 
             EventMessageReceived?.Invoke(eventmessage, args);
+        }
+
+        /// <summary>
+        /// Event invocator for handling a message
+        /// </summary>
+        protected virtual void OnEventMessageHandled(EventMessage eventmessage)
+        {
+            EventMessageHandledEventArgs args = new EventMessageHandledEventArgs
+            {
+                QueueName = QueueName,
+                TopicExpressions = Topics
+            };
+
+            EventMessageHandled?.Invoke(eventmessage, args);
         }
 
         /// <summary>

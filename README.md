@@ -271,6 +271,7 @@ These events are:
 
 ### IMicroserviceHost
 - EventMessageReceived
+- EventMessageHandled
 - HostStarted
 - HostPaused
 - HostResumed
