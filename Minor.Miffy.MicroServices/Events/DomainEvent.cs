@@ -12,7 +12,7 @@ namespace Minor.Miffy.MicroServices.Events
         /// The Topic is used by the underlying protocol to route events to subscribers
         /// </summary>
         [JsonProperty]
-        protected internal string Topic { get; internal set; }
+        public string Topic { get; internal set; }
 
         /// <summary>
         /// The Timestamp is set to the creation time of the domain event.

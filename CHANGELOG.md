@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 2.3.1
+
+- The **Topic** property on DomainEvents is now public
+
 ## 2.3.0
 
 - Added EventMessageHandled event to host, fired whenever a message is handled
