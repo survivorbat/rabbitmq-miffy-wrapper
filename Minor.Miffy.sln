@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.Core", "Minor.Miffy.Core\Minor.Miffy.Core.csproj", "{47F7C74F-1730-42F5-A5C2-7802F0AFD182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miffy.Core", "Miffy.Core\Miffy.Core.csproj", "{47F7C74F-1730-42F5-A5C2-7802F0AFD182}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minor.Miffy.MicroServices", "Minor.Miffy.MicroServices\Minor.Miffy.MicroServices.csproj", "{7D36EFF3-C185-41F8-958D-5DBB55E7B344}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miffy.MicroServices", "Miffy.MicroServices\Miffy.MicroServices.csproj", "{7D36EFF3-C185-41F8-958D-5DBB55E7B344}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleMicroService", "ExampleMicroService\ExampleMicroService.csproj", "{43AEDA7E-2E10-42DD-8967-74D2B1EE1DFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus", "Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj", "{183F572D-7160-4B29-ABC3-367A9E874488}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.RabbitMQBus", "Miffy.RabbitMQBus\Miffy.RabbitMQBus.csproj", "{183F572D-7160-4B29-ABC3-367A9E874488}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.Core.Test", "Minor.Miffy.Core.Test\Minor.Miffy.Core.Test.csproj", "{6628A592-5D27-4F54-9C0F-2B36D42C0023}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.Core.Test", "Miffy.Core.Test\Miffy.Core.Test.csproj", "{6628A592-5D27-4F54-9C0F-2B36D42C0023}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus.Test", "Minor.Miffy.RabbitMQBus.Test\Minor.Miffy.RabbitMQBus.Test.csproj", "{019C1378-C135-425A-A59B-80285364165E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.RabbitMQBus.Test", "Miffy.RabbitMQBus.Test\Miffy.RabbitMQBus.Test.csproj", "{019C1378-C135-425A-A59B-80285364165E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.MicroServices.Test", "Minor.Miffy.MicroServices.Test\Minor.Miffy.MicroServices.Test.csproj", "{EF238689-8FA9-4D93-B58E-08DD1970E324}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.MicroServices.Test", "Miffy.MicroServices.Test\Miffy.MicroServices.Test.csproj", "{EF238689-8FA9-4D93-B58E-08DD1970E324}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.MicroServices.Test.Conventions", "Minor.Miffy.MicroServices.Test.Conventions\Minor.Miffy.MicroServices.Test.Conventions.csproj", "{6AA9C809-73C3-4666-B729-4A45BA5FA833}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.MicroServices.Test.Conventions", "Miffy.MicroServices.Test.Conventions\Miffy.MicroServices.Test.Conventions.csproj", "{6AA9C809-73C3-4666-B729-4A45BA5FA833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.Microservices.Test.Integration", "Minor.Miffy.Microservices.Test.Integration\Minor.Miffy.Microservices.Test.Integration.csproj", "{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.Microservices.Test.Integration", "Miffy.Microservices.Test.Integration\Miffy.Microservices.Test.Integration.csproj", "{7A2E5F9B-5FB3-475B-9243-9466E1D9A59D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minor.Miffy.RabbitMQBus.Test.Integration", "Minor.Miffy.RabbitMQBus.Test.Integration\Minor.Miffy.RabbitMQBus.Test.Integration.csproj", "{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miffy.RabbitMQBus.Test.Integration", "Miffy.RabbitMQBus.Test.Integration\Miffy.RabbitMQBus.Test.Integration.csproj", "{1EB42A69-1E0C-4E07-91D7-551737B0BF5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

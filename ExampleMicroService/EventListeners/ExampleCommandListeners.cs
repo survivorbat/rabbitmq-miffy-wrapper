@@ -1,8 +1,8 @@
 using ExampleMicroService.Commands;
 using ExampleMicroService.DAL;
 using ExampleMicroService.Exceptions;
-using Minor.Miffy.MicroServices.Commands;
-using Minor.Miffy.MicroServices.Events;
+using Miffy.MicroServices.Commands;
+using Miffy.MicroServices.Events;
 
 namespace ExampleMicroService.EventListeners
 {

@@ -7,11 +7,11 @@ using ExampleMicroService.Events;
 using ExampleMicroService.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Minor.Miffy;
-using Minor.Miffy.MicroServices.Commands;
-using Minor.Miffy.MicroServices.Events;
-using Minor.Miffy.MicroServices.Host;
-using Minor.Miffy.RabbitMQBus;
+using Miffy;
+using Miffy.MicroServices.Commands;
+using Miffy.MicroServices.Events;
+using Miffy.MicroServices.Host;
+using Miffy.RabbitMQBus;
 using RabbitMQ.Client;
 
 namespace ExampleMicroService

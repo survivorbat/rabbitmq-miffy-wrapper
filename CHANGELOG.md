@@ -1,5 +1,9 @@
 # Changelog Miffy Framework
 
+## 2.4.0
+
+- Changed Minor.Miffy to just Miffy
+
 ## 2.3.1
 
 - The **Topic** property on DomainEvents is now public

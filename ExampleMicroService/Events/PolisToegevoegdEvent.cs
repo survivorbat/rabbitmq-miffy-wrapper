@@ -1,5 +1,5 @@
 ﻿using ExampleMicroService.Models;
-using Minor.Miffy.MicroServices.Events;
+using Miffy.MicroServices.Events;
 
 namespace ExampleMicroService.Events
 {

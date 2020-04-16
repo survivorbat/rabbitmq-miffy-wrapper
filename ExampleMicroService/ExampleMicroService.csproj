@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Minor.Miffy.Core\Minor.Miffy.Core.csproj" />
-    <ProjectReference Include="..\Minor.Miffy.MicroServices\Minor.Miffy.MicroServices.csproj" />
-    <ProjectReference Include="..\Minor.Miffy.RabbitMQBus\Minor.Miffy.RabbitMQBus.csproj" />
+    <ProjectReference Include="..\Miffy.Core\Miffy.Core.csproj" />
+    <ProjectReference Include="..\Miffy.MicroServices\Miffy.MicroServices.csproj" />
+    <ProjectReference Include="..\Miffy.RabbitMQBus\Miffy.RabbitMQBus.csproj" />
   </ItemGroup>
 
 </Project>

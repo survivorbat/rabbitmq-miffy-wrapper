@@ -1,4 +1,4 @@
-using Minor.Miffy.MicroServices.Commands;
+using Miffy.MicroServices.Commands;
 
 namespace ExampleMicroService.Commands
 {

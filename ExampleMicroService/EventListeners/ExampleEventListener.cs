@@ -2,7 +2,7 @@
 using ExampleMicroService.DAL;
 using ExampleMicroService.Events;
 using Microsoft.Extensions.Logging;
-using Minor.Miffy.MicroServices.Events;
+using Miffy.MicroServices.Events;
 
 namespace ExampleMicroService.EventListeners
 {
