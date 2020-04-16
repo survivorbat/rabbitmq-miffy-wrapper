@@ -77,7 +77,7 @@ stages:
   - stage: Release
     displayName: Release
     dependsOn: Integration
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
     jobs:
       - job: Release
         displayName: Release
