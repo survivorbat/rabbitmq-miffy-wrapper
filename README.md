@@ -1,6 +1,7 @@
 # Miffy: RabbitMQ .NET Core Wrapper
 
 ![GitHub](https://img.shields.io/github/license/survivorbat/rabbitmq-miffy-wrapper)
+![Nuget](https://img.shields.io/nuget/v/Miffy.Abstractions)
 
 **Important: This package has been moved from MaartenH.Minor.Miffy to just Miffy! If you're still using MaartenH.Minor.Miffy please consider moving.**
 
