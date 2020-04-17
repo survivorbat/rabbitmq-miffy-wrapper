@@ -13,16 +13,19 @@ Contains all the interfaces and base classes of the framework.
 This package also contains a testbus for in-memory queueing.
 
 ![Nuget](https://img.shields.io/nuget/dt/Miffy.Abstractions)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.Abstractions)
 
 **Miffy.MicroServices**
 The package containing the classes used to set up a microservice host.
 
 ![Nuget](https://img.shields.io/nuget/dt/Miffy.MicroServices)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.MicroServices)
 
 **Miffy.RabbitMQBus**
 Implementation classes to use RabbitMQ with the framework
 
 ![Nuget](https://img.shields.io/nuget/dt/Miffy.RabbitMQBus)
+![Nuget](https://img.shields.io/nuget/dt/MaartenH.Minor.Miffy.RabbitMQBus)
 
 These packages can be found on nuget.org.
 
